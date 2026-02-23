@@ -1,0 +1,271 @@
+import { create } from "zustand";
+import type {
+  Player,
+  Quest,
+  ChatMessage,
+  EditorFile,
+  FileTreeNode,
+  Locale,
+  AppSettings,
+  DiffViewerState,
+  ActionCardData,
+  ActionLogData,
+  ProjectScanResult,
+} from "../types/game";
+
+interface GameState {
+  player: Player;
+  quests: Quest[];
+  messages: ChatMessage[];
+  showLevelUp: boolean;
+  newLevel: number;
+  isForging: boolean;
+
+  // Editor state
+  currentFile: EditorFile | null;
+  openFiles: EditorFile[];
+  fileTree: FileTreeNode[];
+  fileTreeRoot: string;
+  linesWritten: number;
+  lastSaveTime: number | null;
+  sessionStartTime: number;
+
+  // Diff viewer
+  diffViewer: DiffViewerState;
+
+  // i18n & settings
+  locale: Locale;
+  settings: AppSettings;
+  showSettings: boolean;
+
+  // Project scan
+  projectScan: ProjectScanResult | null;
+
+  // AI state
+  isAiResponding: boolean;
+
+  // App lifecycle
+  appReady: boolean;
+
+  // Actions
+  setPlayer: (player: Player) => void;
+  setQuests: (quests: Quest[]) => void;
+  addMessage: (msg: Omit<ChatMessage, "id" | "timestamp">) => void;
+  triggerLevelUp: (level: number) => void;
+  dismissLevelUp: () => void;
+  setForging: (v: boolean) => void;
+
+  // Editor actions
+  openFile: (file: EditorFile) => void;
+  closeFile: (path: string) => void;
+  updateFileContent: (path: string, content: string) => void;
+  markFileSaved: (path: string) => void;
+  setFileTree: (tree: FileTreeNode[]) => void;
+  setFileTreeRoot: (root: string) => void;
+  incrementLines: (delta: number) => void;
+  resetLinesWritten: () => void;
+
+  // Diff viewer actions
+  showDiffViewer: (filePath: string, fileName: string, oldContent: string, newContent: string) => void;
+  closeDiffViewer: () => void;
+
+  // Message helpers
+  addActionCard: (card: ActionCardData) => void;
+  addActionLog: (log: ActionLogData) => void;
+  updateLastMessage: (content: string) => void;
+
+  // Settings actions
+  setLocale: (locale: Locale) => void;
+  setSettings: (settings: AppSettings) => void;
+  toggleSettings: () => void;
+
+  // Project actions
+  setProjectScan: (scan: ProjectScanResult | null) => void;
+
+  // AI actions
+  setAiResponding: (v: boolean) => void;
+
+  // App lifecycle
+  setAppReady: (v: boolean) => void;
+}
+
+const defaultPlayer: Player = {
+  name: "Codemancer",
+  level: 0,
+  total_exp: 0,
+  exp_progress: 0,
+  exp_for_next_level: 100,
+  hp: 100,
+  max_hp: 100,
+  mp: 50,
+  max_mp: 50,
+};
+
+const defaultSettings: AppSettings = {
+  locale: "en",
+  workspace_root: "",
+  font_size: 14,
+  theme: "vs-dark",
+  anthropic_api_key: "",
+  claude_model: "claude-sonnet-4-20250514",
+  auth_method: "api_key",
+  oauth_access_token: "",
+  oauth_refresh_token: "",
+};
+
+export const useGameStore = create<GameState>((set) => ({
+  player: defaultPlayer,
+  quests: [],
+  messages: [],
+  showLevelUp: false,
+  newLevel: 0,
+  isForging: false,
+
+  currentFile: null,
+  openFiles: [],
+  fileTree: [],
+  fileTreeRoot: "",
+  linesWritten: 0,
+  lastSaveTime: null,
+  sessionStartTime: Date.now(),
+
+  diffViewer: { show: false, filePath: "", fileName: "", oldContent: "", newContent: "" },
+
+  locale: "en",
+  settings: defaultSettings,
+  showSettings: false,
+
+  projectScan: null,
+  isAiResponding: false,
+  appReady: false,
+
+  setPlayer: (player) => set({ player }),
+  setQuests: (quests) => set({ quests }),
+
+  addMessage: (msg) =>
+    set((s) => ({
+      messages: [
+        ...s.messages,
+        { ...msg, id: crypto.randomUUID(), timestamp: Date.now() },
+      ],
+    })),
+
+  triggerLevelUp: (level) => set({ showLevelUp: true, newLevel: level }),
+  dismissLevelUp: () => set({ showLevelUp: false }),
+  setForging: (v) => set({ isForging: v }),
+
+  // Editor actions
+  openFile: (file) =>
+    set((s) => {
+      const exists = s.openFiles.find((f) => f.path === file.path);
+      if (exists) {
+        return { currentFile: exists };
+      }
+      return {
+        openFiles: [...s.openFiles, file],
+        currentFile: file,
+      };
+    }),
+
+  closeFile: (path) =>
+    set((s) => {
+      const filtered = s.openFiles.filter((f) => f.path !== path);
+      const newCurrent =
+        s.currentFile?.path === path
+          ? filtered[filtered.length - 1] ?? null
+          : s.currentFile;
+      return { openFiles: filtered, currentFile: newCurrent };
+    }),
+
+  updateFileContent: (path, content) =>
+    set((s) => {
+      const openFiles = s.openFiles.map((f) =>
+        f.path === path ? { ...f, content, isDirty: true } : f
+      );
+      const currentFile =
+        s.currentFile?.path === path
+          ? { ...s.currentFile, content, isDirty: true }
+          : s.currentFile;
+      return { openFiles, currentFile };
+    }),
+
+  markFileSaved: (path) =>
+    set((s) => {
+      const openFiles = s.openFiles.map((f) =>
+        f.path === path ? { ...f, isDirty: false } : f
+      );
+      const currentFile =
+        s.currentFile?.path === path
+          ? { ...s.currentFile, isDirty: false }
+          : s.currentFile;
+      return { openFiles, currentFile, lastSaveTime: Date.now() };
+    }),
+
+  setFileTree: (tree) => set({ fileTree: tree }),
+  setFileTreeRoot: (root) => set({ fileTreeRoot: root }),
+
+  incrementLines: (delta) =>
+    set((s) => ({ linesWritten: s.linesWritten + Math.max(0, delta) })),
+
+  resetLinesWritten: () => set({ linesWritten: 0 }),
+
+  showDiffViewer: (filePath, fileName, oldContent, newContent) =>
+    set({ diffViewer: { show: true, filePath, fileName, oldContent, newContent } }),
+
+  closeDiffViewer: () =>
+    set((s) => ({ diffViewer: { ...s.diffViewer, show: false } })),
+
+  addActionCard: (card) =>
+    set((s) => ({
+      messages: [
+        ...s.messages,
+        {
+          id: crypto.randomUUID(),
+          role: "system" as const,
+          content: card.fileName,
+          timestamp: Date.now(),
+          type: "action_card" as const,
+          actionCard: card,
+        },
+      ],
+    })),
+
+  addActionLog: (log) =>
+    set((s) => ({
+      messages: [
+        ...s.messages,
+        {
+          id: crypto.randomUUID(),
+          role: "system" as const,
+          content: log.action,
+          timestamp: Date.now(),
+          type: "action_log" as const,
+          actionLog: log,
+        },
+      ],
+    })),
+
+  updateLastMessage: (content) =>
+    set((s) => {
+      const msgs = [...s.messages];
+      if (msgs.length > 0) {
+        const last = msgs[msgs.length - 1];
+        msgs[msgs.length - 1] = { ...last, content };
+      }
+      return { messages: msgs };
+    }),
+
+  setLocale: (locale) =>
+    set((s) => ({ locale, settings: { ...s.settings, locale } })),
+
+  setSettings: (settings) =>
+    set({ settings, locale: settings.locale }),
+
+  toggleSettings: () => set((s) => ({ showSettings: !s.showSettings })),
+
+  setProjectScan: (scan) => set({ projectScan: scan }),
+
+  setAiResponding: (v) => set({ isAiResponding: v }),
+
+  setAppReady: (v) => set({ appReady: v }),
+}));
