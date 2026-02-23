@@ -129,6 +129,23 @@ const api = {
 
   getAllChatModels: () =>
     fetchJson<Record<string, AIModel[]>>("/api/chat/models"),
+
+  // Commands
+  execCommand: (cmd: string, args: string[] = []) =>
+    fetchJson<{ status: string; output: string; exit_code: number }>("/api/commands/exec", {
+      method: "POST",
+      body: JSON.stringify({ cmd, args }),
+    }),
+
+  // Recent projects
+  getRecentProjects: () =>
+    fetchJson<{ path: string; name: string; last_opened: number }[]>("/api/settings/recent-projects"),
+
+  addRecentProject: (path: string, name?: string) =>
+    fetchJson<{ path: string; name: string; last_opened: number }[]>("/api/settings/add-project", {
+      method: "POST",
+      body: JSON.stringify({ path, name: name || "" }),
+    }),
 };
 
 export function useApi() {

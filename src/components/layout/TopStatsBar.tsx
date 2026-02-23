@@ -1,4 +1,5 @@
-import { Settings, FolderOpen, Shield } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Settings, FolderOpen, Shield, HardDrive, ChevronDown } from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { StatBar } from "../bars/StatBar";
 import { ExpBar } from "../bars/ExpBar";
@@ -6,6 +7,12 @@ import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
 import { shortenPath } from "../../utils/paths";
+
+interface RecentProject {
+  path: string;
+  name: string;
+  last_opened: number;
+}
 
 export function TopStatsBar() {
   const player = useGameStore((s) => s.player);
@@ -18,16 +25,36 @@ export function TopStatsBar() {
   const setFileTreeRoot = useGameStore((s) => s.setFileTreeRoot);
   const addActionCard = useGameStore((s) => s.addActionCard);
   const addActionLog = useGameStore((s) => s.addActionLog);
+  const totalBytesProcessed = useGameStore((s) => s.totalBytesProcessed);
   const api = useApi();
   const { t } = useTranslation();
 
-  const handlePickFolder = async () => {
-    try {
-      const selected = await open({ directory: true, multiple: false });
-      if (!selected) return;
+  const [recentProjects, setRecentProjects] = useState<RecentProject[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-      const path = selected as string;
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    if (showDropdown) {
+      document.addEventListener("mousedown", handler);
+      return () => document.removeEventListener("mousedown", handler);
+    }
+  }, [showDropdown]);
 
+  const formatBytes = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const loadAndSwitchProject = useCallback(
+    async (path: string) => {
+      setShowDropdown(false);
       const newSettings = { ...settings, workspace_root: path };
       setSettings(newSettings);
       setFileTreeRoot(path);
@@ -35,21 +62,45 @@ export function TopStatsBar() {
 
       addActionLog({ action: t("project.scanning"), status: "pending" });
 
-      const scan = await api.scanProject(path, true);
-      setProjectScan(scan);
+      try {
+        const scan = await api.scanProject(path, true);
+        setProjectScan(scan);
+        const updatedPlayer = await api.getStatus();
+        setPlayer(updatedPlayer);
+        await api.addRecentProject(path);
+        addActionCard({
+          fileName: `[PROJECT LOADED]: ${shortenPath(path)}`,
+          status: "done",
+          filePath: path,
+          expGained: scan.exp_gained,
+        });
+      } catch {
+        addActionLog({ action: t("project.scanFailed"), status: "error" });
+      }
+    },
+    [settings, setSettings, setFileTreeRoot, api, addActionLog, setProjectScan, setPlayer, addActionCard, t]
+  );
 
-      const updatedPlayer = await api.getStatus();
-      setPlayer(updatedPlayer);
-
-      addActionCard({
-        fileName: `[PROJECT LOADED]: ${shortenPath(path)}`,
-        status: "done",
-        filePath: path,
-        expGained: scan.exp_gained,
-      });
+  const handlePickFolder = async () => {
+    try {
+      const selected = await open({ directory: true, multiple: false });
+      if (!selected) return;
+      await loadAndSwitchProject(selected as string);
     } catch {
       addActionLog({ action: t("project.scanFailed"), status: "error" });
     }
+  };
+
+  const handleToggleDropdown = async () => {
+    if (!showDropdown) {
+      try {
+        const projects = await api.getRecentProjects();
+        setRecentProjects(projects);
+      } catch {
+        // ignore
+      }
+    }
+    setShowDropdown(!showDropdown);
   };
 
   return (
@@ -70,8 +121,8 @@ export function TopStatsBar() {
       {/* Divider */}
       <div className="w-px h-5 bg-[var(--theme-glass-border)]" />
 
-      {/* Folder picker + project path */}
-      <div className="flex items-center gap-1.5 min-w-0">
+      {/* Folder picker + project path + recent projects dropdown */}
+      <div className="flex items-center gap-1.5 min-w-0 relative" ref={dropdownRef}>
         <button
           onClick={handlePickFolder}
           className="p-1 rounded hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent transition-colors shrink-0"
@@ -80,12 +131,34 @@ export function TopStatsBar() {
           <FolderOpen className="w-3.5 h-3.5" strokeWidth={1.5} />
         </button>
         {projectScan && (
-          <span className="text-[10px] text-theme-text-dim font-mono truncate max-w-[200px]" title={projectScan.path}>
+          <button
+            onClick={handleToggleDropdown}
+            className="flex items-center gap-0.5 text-[10px] text-theme-text-dim font-mono truncate max-w-[200px] hover:text-theme-accent transition-colors"
+            title={projectScan.path}
+          >
             {shortenPath(projectScan.path)}
             <span className="text-theme-text-dimmer ml-1.5">
               [{projectScan.total_files} files]
             </span>
-          </span>
+            <ChevronDown className="w-2.5 h-2.5 ml-0.5 shrink-0" strokeWidth={1.5} />
+          </button>
+        )}
+
+        {/* Recent projects dropdown */}
+        {showDropdown && recentProjects.length > 0 && (
+          <div className="absolute top-full left-0 mt-1 z-50 glass-panel border border-[var(--theme-glass-border)] rounded shadow-lg min-w-[240px] py-1">
+            {recentProjects.map((p) => (
+              <button
+                key={p.path}
+                onClick={() => loadAndSwitchProject(p.path)}
+                className="w-full text-left px-3 py-1.5 text-[10px] font-mono text-theme-text-dim hover:bg-theme-accent/10 hover:text-theme-accent transition-colors truncate"
+                title={p.path}
+              >
+                <span className="text-theme-text">{p.name}</span>
+                <span className="text-theme-text-dimmer ml-2">{shortenPath(p.path)}</span>
+              </button>
+            ))}
+          </div>
         )}
       </div>
 
@@ -104,6 +177,19 @@ export function TopStatsBar() {
           <ExpBar />
         </div>
       </div>
+
+      {/* Memory Usage */}
+      {totalBytesProcessed > 0 && (
+        <>
+          <div className="w-px h-5 bg-[var(--theme-glass-border)]" />
+          <div className="flex items-center gap-1">
+            <HardDrive className="w-3 h-3 text-theme-accent/60" strokeWidth={1.5} />
+            <span className="text-[10px] font-mono text-theme-accent/60">
+              {t("stats.data")}: {formatBytes(totalBytesProcessed)}
+            </span>
+          </div>
+        </>
+      )}
 
       {/* Settings */}
       <button

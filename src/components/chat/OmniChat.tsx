@@ -9,6 +9,17 @@ import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
 import { shortenPath } from "../../utils/paths";
 
+const TOOL_DISPLAY_NAMES: Record<string, string> = {
+  list_files: "Scanning sector",
+  read_file: "Extracting data",
+  write_file: "Deploying patch",
+  search_text: "Signal sweep",
+};
+
+function getToolDisplayName(toolName: string): string {
+  return TOOL_DISPLAY_NAMES[toolName] || toolName;
+}
+
 export function OmniChat() {
   const messages = useGameStore((s) => s.messages);
   const addMessage = useGameStore((s) => s.addMessage);
@@ -20,6 +31,9 @@ export function OmniChat() {
   const isAiResponding = useGameStore((s) => s.isAiResponding);
   const setAiResponding = useGameStore((s) => s.setAiResponding);
   const updateLastMessage = useGameStore((s) => s.updateLastMessage);
+  const addActionLog = useGameStore((s) => s.addActionLog);
+  const addActionCard = useGameStore((s) => s.addActionCard);
+  const addBytesProcessed = useGameStore((s) => s.addBytesProcessed);
   const showDiffViewer = useGameStore((s) => s.showDiffViewer);
   const scrollRef = useRef<HTMLDivElement>(null);
   const api = useApi();
@@ -33,9 +47,26 @@ export function OmniChat() {
     });
   }, [messages]);
 
+  const handleGitCommand = useCallback(
+    async (cmd: string, args: string[] = []) => {
+      addActionLog({ action: `[EXECUTING]: ${cmd} ${args.join(" ")}`.trim(), status: "pending" });
+      try {
+        const result = await api.execCommand(cmd, args);
+        addActionLog({
+          action: `[${result.status === "success" ? "COMPLETE" : "FAULT"}]: ${result.output.slice(0, 200)}`,
+          status: result.status === "success" ? "done" : "error",
+        });
+      } catch {
+        addActionLog({ action: "[FAULT]: Command execution failed", status: "error" });
+      }
+    },
+    [api, addActionLog]
+  );
+
   const handleSlashCommand = useCallback(
     (text: string): boolean => {
-      const cmd = text.trim().toLowerCase();
+      const trimmed = text.trim();
+      const cmd = trimmed.toLowerCase();
 
       if (cmd === "/status") {
         let info = `**${player.name}** | Lv.${player.level} | EXP: ${player.total_exp}\nHP: ${player.hp}/${player.max_hp} | MP: ${player.mp}/${player.max_mp}`;
@@ -67,11 +98,39 @@ export function OmniChat() {
         return true;
       }
 
+      // Git commands
+      if (cmd === "/git-status") {
+        handleGitCommand("git status");
+        return true;
+      }
+      if (cmd === "/git-diff") {
+        handleGitCommand("git diff");
+        return true;
+      }
+      if (cmd === "/git-log") {
+        handleGitCommand("git log --oneline -10");
+        return true;
+      }
+      if (cmd === "/push") {
+        handleGitCommand("git push");
+        return true;
+      }
+      if (cmd.startsWith("/commit ")) {
+        const msg = trimmed.slice(8).trim();
+        if (msg) {
+          handleGitCommand("git add .");
+          handleGitCommand(`git commit -m`, [JSON.stringify(msg)]);
+        } else {
+          addMessage({ role: "system", content: t("slash.commitNoMsg") });
+        }
+        return true;
+      }
+
       // Unknown slash command
       addMessage({ role: "system", content: t("slash.unknown") });
       return true;
     },
-    [addMessage, player, projectScan, t]
+    [addMessage, player, projectScan, t, handleGitCommand]
   );
 
   const handleSend = useCallback(
@@ -169,13 +228,72 @@ export function OmniChat() {
             if (!line.startsWith("data: ")) continue;
             try {
               const data = JSON.parse(line.slice(6));
-              if (data.done) break;
+
+              if (data.done) {
+                // Final event with totals
+                if (data.total_bytes_processed) {
+                  addBytesProcessed(data.total_bytes_processed);
+                }
+                // Refresh player to get updated stats
+                try {
+                  const updatedPlayer = await api.getStatus();
+                  setPlayer(updatedPlayer);
+                } catch {
+                  // ignore
+                }
+                break;
+              }
+
+              // Error event from backend
+              if (data.type === "error") {
+                updateLastMessage(data.error || t("ai.streamError"));
+                break;
+              }
+
+              // Text chunk (both old format and new type:text format)
               if (data.text) {
                 accumulated += data.text;
                 updateLastMessage(accumulated);
               }
+
+              // Tool call event
+              if (data.type === "tool_call") {
+                const displayName = getToolDisplayName(data.tool_name);
+                const pathInfo = data.input?.path ? ` ${data.input.path}` : "";
+                addActionLog({
+                  action: `[EXECUTING]: ${displayName}${pathInfo}`,
+                  status: "pending",
+                  toolName: data.tool_name,
+                  toolId: data.tool_id,
+                });
+              }
+
+              // Tool result event
+              if (data.type === "tool_result") {
+                const displayName = getToolDisplayName(data.tool_name);
+                addActionLog({
+                  action: `[DATA_ACQUIRED]: ${displayName} — ${data.summary}`,
+                  status: data.status === "success" ? "done" : "error",
+                  expGained: data.exp_gained || undefined,
+                  toolName: data.tool_name,
+                  toolId: data.tool_id,
+                  bytesProcessed: data.bytes_processed,
+                });
+              }
+
+              // Tool diff event (for write operations)
+              if (data.type === "tool_diff") {
+                addActionCard({
+                  fileName: data.file_name || "file",
+                  status: "patched",
+                  filePath: data.file_path || "",
+                  oldContent: data.old_content,
+                  newContent: data.new_content,
+                  expGained: data.exp_gained,
+                });
+              }
             } catch {
-              // ignore
+              // ignore parse errors
             }
           }
         }
@@ -185,7 +303,7 @@ export function OmniChat() {
 
       setAiResponding(false);
     },
-    [addMessage, api, setPlayer, triggerLevelUp, player.mp, settings.ai_provider, settings.anthropic_api_key, settings.auth_method, settings.oauth_access_token, settings.openai_api_key, settings.gemini_api_key, settings.custom_base_url, projectScan, handleSlashCommand, setAiResponding, updateLastMessage, t]
+    [addMessage, api, setPlayer, triggerLevelUp, player.mp, settings.ai_provider, settings.anthropic_api_key, settings.auth_method, settings.oauth_access_token, settings.openai_api_key, settings.gemini_api_key, settings.custom_base_url, projectScan, handleSlashCommand, setAiResponding, updateLastMessage, addActionLog, addActionCard, addBytesProcessed, t]
   );
 
   const handleApplyCode = useCallback(

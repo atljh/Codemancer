@@ -8,6 +8,7 @@ export interface Player {
   max_hp: number;
   mp: number;
   max_mp: number;
+  total_bytes_processed: number;
 }
 
 export type ActionType =
@@ -51,6 +52,9 @@ export interface ActionLogData {
   action: string;
   status: "pending" | "done" | "error";
   expGained?: number;
+  toolName?: string;
+  toolId?: string;
+  bytesProcessed?: number;
 }
 
 export interface ChatMessage {

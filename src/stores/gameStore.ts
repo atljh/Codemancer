@@ -44,6 +44,9 @@ interface GameState {
   // AI state
   isAiResponding: boolean;
 
+  // Tool stats
+  totalBytesProcessed: number;
+
   // App lifecycle
   appReady: boolean;
 
@@ -85,6 +88,9 @@ interface GameState {
   // AI actions
   setAiResponding: (v: boolean) => void;
 
+  // Tool stats
+  addBytesProcessed: (bytes: number) => void;
+
   // App lifecycle
   setAppReady: (v: boolean) => void;
 }
@@ -99,6 +105,7 @@ const defaultPlayer: Player = {
   max_hp: 100,
   mp: 50,
   max_mp: 50,
+  total_bytes_processed: 0,
 };
 
 const defaultSettings: AppSettings = {
@@ -145,6 +152,7 @@ export const useGameStore = create<GameState>((set) => ({
 
   projectScan: null,
   isAiResponding: false,
+  totalBytesProcessed: 0,
   appReady: false,
 
   setPlayer: (player) => set({ player }),
@@ -274,6 +282,9 @@ export const useGameStore = create<GameState>((set) => ({
   setProjectScan: (scan) => set({ projectScan: scan }),
 
   setAiResponding: (v) => set({ isAiResponding: v }),
+
+  addBytesProcessed: (bytes) =>
+    set((s) => ({ totalBytesProcessed: s.totalBytesProcessed + bytes })),
 
   setAppReady: (v) => set({ appReady: v }),
 }));

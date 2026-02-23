@@ -108,13 +108,25 @@ const translations = {
     "project.scanFailed": "Project scan failed",
 
     // Slash commands
-    "slash.unknown": "Unknown command. Available: /status, /ls",
+    "slash.unknown": "Unknown command. Available: /status, /ls, /commit, /push, /git-status, /git-diff, /git-log",
     "slash.noProject": "No project loaded. Use the folder button to select one.",
+    "slash.commitNoMsg": "Usage: /commit <message>",
 
     // AI
     "ai.thinking": "Processing...",
     "ai.noApiKey": "Configure authentication in Settings to get AI responses.",
     "ai.streamError": "AI response error",
+
+    // Tool events
+    "tool.scanning": "Scanning sector",
+    "tool.reading": "Extracting data",
+    "tool.writing": "Deploying patch",
+    "tool.searching": "Signal sweep",
+    "tool.executing": "Executing",
+    "tool.dataAcquired": "Data acquired",
+    "tool.success": "Success",
+    "tool.fault": "Fault",
+    "stats.data": "DATA",
 
     // Multi-provider settings
     "settings.aiProvider": "AI Provider",
@@ -243,13 +255,25 @@ const translations = {
     "project.scanFailed": "Ошибка сканирования проекта",
 
     // Slash commands
-    "slash.unknown": "Неизвестная команда. Доступны: /status, /ls",
+    "slash.unknown": "Неизвестная команда. Доступны: /status, /ls, /commit, /push, /git-status, /git-diff, /git-log",
     "slash.noProject": "Проект не загружен. Используйте кнопку папки для выбора.",
+    "slash.commitNoMsg": "Использование: /commit <сообщение>",
 
     // AI
     "ai.thinking": "Обработка...",
     "ai.noApiKey": "Настройте аутентификацию в Настройках для ответов ИИ.",
     "ai.streamError": "Ошибка ответа ИИ",
+
+    // Tool events
+    "tool.scanning": "Сканирование сектора",
+    "tool.reading": "Извлечение данных",
+    "tool.writing": "Развёртывание патча",
+    "tool.searching": "Обзор сигналов",
+    "tool.executing": "Выполнение",
+    "tool.dataAcquired": "Данные получены",
+    "tool.success": "Успех",
+    "tool.fault": "Ошибка",
+    "stats.data": "ДАННЫЕ",
 
     // Multi-provider settings
     "settings.aiProvider": "Провайдер ИИ",
