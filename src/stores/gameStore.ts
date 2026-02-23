@@ -76,6 +76,7 @@ interface GameState {
   addActionCard: (card: ActionCardData) => void;
   addActionLog: (log: ActionLogData) => void;
   updateLastMessage: (content: string) => void;
+  updateMessageById: (id: string, content: string) => void;
 
   // Settings actions
   setLocale: (locale: Locale) => void;
@@ -162,7 +163,7 @@ export const useGameStore = create<GameState>((set) => ({
     set((s) => ({
       messages: [
         ...s.messages,
-        { ...msg, id: crypto.randomUUID(), timestamp: Date.now() },
+        { ...msg, id: (msg as any).id || crypto.randomUUID(), timestamp: Date.now() },
       ],
     })),
 
@@ -270,6 +271,13 @@ export const useGameStore = create<GameState>((set) => ({
       }
       return { messages: msgs };
     }),
+
+  updateMessageById: (id, content) =>
+    set((s) => ({
+      messages: s.messages.map((m) =>
+        m.id === id ? { ...m, content } : m
+      ),
+    })),
 
   setLocale: (locale) =>
     set((s) => ({ locale, settings: { ...s.settings, locale } })),

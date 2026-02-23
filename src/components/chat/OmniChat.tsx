@@ -31,6 +31,7 @@ export function OmniChat() {
   const isAiResponding = useGameStore((s) => s.isAiResponding);
   const setAiResponding = useGameStore((s) => s.setAiResponding);
   const updateLastMessage = useGameStore((s) => s.updateLastMessage);
+  const updateMessageById = useGameStore((s) => s.updateMessageById);
   const addActionLog = useGameStore((s) => s.addActionLog);
   const addActionCard = useGameStore((s) => s.addActionCard);
   const addBytesProcessed = useGameStore((s) => s.addBytesProcessed);
@@ -196,20 +197,23 @@ export function OmniChat() {
       }
 
       try {
-        addMessage({ role: "assistant", content: "" });
+        // Create assistant message with known ID so we can update it by ID
+        // even after action logs are added to the message list
+        const assistantMsgId = crypto.randomUUID();
+        addMessage({ role: "assistant", content: "", id: assistantMsgId } as any);
 
         const response = await api.chatStream(conversationMessages, projectContext);
 
         if (!response.ok) {
           const err = await response.text();
-          updateLastMessage(t("ai.streamError") + `: ${err}`);
+          updateMessageById(assistantMsgId, t("ai.streamError") + `: ${err}`);
           setAiResponding(false);
           return;
         }
 
         const reader = response.body?.getReader();
         if (!reader) {
-          updateLastMessage(t("ai.streamError"));
+          updateMessageById(assistantMsgId, t("ai.streamError"));
           setAiResponding(false);
           return;
         }
@@ -246,14 +250,14 @@ export function OmniChat() {
 
               // Error event from backend
               if (data.type === "error") {
-                updateLastMessage(data.error || t("ai.streamError"));
+                updateMessageById(assistantMsgId, data.error || t("ai.streamError"));
                 break;
               }
 
               // Text chunk (both old format and new type:text format)
               if (data.text) {
                 accumulated += data.text;
-                updateLastMessage(accumulated);
+                updateMessageById(assistantMsgId, accumulated);
               }
 
               // Tool call event

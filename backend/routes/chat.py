@@ -82,8 +82,10 @@ def _build_system_prompt(project_context: str = "", has_tools: bool = False) -> 
 - write_file: Create or modify files
 - search_text: Search for patterns in code
 
-Use these tools when the user asks you to read, write, modify, search, or explore files.
-When modifying files, always read the file first to understand its current content, then write the complete updated content."""
+IMPORTANT: Always use tools to get accurate information. Do NOT guess file contents or project structure — use list_files and read_file to verify.
+When the user asks about the project, use list_files first to see the actual structure.
+When modifying files, always read the file first, then write the complete updated content.
+Paths can be relative to the project root or absolute."""
 
     return SYSTEM_PROMPT_TEMPLATE.format(
         player_info=player_info,
