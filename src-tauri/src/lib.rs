@@ -126,6 +126,7 @@ pub fn run() {
                     "127.0.0.1",
                     "--port",
                     "8420",
+                    "--reload",
                 ])
                 .current_dir(&backend_dir)
                 .spawn();
