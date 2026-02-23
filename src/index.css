@@ -1,19 +1,28 @@
 @import "tailwindcss";
+@import "./themes/themes.css";
 
 @theme {
-  --color-tactical-bg: #0a0c10;
-  --color-tactical-surface: #0d1117;
-  --color-tactical-panel: #111820;
-  --color-tactical-border: rgba(0, 212, 255, 0.1);
-  --color-tactical-cyan: #00d4ff;
-  --color-tactical-cyan-dim: #0891b2;
-  --color-tactical-amber: #ffaa00;
-  --color-tactical-red: #cc3333;
-  --color-tactical-green: #22c55e;
-  --color-tactical-text: #c8d6e5;
-  --color-tactical-text-dim: #5a6b7f;
-  --color-tactical-purple-500: #a855f7;
-  --color-tactical-purple-600: #7c3aed;
+  --color-theme-bg-deep: var(--theme-bg-deep);
+  --color-theme-bg-base: var(--theme-bg-base);
+  --color-theme-bg-elevated: var(--theme-bg-elevated);
+  --color-theme-bg-inset: var(--theme-bg-inset);
+  --color-theme-bg-empty: var(--theme-bg-empty);
+
+  --color-theme-accent: var(--theme-accent);
+  --color-theme-accent-dim: var(--theme-accent-dim);
+
+  --color-theme-text: var(--theme-text);
+  --color-theme-text-dim: var(--theme-text-dim);
+  --color-theme-text-dimmer: var(--theme-text-dimmer);
+  --color-theme-text-bright: var(--theme-text-bright);
+
+  --color-theme-status-success: var(--theme-status-success);
+  --color-theme-status-warning: var(--theme-status-warning);
+  --color-theme-status-error: var(--theme-status-error);
+
+  --color-theme-purple: var(--theme-purple);
+  --color-theme-purple-dim: var(--theme-purple-dim);
+
   --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
   --font-display: "Orbitron", "Rajdhani", sans-serif;
 }
@@ -35,8 +44,8 @@ body,
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: #0a0c10;
-  color: #c8d6e5;
+  background-color: var(--theme-bg-deep);
+  color: var(--theme-text);
 }
 
 /* ═══════════════════════════════════════════════
@@ -48,9 +57,9 @@ body,
   pointer-events: none;
   z-index: 0;
   background-image:
-    radial-gradient(circle, rgba(0, 212, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(rgba(0, 212, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 212, 255, 0.02) 1px, transparent 1px);
+    radial-gradient(circle, var(--theme-grid-color) 1px, transparent 1px),
+    linear-gradient(var(--theme-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--theme-grid-line) 1px, transparent 1px);
   background-size: 20px 20px, 80px 80px, 80px 80px;
 }
 
@@ -58,17 +67,17 @@ body,
    GLASSMORPHISM PANELS
    ═══════════════════════════════════════════════ */
 .glass-panel {
-  background: rgba(13, 17, 23, 0.85);
+  background: var(--theme-glass-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 212, 255, 0.1);
+  border: 1px solid var(--theme-glass-border);
 }
 
 .glass-panel-bright {
-  background: rgba(17, 24, 32, 0.9);
+  background: var(--theme-glass-bg-bright);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 212, 255, 0.15);
+  border: 1px solid var(--theme-glass-border-bright);
 }
 
 /* ═══════════════════════════════════════════════
@@ -83,25 +92,24 @@ body,
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(0, 212, 255, 0.15);
+  background: rgba(var(--theme-accent-rgb), 0.15);
   border-radius: 9999px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 212, 255, 0.3);
+  background: rgba(var(--theme-accent-rgb), 0.3);
 }
 
 /* ═══════════════════════════════════════════════
    SEGMENTED BAR OVERLAY
-   Applies vertical dark lines to create segments
    ═══════════════════════════════════════════════ */
 .segmented-overlay {
   background-image: repeating-linear-gradient(
     to right,
     transparent 0px,
     transparent 6px,
-    rgba(10, 12, 16, 0.9) 6px,
-    rgba(10, 12, 16, 0.9) 8px
+    var(--theme-bg-deep) 6px,
+    var(--theme-bg-deep) 8px
   );
 }
 
@@ -113,10 +121,10 @@ body,
 @keyframes glow-pulse {
   0%,
   100% {
-    box-shadow: 0 0 6px rgba(0, 212, 255, 0.2);
+    box-shadow: 0 0 6px rgba(var(--theme-accent-rgb), 0.2);
   }
   50% {
-    box-shadow: 0 0 18px rgba(0, 212, 255, 0.5);
+    box-shadow: 0 0 18px rgba(var(--theme-accent-rgb), 0.5);
   }
 }
 
@@ -179,7 +187,7 @@ body,
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(0, 212, 255, 0.04) 50%,
+    rgba(var(--theme-accent-rgb), 0.04) 50%,
     transparent 100%
   );
   background-size: 200% 100%;
@@ -201,8 +209,8 @@ body,
     0deg,
     transparent,
     transparent 2px,
-    rgba(0, 212, 255, 0.015) 2px,
-    rgba(0, 212, 255, 0.015) 4px
+    rgba(var(--theme-accent-rgb), 0.015) 2px,
+    rgba(var(--theme-accent-rgb), 0.015) 4px
   );
   background-size: 100% 200%;
   animation: scanline 10s linear infinite;
@@ -211,7 +219,7 @@ body,
 /* Code block flash on appear */
 @keyframes code-flash {
   0% {
-    background-color: rgba(0, 212, 255, 0.15);
+    background-color: rgba(var(--theme-accent-rgb), 0.15);
   }
   100% {
     background-color: transparent;
@@ -295,7 +303,7 @@ body,
   position: absolute;
   width: 8px;
   height: 8px;
-  border-color: rgba(0, 212, 255, 0.3);
+  border-color: var(--theme-corner-color);
   pointer-events: none;
 }
 
@@ -324,6 +332,6 @@ body,
 
 /* Selection color */
 ::selection {
-  background: rgba(0, 212, 255, 0.25);
-  color: #ffffff;
+  background: rgba(var(--theme-accent-rgb), 0.25);
+  color: var(--theme-text-bright);
 }

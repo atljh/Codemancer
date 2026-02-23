@@ -12,28 +12,28 @@ const SEGMENTS = 20;
 
 const colorMap = {
   cyan: {
-    filled: "bg-[#00d4ff]",
-    shadow: "shadow-[0_0_4px_rgba(0,212,255,0.6)]",
-    text: "text-[#00d4ff]",
-    dimText: "text-[#00d4ff]/50",
+    filled: "bg-theme-accent",
+    text: "text-theme-accent",
+    dimText: "text-theme-accent/50",
+    shadowColor: "var(--theme-accent)",
   },
   purple: {
-    filled: "bg-purple-400",
-    shadow: "shadow-[0_0_4px_rgba(168,85,247,0.6)]",
-    text: "text-purple-400",
-    dimText: "text-purple-400/50",
+    filled: "bg-theme-purple",
+    text: "text-theme-purple",
+    dimText: "text-theme-purple/50",
+    shadowColor: "var(--theme-purple)",
   },
   green: {
-    filled: "bg-[#22c55e]",
-    shadow: "shadow-[0_0_4px_rgba(34,197,94,0.6)]",
-    text: "text-[#22c55e]",
-    dimText: "text-[#22c55e]/50",
+    filled: "bg-theme-status-success",
+    text: "text-theme-status-success",
+    dimText: "text-theme-status-success/50",
+    shadowColor: "var(--theme-status-success)",
   },
   red: {
-    filled: "bg-[#cc3333]",
-    shadow: "shadow-[0_0_4px_rgba(204,51,51,0.6)]",
-    text: "text-[#cc3333]",
-    dimText: "text-[#cc3333]/50",
+    filled: "bg-theme-status-error",
+    text: "text-theme-status-error",
+    dimText: "text-theme-status-error/50",
+    shadowColor: "var(--theme-status-error)",
   },
 };
 
@@ -49,7 +49,7 @@ export function StatBar({ label, current, max, color, className = "" }: StatBarP
         <span className={`text-[10px] font-bold tracking-widest uppercase ${c.text}`}>
           {label}
         </span>
-        <span className="text-[10px] text-[#5a6b7f] font-mono tabular-nums">
+        <span className="text-[10px] text-theme-text-dim font-mono tabular-nums">
           {current}/{max}
         </span>
       </div>
@@ -66,10 +66,10 @@ export function StatBar({ label, current, max, color, className = "" }: StatBarP
             className={`flex-1 rounded-[1px] transition-colors duration-300 ${
               i < filledSegments
                 ? `${c.filled} ${isLow ? "animate-bar-pulse" : ""}`
-                : "bg-[#1a2030]"
+                : "bg-theme-bg-empty"
             }`}
             style={i < filledSegments ? {
-              boxShadow: `0 0 3px ${color === "cyan" ? "rgba(0,212,255,0.4)" : color === "red" ? "rgba(204,51,51,0.4)" : color === "purple" ? "rgba(168,85,247,0.4)" : "rgba(34,197,94,0.4)"}`,
+              boxShadow: `0 0 3px color-mix(in srgb, ${c.shadowColor} 40%, transparent)`,
             } : undefined}
           />
         ))}

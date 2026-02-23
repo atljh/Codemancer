@@ -21,7 +21,8 @@ import { invoke } from "@tauri-apps/api/core";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
-import type { AppSettings, AuthMethod, Locale, ClaudeModel } from "../../types/game";
+import { themes, themeIds } from "../../themes/themeConfig";
+import type { AppSettings, AuthMethod, Locale, ClaudeModel, ThemeId } from "../../types/game";
 import type { TranslationKey } from "../../i18n/translations";
 
 const FALLBACK_MODELS: ClaudeModel[] = [
@@ -106,13 +107,13 @@ export function SettingsModal() {
             exit={{ scale: 0.97, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-[600px] max-h-[80vh] rounded-lg glass-panel-bright shadow-[0_0_40px_rgba(0,212,255,0.08)] flex overflow-hidden tactical-corners"
+            className="w-[600px] max-h-[80vh] rounded-lg glass-panel-bright shadow-[0_0_40px_rgba(var(--theme-accent-rgb),0.08)] flex overflow-hidden tactical-corners"
           >
             {/* Sidebar */}
-            <div className="w-40 bg-[rgba(10,12,16,0.6)] border-r border-[rgba(0,212,255,0.06)] py-4 px-2 flex flex-col shrink-0">
+            <div className="w-40 bg-theme-bg-deep/60 border-r border-[var(--theme-glass-border)] py-4 px-2 flex flex-col shrink-0">
               <div className="flex items-center gap-2 px-3 mb-5">
-                <Settings className="w-4 h-4 text-[#00d4ff]" strokeWidth={1.5} />
-                <span className="text-xs font-mono font-bold text-[#c8d6e5] tracking-wider uppercase">{t("panel.settings")}</span>
+                <Settings className="w-4 h-4 text-theme-accent" strokeWidth={1.5} />
+                <span className="text-xs font-mono font-bold text-theme-text tracking-wider uppercase">{t("panel.settings")}</span>
               </div>
 
               <nav className="space-y-0.5 flex-1">
@@ -122,22 +123,22 @@ export function SettingsModal() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full flex items-center gap-2 px-3 py-2 rounded text-xs font-mono tracking-wider transition-all ${
                       activeTab === tab.id
-                        ? "bg-[rgba(0,212,255,0.08)] text-white border-l-2 border-[#00d4ff]"
-                        : "text-[#5a6b7f] hover:text-[#c8d6e5] hover:bg-[rgba(0,212,255,0.03)]"
+                        ? "bg-theme-accent/8 text-white border-l-2 border-theme-accent"
+                        : "text-theme-text-dim hover:text-theme-text hover:bg-theme-accent/3"
                     }`}
                   >
-                    <span className={activeTab === tab.id ? "text-[#00d4ff]" : ""}>{tab.icon}</span>
+                    <span className={activeTab === tab.id ? "text-theme-accent" : ""}>{tab.icon}</span>
                     {tab.label}
                   </button>
                 ))}
               </nav>
 
               {/* Operative info */}
-              <div className="mt-auto px-3 pt-3 border-t border-[rgba(0,212,255,0.06)]">
-                <div className="text-[10px] text-[#5a6b7f] font-mono tracking-wider">
+              <div className="mt-auto px-3 pt-3 border-t border-[var(--theme-glass-border)]">
+                <div className="text-[10px] text-theme-text-dim font-mono tracking-wider">
                   {player.name} // LV.{player.level}
                 </div>
-                <div className="text-[9px] text-[#3a4a5f] font-mono mt-0.5">
+                <div className="text-[9px] text-theme-text-dimmer font-mono mt-0.5">
                   EXP: {player.total_exp}
                 </div>
               </div>
@@ -146,13 +147,13 @@ export function SettingsModal() {
             {/* Content */}
             <div className="flex-1 flex flex-col">
               {/* Header */}
-              <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(0,212,255,0.06)]">
-                <h2 className="text-xs font-mono font-bold text-[#00d4ff] tracking-[0.15em] uppercase">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--theme-glass-border)]">
+                <h2 className="text-xs font-mono font-bold text-theme-accent tracking-[0.15em] uppercase">
                   {tabs.find((t) => t.id === activeTab)?.label}
                 </h2>
                 <button
                   onClick={toggleSettings}
-                  className="text-[#5a6b7f] hover:text-white transition-colors"
+                  className="text-theme-text-dim hover:text-white transition-colors"
                 >
                   <X className="w-4 h-4" strokeWidth={1.5} />
                 </button>
@@ -185,10 +186,10 @@ export function SettingsModal() {
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-between px-5 py-2.5 border-t border-[rgba(0,212,255,0.06)]">
+              <div className="flex items-center justify-between px-5 py-2.5 border-t border-[var(--theme-glass-border)]">
                 <button
                   onClick={toggleSettings}
-                  className="px-3 py-1.5 rounded text-xs font-mono text-[#5a6b7f] hover:text-white hover:bg-[rgba(0,212,255,0.06)] transition-colors tracking-wider uppercase"
+                  className="px-3 py-1.5 rounded text-xs font-mono text-theme-text-dim hover:text-white hover:bg-theme-accent/6 transition-colors tracking-wider uppercase"
                 >
                   {t("settings.cancel")}
                 </button>
@@ -198,8 +199,8 @@ export function SettingsModal() {
                   onClick={handleSave}
                   className={`flex items-center gap-2 px-4 py-1.5 rounded text-xs font-mono font-bold tracking-[0.1em] uppercase transition-all ${
                     saved
-                      ? "glass-panel-bright text-[#22c55e] border border-[rgba(34,197,94,0.2)]"
-                      : "glass-panel-bright text-[#00d4ff] hover:bg-[rgba(0,212,255,0.1)]"
+                      ? "glass-panel-bright text-theme-status-success border border-theme-status-success/20"
+                      : "glass-panel-bright text-theme-accent hover:bg-theme-accent/10"
                   }`}
                 >
                   {saved ? (
@@ -240,7 +241,7 @@ function GeneralTab({
         <select
           value={draft.locale}
           onChange={(e) => setDraft({ ...draft, locale: e.target.value as Locale })}
-          className="w-full bg-[#0d1117] border border-[rgba(0,212,255,0.1)] rounded px-3 py-2 text-xs font-mono text-[#c8d6e5] outline-none focus:border-[#00d4ff]/30 transition-colors"
+          className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2 text-xs font-mono text-theme-text outline-none focus:border-theme-accent/30 transition-colors"
         >
           <option value="en">English</option>
           <option value="ru">Русский</option>
@@ -254,32 +255,32 @@ function GeneralTab({
             value={draft.workspace_root}
             onChange={(e) => setDraft({ ...draft, workspace_root: e.target.value })}
             placeholder="/path/to/project"
-            className="flex-1 bg-[#0d1117] border border-[rgba(0,212,255,0.1)] rounded px-3 py-2 text-xs text-[#c8d6e5] placeholder-[#3a4a5f] outline-none focus:border-[#00d4ff]/30 font-mono transition-colors"
+            className="flex-1 bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2 text-xs text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
           />
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={onBrowse}
-            className="px-3 py-2 rounded glass-panel-bright text-[#5a6b7f] hover:text-[#00d4ff] text-xs font-mono tracking-wider transition-colors shrink-0"
+            className="px-3 py-2 rounded glass-panel-bright text-theme-text-dim hover:text-theme-accent text-xs font-mono tracking-wider transition-colors shrink-0"
           >
             {t("settings.browse")}
           </motion.button>
         </div>
-        <p className="text-[10px] text-[#3a4a5f] mt-1.5 font-mono">{t("settings.workspaceHint")}</p>
+        <p className="text-[10px] text-theme-text-dimmer mt-1.5 font-mono">{t("settings.workspaceHint")}</p>
       </SettingsField>
 
-      <div className="mt-5 pt-4 border-t border-[rgba(204,51,51,0.1)]">
-        <h3 className="text-[10px] font-mono font-bold text-[#cc3333]/70 uppercase tracking-[0.15em] mb-3">
+      <div className="mt-5 pt-4 border-t border-theme-status-error/10">
+        <h3 className="text-[10px] font-mono font-bold text-theme-status-error/70 uppercase tracking-[0.15em] mb-3">
           {t("settings.dangerZone")}
         </h3>
         <button
           onClick={onResetPlayer}
-          className="flex items-center gap-2 px-3 py-2 rounded border border-[rgba(204,51,51,0.15)] bg-[rgba(204,51,51,0.05)] text-[#cc3333] hover:bg-[rgba(204,51,51,0.1)] text-xs font-mono tracking-wider transition-colors"
+          className="flex items-center gap-2 px-3 py-2 rounded border border-theme-status-error/15 bg-theme-status-error/5 text-theme-status-error hover:bg-theme-status-error/10 text-xs font-mono tracking-wider transition-colors"
         >
           <RotateCcw className="w-3.5 h-3.5" strokeWidth={1.5} />
           {t("settings.resetProgress")}
         </button>
-        <p className="text-[10px] text-[#3a4a5f] mt-1.5 font-mono">{t("settings.resetHint")}</p>
+        <p className="text-[10px] text-theme-text-dimmer mt-1.5 font-mono">{t("settings.resetHint")}</p>
       </div>
     </>
   );
@@ -341,10 +342,10 @@ function AiTab({
       {/* Status indicator */}
       <div className={`flex items-center gap-2 px-3 py-2 rounded text-xs font-mono tracking-wider ${
         hasAuth
-          ? "bg-[rgba(34,197,94,0.05)] border border-[rgba(34,197,94,0.15)] text-[#22c55e]"
-          : "bg-[rgba(255,170,0,0.05)] border border-[rgba(255,170,0,0.12)] text-[#ffaa00]"
+          ? "bg-theme-status-success/5 border border-theme-status-success/15 text-theme-status-success"
+          : "bg-theme-status-warning/5 border border-theme-status-warning/12 text-theme-status-warning"
       }`}>
-        <div className={`w-1.5 h-1.5 rounded-full ${hasAuth ? "bg-[#22c55e] animate-glow-pulse" : "bg-[#ffaa00]"}`} />
+        <div className={`w-1.5 h-1.5 rounded-full ${hasAuth ? "bg-theme-status-success animate-glow-pulse" : "bg-theme-status-warning"}`} />
         {hasAuth
           ? (draft.auth_method === "oauth" ? t("settings.oauthConnected") : t("settings.aiConnected"))
           : t("settings.aiNotConfigured")}
@@ -362,8 +363,8 @@ function AiTab({
               onClick={() => setDraft({ ...draft, auth_method: method.id })}
               className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded text-xs font-mono tracking-wider transition-all ${
                 draft.auth_method === method.id
-                  ? "border border-[rgba(0,212,255,0.2)] bg-[rgba(0,212,255,0.06)] text-[#00d4ff]"
-                  : "border border-[rgba(0,212,255,0.06)] bg-transparent text-[#5a6b7f] hover:text-[#c8d6e5]"
+                  ? "border border-theme-accent/20 bg-theme-accent/6 text-theme-accent"
+                  : "border border-[var(--theme-glass-border)] bg-transparent text-theme-text-dim hover:text-theme-text"
               }`}
             >
               {method.icon}
@@ -382,17 +383,17 @@ function AiTab({
               value={draft.anthropic_api_key}
               onChange={(e) => setDraft({ ...draft, anthropic_api_key: e.target.value })}
               placeholder="sk-ant-api03-..."
-              className="w-full bg-[#0d1117] border border-[rgba(0,212,255,0.1)] rounded px-3 py-2 pr-10 text-xs text-[#c8d6e5] placeholder-[#3a4a5f] outline-none focus:border-[#00d4ff]/30 font-mono transition-colors"
+              className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2 pr-10 text-xs text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
             />
             <button
               type="button"
               onClick={() => setShowApiKey(!showApiKey)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-[#5a6b7f] hover:text-[#c8d6e5] transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-theme-text-dim hover:text-theme-text transition-colors"
             >
               {showApiKey ? <EyeOff className="w-3.5 h-3.5" strokeWidth={1.5} /> : <Eye className="w-3.5 h-3.5" strokeWidth={1.5} />}
             </button>
           </div>
-          <p className="text-[10px] text-[#3a4a5f] mt-1.5 font-mono">{t("settings.apiKeyHint")}</p>
+          <p className="text-[10px] text-theme-text-dimmer mt-1.5 font-mono">{t("settings.apiKeyHint")}</p>
         </SettingsField>
       )}
 
@@ -401,13 +402,13 @@ function AiTab({
         <SettingsField label={t("settings.authOAuth")} icon={<LogIn className="w-3.5 h-3.5" strokeWidth={1.5} />}>
           {draft.oauth_access_token ? (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 px-3 py-2 rounded bg-[rgba(34,197,94,0.05)] border border-[rgba(34,197,94,0.15)] text-[#22c55e] text-xs font-mono">
+              <div className="flex items-center gap-2 px-3 py-2 rounded bg-theme-status-success/5 border border-theme-status-success/15 text-theme-status-success text-xs font-mono">
                 <Check className="w-3.5 h-3.5" strokeWidth={1.5} />
                 {t("settings.oauthConnected")}
               </div>
               <button
                 onClick={handleOAuthSignOut}
-                className="flex items-center gap-2 px-3 py-2 rounded border border-[rgba(204,51,51,0.15)] bg-[rgba(204,51,51,0.05)] text-[#cc3333] hover:bg-[rgba(204,51,51,0.1)] text-xs font-mono tracking-wider transition-colors"
+                className="flex items-center gap-2 px-3 py-2 rounded border border-theme-status-error/15 bg-theme-status-error/5 text-theme-status-error hover:bg-theme-status-error/10 text-xs font-mono tracking-wider transition-colors"
               >
                 <LogOut className="w-3 h-3" strokeWidth={1.5} />
                 {t("settings.oauthSignOut")}
@@ -419,7 +420,7 @@ function AiTab({
               whileTap={{ scale: 0.99 }}
               onClick={handleOAuthSignIn}
               disabled={oauthPending}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded glass-panel-bright text-[#00d4ff] text-xs font-mono font-bold tracking-[0.1em] uppercase hover:bg-[rgba(0,212,255,0.08)] transition-all disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded glass-panel-bright text-theme-accent text-xs font-mono font-bold tracking-[0.1em] uppercase hover:bg-theme-accent/8 transition-all disabled:opacity-50"
             >
               {oauthPending ? (
                 <>{t("settings.oauthPending")}</>
@@ -442,8 +443,8 @@ function AiTab({
               key={m.id}
               className={`flex items-center gap-3 px-3 py-2 rounded border cursor-pointer transition-all ${
                 draft.claude_model === m.id
-                  ? "border-[rgba(0,212,255,0.2)] bg-[rgba(0,212,255,0.06)]"
-                  : "border-[rgba(0,212,255,0.06)] hover:border-[rgba(0,212,255,0.12)]"
+                  ? "border-theme-accent/20 bg-theme-accent/6"
+                  : "border-[var(--theme-glass-border)] hover:border-theme-accent/12"
               }`}
             >
               <input
@@ -455,15 +456,15 @@ function AiTab({
                 className="sr-only"
               />
               <div className={`w-3 h-3 rounded-full border flex items-center justify-center shrink-0 ${
-                draft.claude_model === m.id ? "border-[#00d4ff]" : "border-[#3a4a5f]"
+                draft.claude_model === m.id ? "border-theme-accent" : "border-theme-text-dimmer"
               }`}>
                 {draft.claude_model === m.id && (
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#00d4ff]" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-theme-accent" />
                 )}
               </div>
               <div className="flex-1">
-                <div className="text-xs font-mono text-[#c8d6e5] font-medium">{m.name}</div>
-                <div className="text-[10px] font-mono text-[#5a6b7f]">{m.description}</div>
+                <div className="text-xs font-mono text-theme-text font-medium">{m.name}</div>
+                <div className="text-[10px] font-mono text-theme-text-dim">{m.description}</div>
               </div>
             </label>
           ))}
@@ -487,19 +488,19 @@ function AppearanceTab({
     <>
       <SettingsField label={`${t("settings.fontSize")}: ${draft.font_size}px`} icon={<Palette className="w-3.5 h-3.5" strokeWidth={1.5} />}>
         <div className="flex items-center gap-4">
-          <span className="text-[10px] text-[#5a6b7f] font-mono w-6">12</span>
+          <span className="text-[10px] text-theme-text-dim font-mono w-6">12</span>
           <input
             type="range"
             min={12}
             max={24}
             value={draft.font_size}
             onChange={(e) => setDraft({ ...draft, font_size: parseInt(e.target.value) })}
-            className="flex-1 accent-[#00d4ff]"
+            className="flex-1 accent-[var(--theme-accent)]"
           />
-          <span className="text-[10px] text-[#5a6b7f] font-mono w-6">24</span>
+          <span className="text-[10px] text-theme-text-dim font-mono w-6">24</span>
         </div>
         <div
-          className="mt-3 px-3 py-2 rounded bg-[#080a0e] border border-[rgba(0,212,255,0.08)] font-mono text-[#c8d6e5]/70"
+          className="mt-3 px-3 py-2 rounded bg-theme-bg-inset border border-[var(--theme-glass-border)] font-mono text-theme-text/70"
           style={{ fontSize: `${draft.font_size}px` }}
         >
           const protocol = "tactical";
@@ -507,28 +508,28 @@ function AppearanceTab({
       </SettingsField>
 
       <SettingsField label={t("settings.theme")} icon={<Palette className="w-3.5 h-3.5" strokeWidth={1.5} />}>
-        <div className="flex gap-2">
-          {[
-            { id: "vs-dark", label: "DARK_OPS", colors: ["#111820", "#0a0c10"] },
-            { id: "midnight", label: "MIDNIGHT", colors: ["#0d1117", "#050608"] },
-          ].map((theme) => (
-            <button
-              key={theme.id}
-              onClick={() => setDraft({ ...draft, theme: theme.id })}
-              className={`flex-1 rounded border p-3 transition-all ${
-                draft.theme === theme.id
-                  ? "border-[rgba(0,212,255,0.25)] bg-[rgba(0,212,255,0.04)]"
-                  : "border-[rgba(0,212,255,0.06)] hover:border-[rgba(0,212,255,0.12)]"
-              }`}
-            >
-              <div className="flex gap-1 mb-2">
-                {theme.colors.map((c, i) => (
-                  <div key={i} className="w-5 h-5 rounded-sm border border-[rgba(0,212,255,0.08)]" style={{ backgroundColor: c }} />
-                ))}
-              </div>
-              <div className="text-[10px] font-mono text-[#5a6b7f] tracking-wider">{theme.label}</div>
-            </button>
-          ))}
+        <div className="grid grid-cols-2 gap-2">
+          {themeIds.map((id) => {
+            const cfg = themes[id];
+            return (
+              <button
+                key={id}
+                onClick={() => setDraft({ ...draft, theme: id as ThemeId })}
+                className={`rounded border p-3 transition-all ${
+                  draft.theme === id
+                    ? "border-theme-accent/25 bg-theme-accent/4"
+                    : "border-[var(--theme-glass-border)] hover:border-theme-accent/12"
+                }`}
+              >
+                <div className="flex gap-1 mb-2">
+                  <div className="w-5 h-5 rounded-sm border border-[var(--theme-glass-border)]" style={{ backgroundColor: cfg.previewBg }} />
+                  <div className="w-5 h-5 rounded-sm border border-[var(--theme-glass-border)]" style={{ backgroundColor: cfg.previewSurface }} />
+                  <div className="w-5 h-5 rounded-sm border border-[var(--theme-glass-border)]" style={{ backgroundColor: cfg.previewAccent }} />
+                </div>
+                <div className="text-[10px] font-mono text-theme-text-dim tracking-wider">{cfg.label}</div>
+              </button>
+            );
+          })}
         </div>
       </SettingsField>
     </>
@@ -547,8 +548,8 @@ function SettingsField({
 }) {
   return (
     <div>
-      <label className="flex items-center gap-1.5 text-[10px] font-mono text-[#5a6b7f] mb-2 font-bold tracking-[0.1em] uppercase">
-        {icon && <span className="text-[#00d4ff]/40">{icon}</span>}
+      <label className="flex items-center gap-1.5 text-[10px] font-mono text-theme-text-dim mb-2 font-bold tracking-[0.1em] uppercase">
+        {icon && <span className="text-theme-accent/40">{icon}</span>}
         {label}
       </label>
       {children}

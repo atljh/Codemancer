@@ -13,10 +13,10 @@ export function GlowPanel({
   glowColor = "cyan",
 }: GlowPanelProps) {
   const shadowMap: Record<string, string> = {
-    cyan: "shadow-[0_0_12px_rgba(0,212,255,0.15)]",
-    purple: "shadow-[0_0_12px_rgba(168,85,247,0.15)]",
-    green: "shadow-[0_0_12px_rgba(34,197,94,0.15)]",
-    amber: "shadow-[0_0_12px_rgba(255,170,0,0.15)]",
+    cyan: "shadow-[0_0_12px_rgba(var(--theme-accent-rgb),0.15)]",
+    purple: "shadow-[0_0_12px_rgba(var(--theme-accent-rgb),0.15)]",
+    green: "shadow-[0_0_12px_rgba(var(--theme-accent-rgb),0.15)]",
+    amber: "shadow-[0_0_12px_rgba(var(--theme-accent-rgb),0.15)]",
   };
 
   return (

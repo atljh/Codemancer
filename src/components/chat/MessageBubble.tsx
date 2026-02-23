@@ -74,9 +74,9 @@ export function MessageBubble({ message, onApplyCode }: MessageBubbleProps) {
       <div
         className={`
           w-7 h-7 rounded flex-shrink-0 flex items-center justify-center glass-panel
-          ${isSystem ? "text-[#ffaa00]" : ""}
-          ${isUser ? "text-[#00d4ff]" : ""}
-          ${!isUser && !isSystem ? "text-[#a855f7]" : ""}
+          ${isSystem ? "text-theme-status-warning" : ""}
+          ${isUser ? "text-theme-accent" : ""}
+          ${!isUser && !isSystem ? "text-theme-purple" : ""}
         `}
       >
         {isSystem ? (
@@ -95,16 +95,16 @@ export function MessageBubble({ message, onApplyCode }: MessageBubbleProps) {
           ${isUser ? "max-w-[80%]" : "max-w-[95%]"}
           ${
             isUser
-              ? "glass-panel border-[rgba(0,212,255,0.15)] text-[#c8d6e5]"
+              ? "glass-panel border-[var(--theme-glass-border-bright)] text-theme-text"
               : isSystem
-                ? "bg-[rgba(255,170,0,0.05)] border border-[rgba(255,170,0,0.12)] text-[#ffaa00]/90"
-                : "bg-[rgba(168,85,247,0.04)] border border-[rgba(168,85,247,0.1)] text-[#c8d6e5]"
+                ? "bg-theme-status-warning/5 border border-theme-status-warning/12 text-theme-status-warning/90"
+                : "bg-theme-purple/4 border border-theme-purple/10 text-theme-text"
           }
         `}
       >
         {/* Timestamp + prefix header */}
         <div className={`text-[10px] mb-1.5 tracking-wider font-bold ${
-          isSystem ? "text-[#ffaa00]/50" : isUser ? "text-[#00d4ff]/40" : "text-[#a855f7]/40"
+          isSystem ? "text-theme-status-warning/50" : isUser ? "text-theme-accent/40" : "text-theme-purple/40"
         }`}>
           [{timestamp}] [{prefix}]
         </div>
@@ -113,16 +113,16 @@ export function MessageBubble({ message, onApplyCode }: MessageBubbleProps) {
           block.type === "code" ? (
             <div key={i} className="my-2 relative group/code">
               {/* SOURCE_DATA header */}
-              <div className="flex items-center justify-between px-2.5 py-1 bg-[rgba(0,212,255,0.06)] border border-[rgba(0,212,255,0.1)] border-b-0 rounded-t text-[10px] text-[#00d4ff]/60 font-bold tracking-widest uppercase">
+              <div className="flex items-center justify-between px-2.5 py-1 bg-theme-accent/6 border border-[var(--theme-glass-border)] border-b-0 rounded-t text-[10px] text-theme-accent/60 font-bold tracking-widest uppercase">
                 <span>SOURCE_DATA{block.language ? ` // ${block.language}` : ""}</span>
               </div>
-              <pre className="bg-[#080a0e] rounded-b border border-[rgba(0,212,255,0.1)] border-t-0 p-2.5 overflow-x-auto text-xs text-[#c8d6e5]/80 font-mono leading-relaxed">
+              <pre className="bg-theme-bg-inset rounded-b border border-[var(--theme-glass-border)] border-t-0 p-2.5 overflow-x-auto text-xs text-theme-text/80 font-mono leading-relaxed">
                 <code>{block.content}</code>
               </pre>
               {onApplyCode && (
                 <button
                   onClick={() => onApplyCode(block.content)}
-                  className="absolute top-1 right-1.5 flex items-center gap-1 px-2 py-0.5 rounded text-[10px] bg-[rgba(0,212,255,0.1)] text-[#00d4ff] border border-[rgba(0,212,255,0.15)] opacity-0 group-hover/code:opacity-100 transition-opacity hover:bg-[rgba(0,212,255,0.2)]"
+                  className="absolute top-1 right-1.5 flex items-center gap-1 px-2 py-0.5 rounded text-[10px] bg-theme-accent/10 text-theme-accent border border-theme-accent/15 opacity-0 group-hover/code:opacity-100 transition-opacity hover:bg-theme-accent/20"
                 >
                   <Copy className="w-2.5 h-2.5" strokeWidth={1.5} />
                   {t("diff.viewDiff")}

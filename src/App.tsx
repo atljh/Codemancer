@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { AppLayout } from "./components/layout/AppLayout";
 import { useGameStore } from "./stores/gameStore";
 import { useApi } from "./hooks/useApi";
+import { useThemeEffect } from "./hooks/useThemeEffect";
 import translations from "./i18n/translations";
 
 function App() {
@@ -12,11 +13,18 @@ function App() {
   const setProjectScan = useGameStore((s) => s.setProjectScan);
   const setAppReady = useGameStore((s) => s.setAppReady);
   const sessionStartTime = useGameStore((s) => s.sessionStartTime);
+  const theme = useGameStore((s) => s.settings.theme);
   const api = useApi();
+
+  useThemeEffect(theme);
   const timersRef = useRef<{ hp?: ReturnType<typeof setInterval>; mp?: ReturnType<typeof setInterval> }>({});
+  const initRef = useRef(false);
 
   // Initialize
   useEffect(() => {
+    if (initRef.current) return;
+    initRef.current = true;
+
     const init = async () => {
       let locale: "en" | "ru" = "en";
 

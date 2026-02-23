@@ -94,11 +94,13 @@ export type Locale = "en" | "ru";
 
 export type AuthMethod = "api_key" | "oauth";
 
+export type ThemeId = "dark-ops" | "midnight" | "phantom" | "arctic";
+
 export interface AppSettings {
   locale: Locale;
   workspace_root: string;
   font_size: number;
-  theme: string;
+  theme: ThemeId;
   anthropic_api_key: string;
   claude_model: string;
   auth_method: AuthMethod;

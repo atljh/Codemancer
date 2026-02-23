@@ -53,36 +53,36 @@ export function TopStatsBar() {
   };
 
   return (
-    <div className="h-11 flex items-center gap-4 px-4 glass-panel border-b border-[rgba(0,212,255,0.08)] shrink-0">
+    <div className="h-11 flex items-center gap-4 px-4 glass-panel border-b border-[var(--theme-glass-border)] shrink-0">
       {/* Operative ID + Level */}
       <div className="flex items-center gap-2">
         <div className="w-6 h-6 rounded glass-panel-bright flex items-center justify-center animate-glow-pulse">
-          <Shield className="w-3 h-3 text-[#00d4ff]" strokeWidth={1.5} />
+          <Shield className="w-3 h-3 text-theme-accent" strokeWidth={1.5} />
         </div>
-        <span className="text-xs font-bold text-[#c8d6e5] tracking-wide uppercase">
+        <span className="text-xs font-bold text-theme-text tracking-wide uppercase">
           {player.name}
         </span>
-        <span className="text-[10px] text-[#00d4ff] font-mono font-bold tracking-wider">
+        <span className="text-[10px] text-theme-accent font-mono font-bold tracking-wider">
           LV.{player.level}
         </span>
       </div>
 
       {/* Divider */}
-      <div className="w-px h-5 bg-[rgba(0,212,255,0.1)]" />
+      <div className="w-px h-5 bg-[var(--theme-glass-border)]" />
 
       {/* Folder picker + project path */}
       <div className="flex items-center gap-1.5 min-w-0">
         <button
           onClick={handlePickFolder}
-          className="p-1 rounded hover:bg-[rgba(0,212,255,0.08)] text-[#5a6b7f] hover:text-[#00d4ff] transition-colors shrink-0"
+          className="p-1 rounded hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent transition-colors shrink-0"
           title={t("project.selectFolder")}
         >
           <FolderOpen className="w-3.5 h-3.5" strokeWidth={1.5} />
         </button>
         {projectScan && (
-          <span className="text-[10px] text-[#5a6b7f] font-mono truncate max-w-[200px]" title={projectScan.path}>
+          <span className="text-[10px] text-theme-text-dim font-mono truncate max-w-[200px]" title={projectScan.path}>
             {shortenPath(projectScan.path)}
-            <span className="text-[#3a4a5f] ml-1.5">
+            <span className="text-theme-text-dimmer ml-1.5">
               [{projectScan.total_files} files]
             </span>
           </span>
@@ -90,7 +90,7 @@ export function TopStatsBar() {
       </div>
 
       {/* Divider */}
-      <div className="w-px h-5 bg-[rgba(0,212,255,0.1)]" />
+      <div className="w-px h-5 bg-[var(--theme-glass-border)]" />
 
       {/* Stat Bars */}
       <div className="flex items-center gap-4 flex-1 max-w-lg">
@@ -108,7 +108,7 @@ export function TopStatsBar() {
       {/* Settings */}
       <button
         onClick={toggleSettings}
-        className="ml-auto p-1.5 rounded hover:bg-[rgba(0,212,255,0.08)] text-[#5a6b7f] hover:text-[#00d4ff] transition-colors"
+        className="ml-auto p-1.5 rounded hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent transition-colors"
       >
         <Settings className="w-4 h-4" strokeWidth={1.5} />
       </button>

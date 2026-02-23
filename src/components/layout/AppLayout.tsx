@@ -16,11 +16,11 @@ export function AppLayout() {
 
   if (!appReady) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-[#0a0c10]">
+      <div className="h-screen w-screen flex items-center justify-center bg-theme-bg-deep">
         <div className="tactical-grid" />
         <div className="relative z-10 flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border border-[#00d4ff]/40 border-t-[#00d4ff] rounded-full animate-spin" />
-          <span className="text-xs text-[#5a6b7f] font-mono tracking-widest uppercase">
+          <div className="w-10 h-10 border border-theme-accent/40 border-t-theme-accent rounded-full animate-spin" />
+          <span className="text-xs text-theme-text-dim font-mono tracking-widest uppercase">
             Initializing systems...
           </span>
         </div>
@@ -39,7 +39,7 @@ export function AppLayout() {
 
   return (
     <EditorRefProvider>
-      <div className="h-screen w-screen flex flex-col bg-[#0a0c10] text-[#c8d6e5] overflow-hidden">
+      <div className="h-screen w-screen flex flex-col bg-theme-bg-deep text-theme-text overflow-hidden">
         {/* Tactical grid background */}
         <div className="tactical-grid" />
         {/* Scanline overlay */}

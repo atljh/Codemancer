@@ -105,7 +105,7 @@ const defaultSettings: AppSettings = {
   locale: "en",
   workspace_root: "",
   font_size: 14,
-  theme: "vs-dark",
+  theme: "dark-ops",
   anthropic_api_key: "",
   claude_model: "claude-sonnet-4-20250514",
   auth_method: "api_key",

@@ -26,21 +26,22 @@ export function ForgingOverlay() {
             <motion.div
               animate={{
                 boxShadow: [
-                  "0 0 20px rgba(6,182,212,0.4)",
-                  "0 0 60px rgba(6,182,212,0.8)",
-                  "0 0 20px rgba(6,182,212,0.4)",
+                  "0 0 20px rgba(var(--theme-accent-rgb),0.4)",
+                  "0 0 60px rgba(var(--theme-accent-rgb),0.8)",
+                  "0 0 20px rgba(var(--theme-accent-rgb),0.4)",
                 ],
               }}
               transition={{ duration: 1.5, repeat: Infinity }}
-              className="w-24 h-24 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center"
+              className="w-24 h-24 rounded-full flex items-center justify-center"
+              style={{ background: "linear-gradient(to bottom right, var(--theme-accent), var(--theme-accent-dim))" }}
             >
-              <Cpu className="w-12 h-12 text-cyan-100" />
+              <Cpu className="w-12 h-12 text-theme-text-bright" />
             </motion.div>
 
             <motion.p
               animate={{ opacity: [0.5, 1, 0.5] }}
               transition={{ duration: 1.5, repeat: Infinity }}
-              className="text-lg text-cyan-300 font-semibold tracking-wider uppercase"
+              className="text-lg text-theme-accent font-semibold tracking-wider uppercase"
             >
               Compiling Protocol...
             </motion.p>
@@ -49,7 +50,7 @@ export function ForgingOverlay() {
             {Array.from({ length: 8 }).map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-1.5 h-1.5 rounded-full bg-cyan-400"
+                className="absolute w-1.5 h-1.5 rounded-full bg-theme-accent"
                 initial={{
                   x: 0,
                   y: 0,

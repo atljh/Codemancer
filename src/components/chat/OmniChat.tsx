@@ -198,10 +198,10 @@ export function OmniChat() {
       >
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full gap-2">
-            <span className="text-[#00d4ff]/20 text-xs font-mono tracking-[0.3em] uppercase">
+            <span className="text-theme-accent/20 text-xs font-mono tracking-[0.3em] uppercase">
               {t("chat.emptyState")}
             </span>
-            <span className="w-2 h-4 bg-[#00d4ff]/30 animate-cursor-blink" />
+            <span className="w-2 h-4 bg-theme-accent/30 animate-cursor-blink" />
           </div>
         )}
         <AnimatePresence mode="popLayout">
@@ -224,11 +224,11 @@ export function OmniChat() {
         {isAiResponding && (
           <div className="flex items-center gap-2 px-3 py-2">
             <div className="flex gap-1">
-              <span className="w-1 h-3 bg-[#00d4ff]/60 rounded-sm animate-bounce" style={{ animationDelay: "0ms" }} />
-              <span className="w-1 h-3 bg-[#00d4ff]/60 rounded-sm animate-bounce" style={{ animationDelay: "150ms" }} />
-              <span className="w-1 h-3 bg-[#00d4ff]/60 rounded-sm animate-bounce" style={{ animationDelay: "300ms" }} />
+              <span className="w-1 h-3 bg-theme-accent/60 rounded-sm animate-bounce" style={{ animationDelay: "0ms" }} />
+              <span className="w-1 h-3 bg-theme-accent/60 rounded-sm animate-bounce" style={{ animationDelay: "150ms" }} />
+              <span className="w-1 h-3 bg-theme-accent/60 rounded-sm animate-bounce" style={{ animationDelay: "300ms" }} />
             </div>
-            <span className="text-[10px] text-[#5a6b7f] font-mono tracking-wider uppercase">
+            <span className="text-[10px] text-theme-text-dim font-mono tracking-wider uppercase">
               {t("ai.thinking")}
             </span>
           </div>
