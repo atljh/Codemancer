@@ -100,10 +100,21 @@ export function OmniChat() {
         // EXP/MP update failed
       }
 
-      // Check for authentication
-      const hasAuth = settings.auth_method === "oauth"
-        ? settings.oauth_access_token.length > 0
-        : settings.anthropic_api_key.length > 0;
+      // Check for authentication based on provider
+      const hasAuth = (() => {
+        switch (settings.ai_provider) {
+          case "openai":
+            return (settings.openai_api_key ?? "").length > 0;
+          case "gemini":
+            return (settings.gemini_api_key ?? "").length > 0;
+          case "custom":
+            return (settings.custom_base_url ?? "").length > 0;
+          default: // anthropic
+            return settings.auth_method === "oauth"
+              ? (settings.oauth_access_token ?? "").length > 0
+              : (settings.anthropic_api_key ?? "").length > 0;
+        }
+      })();
       if (!hasAuth) {
         addMessage({ role: "system", content: t("ai.noApiKey") });
         return;
@@ -174,7 +185,7 @@ export function OmniChat() {
 
       setAiResponding(false);
     },
-    [addMessage, api, setPlayer, triggerLevelUp, player.mp, settings.anthropic_api_key, settings.auth_method, settings.oauth_access_token, projectScan, handleSlashCommand, setAiResponding, updateLastMessage, t]
+    [addMessage, api, setPlayer, triggerLevelUp, player.mp, settings.ai_provider, settings.anthropic_api_key, settings.auth_method, settings.oauth_access_token, settings.openai_api_key, settings.gemini_api_key, settings.custom_base_url, projectScan, handleSlashCommand, setAiResponding, updateLastMessage, t]
   );
 
   const handleApplyCode = useCallback(

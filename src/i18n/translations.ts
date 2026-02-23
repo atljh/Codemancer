@@ -115,6 +115,24 @@ const translations = {
     "ai.thinking": "Processing...",
     "ai.noApiKey": "Configure authentication in Settings to get AI responses.",
     "ai.streamError": "AI response error",
+
+    // Multi-provider settings
+    "settings.aiProvider": "AI Provider",
+    "settings.providerAnthropic": "Anthropic",
+    "settings.providerOpenAI": "OpenAI",
+    "settings.providerGemini": "Gemini",
+    "settings.providerCustom": "Custom",
+    "settings.openaiApiKey": "OpenAI API Key",
+    "settings.openaiApiKeyHint": "Your API key from platform.openai.com. Stored locally.",
+    "settings.geminiApiKey": "Gemini API Key",
+    "settings.geminiApiKeyHint": "Your API key from aistudio.google.com. Stored locally.",
+    "settings.customBaseUrl": "Base URL",
+    "settings.customBaseUrlHint": "OpenAI-compatible endpoint (e.g. http://localhost:11434/v1 for Ollama).",
+    "settings.customApiKey": "API Key (optional)",
+    "settings.customApiKeyHint": "API key for the custom endpoint, if required.",
+    "settings.customModel": "Model Name",
+    "settings.customModelHint": "Enter the model identifier (e.g. llama3, mixtral).",
+    "settings.customModelPlaceholder": "model-name",
   },
   ru: {
     // Panels
@@ -232,6 +250,24 @@ const translations = {
     "ai.thinking": "Обработка...",
     "ai.noApiKey": "Настройте аутентификацию в Настройках для ответов ИИ.",
     "ai.streamError": "Ошибка ответа ИИ",
+
+    // Multi-provider settings
+    "settings.aiProvider": "Провайдер ИИ",
+    "settings.providerAnthropic": "Anthropic",
+    "settings.providerOpenAI": "OpenAI",
+    "settings.providerGemini": "Gemini",
+    "settings.providerCustom": "Другой",
+    "settings.openaiApiKey": "Ключ API OpenAI",
+    "settings.openaiApiKeyHint": "Ваш API ключ с platform.openai.com. Хранится локально.",
+    "settings.geminiApiKey": "Ключ API Gemini",
+    "settings.geminiApiKeyHint": "Ваш API ключ с aistudio.google.com. Хранится локально.",
+    "settings.customBaseUrl": "Базовый URL",
+    "settings.customBaseUrlHint": "OpenAI-совместимый эндпоинт (напр. http://localhost:11434/v1 для Ollama).",
+    "settings.customApiKey": "API ключ (опционально)",
+    "settings.customApiKeyHint": "API ключ для кастомного эндпоинта, если требуется.",
+    "settings.customModel": "Имя модели",
+    "settings.customModelHint": "Введите идентификатор модели (напр. llama3, mixtral).",
+    "settings.customModelPlaceholder": "имя-модели",
   },
 } as const;
 

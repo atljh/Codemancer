@@ -111,6 +111,14 @@ const defaultSettings: AppSettings = {
   auth_method: "api_key",
   oauth_access_token: "",
   oauth_refresh_token: "",
+  ai_provider: "anthropic",
+  openai_api_key: "",
+  openai_model: "gpt-4o",
+  gemini_api_key: "",
+  gemini_model: "gemini-2.0-flash",
+  custom_base_url: "",
+  custom_api_key: "",
+  custom_model: "",
 };
 
 export const useGameStore = create<GameState>((set) => ({

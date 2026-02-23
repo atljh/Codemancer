@@ -17,6 +17,15 @@ DEFAULT_SETTINGS = {
     "auth_method": "api_key",
     "oauth_access_token": "",
     "oauth_refresh_token": "",
+    # Multi-provider fields
+    "ai_provider": "anthropic",
+    "openai_api_key": "",
+    "openai_model": "gpt-4o",
+    "gemini_api_key": "",
+    "gemini_model": "gemini-2.0-flash",
+    "custom_base_url": "",
+    "custom_api_key": "",
+    "custom_model": "",
 }
 
 
@@ -30,6 +39,15 @@ class AppSettings(BaseModel):
     auth_method: str = "api_key"
     oauth_access_token: str = ""
     oauth_refresh_token: str = ""
+    # Multi-provider fields
+    ai_provider: str = "anthropic"
+    openai_api_key: str = ""
+    openai_model: str = "gpt-4o"
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-2.0-flash"
+    custom_base_url: str = ""
+    custom_api_key: str = ""
+    custom_model: str = ""
 
 
 def load_settings() -> dict:

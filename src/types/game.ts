@@ -94,7 +94,15 @@ export type Locale = "en" | "ru";
 
 export type AuthMethod = "api_key" | "oauth";
 
+export type AIProvider = "anthropic" | "openai" | "gemini" | "custom";
+
 export type ThemeId = "dark-ops" | "midnight" | "phantom" | "arctic";
+
+export interface AIModel {
+  id: string;
+  name: string;
+  description: string;
+}
 
 export interface AppSettings {
   locale: Locale;
@@ -106,6 +114,15 @@ export interface AppSettings {
   auth_method: AuthMethod;
   oauth_access_token: string;
   oauth_refresh_token: string;
+  // Multi-provider fields
+  ai_provider: AIProvider;
+  openai_api_key: string;
+  openai_model: string;
+  gemini_api_key: string;
+  gemini_model: string;
+  custom_base_url: string;
+  custom_api_key: string;
+  custom_model: string;
 }
 
 export interface ProjectScanResult {
@@ -121,8 +138,5 @@ export interface ProjectContextResult extends ProjectScanResult {
   summary: string;
 }
 
-export interface ClaudeModel {
-  id: string;
-  name: string;
-  description: string;
-}
+/** @deprecated Use AIModel instead */
+export type ClaudeModel = AIModel;

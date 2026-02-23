@@ -9,7 +9,8 @@ import type {
   AppSettings,
   ProjectScanResult,
   ProjectContextResult,
-  ClaudeModel,
+  AIModel,
+  AIProvider,
 } from "../types/game";
 
 const API_BASE = "http://127.0.0.1:8420";
@@ -123,7 +124,11 @@ const api = {
       body: JSON.stringify({ messages, project_context: projectContext }),
     }),
 
-  getChatModels: () => fetchJson<ClaudeModel[]>("/api/chat/models"),
+  getChatModels: (provider?: AIProvider) =>
+    fetchJson<AIModel[]>(`/api/chat/models${provider ? `?provider=${provider}` : ""}`),
+
+  getAllChatModels: () =>
+    fetchJson<Record<string, AIModel[]>>("/api/chat/models"),
 };
 
 export function useApi() {

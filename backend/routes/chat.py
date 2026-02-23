@@ -3,10 +3,10 @@ from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
-from anthropic import Anthropic
 
 from models.chat import ChatRequest, ChatResponse
 from models.player import Player
+from services.providers import get_provider
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
@@ -15,11 +15,31 @@ quest_service = None
 
 SETTINGS_FILE = Path(__file__).parent.parent / "settings.json"
 
-AVAILABLE_MODELS = [
-    {"id": "claude-sonnet-4-20250514", "name": "Claude Sonnet 4", "description": "Fast & capable"},
-    {"id": "claude-opus-4-20250514", "name": "Claude Opus 4", "description": "Most powerful"},
-    {"id": "claude-haiku-4-5-20251001", "name": "Claude Haiku 4.5", "description": "Fast & affordable"},
-]
+PROVIDER_MODELS = {
+    "anthropic": [
+        {"id": "claude-sonnet-4-20250514", "name": "Claude Sonnet 4", "description": "Fast & capable"},
+        {"id": "claude-opus-4-20250514", "name": "Claude Opus 4", "description": "Most powerful"},
+        {"id": "claude-haiku-4-5-20251001", "name": "Claude Haiku 4.5", "description": "Fast & affordable"},
+    ],
+    "openai": [
+        {"id": "gpt-4o", "name": "GPT-4o", "description": "Fast & capable"},
+        {"id": "gpt-4o-mini", "name": "GPT-4o Mini", "description": "Fast & affordable"},
+        {"id": "o3-mini", "name": "o3-mini", "description": "Reasoning model"},
+    ],
+    "gemini": [
+        {"id": "gemini-2.0-flash", "name": "Gemini 2.0 Flash", "description": "Fast & capable"},
+        {"id": "gemini-2.5-pro", "name": "Gemini 2.5 Pro", "description": "Most powerful"},
+    ],
+    "custom": [],
+}
+
+# Map provider -> settings key for the selected model
+_MODEL_KEY = {
+    "anthropic": "claude_model",
+    "openai": "openai_model",
+    "gemini": "gemini_model",
+    "custom": "custom_model",
+}
 
 SYSTEM_PROMPT_TEMPLATE = """You are Codemancer — a tactical AI operative embedded in a developer operations terminal.
 You help the user write code, debug, and learn programming.
@@ -38,18 +58,11 @@ def _load_settings() -> dict:
     return {}
 
 
-def _create_client(settings: dict) -> Anthropic:
-    auth_method = settings.get("auth_method", "api_key")
-    if auth_method == "oauth":
-        token = settings.get("oauth_access_token", "")
-        if not token:
-            raise HTTPException(status_code=400, detail="OAuth token not configured")
-        return Anthropic(auth_token=token)
-    else:
-        api_key = settings.get("anthropic_api_key", "")
-        if not api_key:
-            raise HTTPException(status_code=400, detail="API key not configured")
-        return Anthropic(api_key=api_key)
+def _get_model(settings: dict) -> str:
+    provider = settings.get("ai_provider", "anthropic")
+    key = _MODEL_KEY.get(provider, "claude_model")
+    defaults = {"claude_model": "claude-sonnet-4-20250514", "openai_model": "gpt-4o", "gemini_model": "gemini-2.0-flash", "custom_model": ""}
+    return settings.get(key, defaults.get(key, ""))
 
 
 def _build_system_prompt(project_context: str = "") -> str:
@@ -70,53 +83,44 @@ def _build_system_prompt(project_context: str = "") -> str:
 @router.post("/send", response_model=ChatResponse)
 async def chat_send(req: ChatRequest):
     settings = _load_settings()
-    client = _create_client(settings)
 
-    model = settings.get("claude_model", "claude-sonnet-4-20250514")
+    try:
+        provider = get_provider(settings)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
+    model = _get_model(settings)
     system_prompt = _build_system_prompt(req.project_context)
     messages = [{"role": m.role, "content": m.content} for m in req.messages if m.role in ("user", "assistant")]
 
-    response = client.messages.create(
-        model=model,
-        max_tokens=4096,
-        system=system_prompt,
-        messages=messages,
-    )
+    result = provider.chat(messages, system_prompt, model)
 
-    content = response.content[0].text if response.content else ""
-    tokens = (response.usage.input_tokens or 0) + (response.usage.output_tokens or 0)
-
-    return ChatResponse(content=content, model=model, tokens_used=tokens)
+    return ChatResponse(content=result["content"], model=model, tokens_used=result["tokens_used"])
 
 
 @router.post("/stream")
 async def chat_stream(req: ChatRequest):
     settings = _load_settings()
-    client = _create_client(settings)
 
-    model = settings.get("claude_model", "claude-sonnet-4-20250514")
+    try:
+        provider = get_provider(settings)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
+    model = _get_model(settings)
     system_prompt = _build_system_prompt(req.project_context)
     messages = [{"role": m.role, "content": m.content} for m in req.messages if m.role in ("user", "assistant")]
 
     async def event_generator():
-        with client.messages.stream(
-            model=model,
-            max_tokens=4096,
-            system=system_prompt,
-            messages=messages,
-        ) as stream:
-            for text in stream.text_stream:
-                yield f"data: {json.dumps({'text': text})}\n\n"
-
-            final = stream.get_final_message()
-            tokens = (final.usage.input_tokens or 0) + (final.usage.output_tokens or 0)
-            yield f"data: {json.dumps({'done': True, 'tokens_used': tokens})}\n\n"
+        for chunk in provider.chat_stream(messages, system_prompt, model):
+            yield f"data: {json.dumps(chunk)}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
 @router.get("/models")
-async def get_models():
-    return AVAILABLE_MODELS
+async def get_models(provider: str | None = None):
+    if provider and provider in PROVIDER_MODELS:
+        return PROVIDER_MODELS[provider]
+    # Default: return models for all providers
+    return PROVIDER_MODELS
