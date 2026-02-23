@@ -1,4 +1,5 @@
 import json
+import time
 from pathlib import Path
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -6,6 +7,7 @@ from pydantic import BaseModel
 router = APIRouter(prefix="/api/settings", tags=["settings"])
 
 SETTINGS_FILE = Path(__file__).parent.parent / "settings.json"
+PROJECTS_FILE = Path(__file__).parent.parent / "recent_projects.json"
 
 DEFAULT_SETTINGS = {
     "locale": "en",
@@ -73,3 +75,49 @@ async def update_settings(req: AppSettings):
     settings = req.model_dump()
     save_settings(settings)
     return AppSettings(**settings)
+
+
+# --- Recent Projects ---
+
+class RecentProject(BaseModel):
+    path: str
+    name: str
+    last_opened: float
+
+class AddProjectRequest(BaseModel):
+    path: str
+    name: str = ""
+
+
+def _load_recent_projects() -> list[dict]:
+    if PROJECTS_FILE.exists():
+        try:
+            return json.loads(PROJECTS_FILE.read_text())
+        except Exception:
+            pass
+    return []
+
+
+def _save_recent_projects(projects: list[dict]):
+    PROJECTS_FILE.write_text(json.dumps(projects, indent=2))
+
+
+@router.get("/recent-projects", response_model=list[RecentProject])
+async def get_recent_projects():
+    return [RecentProject(**p) for p in _load_recent_projects()]
+
+
+@router.post("/add-project", response_model=list[RecentProject])
+async def add_project(req: AddProjectRequest):
+    projects = _load_recent_projects()
+    name = req.name or Path(req.path).name
+
+    # Update existing or add new
+    projects = [p for p in projects if p["path"] != req.path]
+    projects.insert(0, {"path": req.path, "name": name, "last_opened": time.time()})
+
+    # Keep max 10
+    projects = projects[:10]
+    _save_recent_projects(projects)
+
+    return [RecentProject(**p) for p in projects]
