@@ -8,6 +8,7 @@ class Player(BaseModel):
     max_hp: int = 100
     mp: int = 50
     max_mp: int = 50
+    total_bytes_processed: int = 0
 
     @property
     def level(self) -> int:
@@ -39,3 +40,4 @@ class PlayerResponse(BaseModel):
     max_hp: int
     mp: int
     max_mp: int
+    total_bytes_processed: int
