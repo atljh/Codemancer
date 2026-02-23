@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from models.player import Player
 from services.quest_service import QuestService
-from routes import game, quests, files, settings, chat, project
+from routes import game, quests, files, settings, chat, project, commands
 from services.file_service import FileService
 
 STATE_FILE = Path(__file__).parent / "state.json"
@@ -40,6 +40,8 @@ async def lifespan(app: FastAPI):
     files.file_service = file_service
     chat.player = player
     chat.quest_service = quest_service
+    chat.file_service = file_service
+    chat.save_state_fn = save_state
     project.file_service = file_service
     project.player = player
     project.save_state_fn = save_state
@@ -62,6 +64,7 @@ app.include_router(files.router)
 app.include_router(settings.router)
 app.include_router(chat.router)
 app.include_router(project.router)
+app.include_router(commands.router)
 
 @app.get("/health")
 async def health():
