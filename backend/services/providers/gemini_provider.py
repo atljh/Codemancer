@@ -1,3 +1,5 @@
+import base64
+
 from google import genai
 from .base import BaseLLMProvider
 
@@ -53,5 +55,17 @@ def _build_contents(messages: list[dict]) -> list[genai.types.Content]:
     contents: list[genai.types.Content] = []
     for m in messages:
         role = "model" if m["role"] == "assistant" else "user"
-        contents.append(genai.types.Content(role=role, parts=[genai.types.Part(text=m["content"])]))
+        parts: list[genai.types.Part] = []
+
+        # Handle images attached via _images key
+        for img in m.get("_images", []):
+            raw_bytes = base64.b64decode(img["data"])
+            parts.append(genai.types.Part(
+                inline_data=genai.types.Blob(mime_type=img["media_type"], data=raw_bytes)
+            ))
+
+        if m.get("content"):
+            parts.append(genai.types.Part(text=m["content"]))
+
+        contents.append(genai.types.Content(role=role, parts=parts))
     return contents

@@ -356,6 +356,11 @@ const translations = {
     "intel.expBonus": "x1.5 EXP (briefing bonus)",
     "intel.mpReward": "+5 MP (voice briefing)",
     "cmd.toggleIntelFeed": "Intel Feed",
+
+    // Images
+    "image.attach": "Attach image",
+    "image.drop": "Drop image here",
+    "image.pasteHint": "Paste image from clipboard (Cmd+V)",
   },
   ru: {
     // Panels
@@ -714,6 +719,11 @@ const translations = {
     "intel.expBonus": "x1.5 EXP (бонус брифинга)",
     "intel.mpReward": "+5 MP (голосовой брифинг)",
     "cmd.toggleIntelFeed": "Разведданные",
+
+    // Images
+    "image.attach": "Прикрепить изображение",
+    "image.drop": "Перетащите изображение сюда",
+    "image.pasteHint": "Вставьте изображение из буфера обмена (Cmd+V)",
   },
 } as const;
 

@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from models.chat import ChatRequest, ChatResponse
+from models.chat import ChatRequest, ChatResponse, ImageData
 from models.player import Player
 from services.providers import get_provider
 from services.tools import ToolExecutor
@@ -112,6 +112,52 @@ If you wrote code that caused a test failure, fix it immediately."""
     )
 
 
+def _format_messages(messages_in: list, provider_name: str) -> list[dict]:
+    """Format ChatMessageIn list to provider-specific dicts, handling images."""
+    result = []
+    for m in messages_in:
+        if m.role not in ("user", "assistant"):
+            continue
+        images: list[ImageData] = getattr(m, "images", []) or []
+        if not images or m.role != "user":
+            result.append({"role": m.role, "content": m.content})
+            continue
+
+        if provider_name == "anthropic":
+            content: list[dict] = []
+            for img in images:
+                content.append({
+                    "type": "image",
+                    "source": {"type": "base64", "media_type": img.media_type, "data": img.data},
+                })
+            if m.content:
+                content.append({"type": "text", "text": m.content})
+            result.append({"role": "user", "content": content})
+
+        elif provider_name == "openai":
+            content = []
+            for img in images:
+                content.append({
+                    "type": "image_url",
+                    "image_url": {"url": f"data:{img.media_type};base64,{img.data}"},
+                })
+            if m.content:
+                content.append({"type": "text", "text": m.content})
+            result.append({"role": "user", "content": content})
+
+        elif provider_name == "gemini":
+            result.append({
+                "role": "user",
+                "content": m.content,
+                "_images": [{"media_type": img.media_type, "data": img.data} for img in images],
+            })
+
+        else:
+            result.append({"role": m.role, "content": m.content})
+
+    return result
+
+
 def _get_tools_for_provider(provider_name: str) -> list[dict] | None:
     """Get tool definitions in the right format for the provider. Returns None if tools not supported."""
     if provider_name == "anthropic":
@@ -132,8 +178,9 @@ async def chat_send(req: ChatRequest):
         raise HTTPException(status_code=400, detail=str(e))
 
     model = _get_model(settings)
+    provider_name = settings.get("ai_provider", "anthropic")
     system_prompt = _build_system_prompt(req.project_context)
-    messages = [{"role": m.role, "content": m.content} for m in req.messages if m.role in ("user", "assistant")]
+    messages = _format_messages(req.messages, provider_name)
 
     result = provider.chat(messages, system_prompt, model)
 
@@ -158,7 +205,7 @@ async def chat_stream(req: ChatRequest):
     has_tools = tools is not None and len(tools) > 0
 
     system_prompt = _build_system_prompt(req.project_context, has_tools=has_tools)
-    messages = [{"role": m.role, "content": m.content} for m in req.messages if m.role in ("user", "assistant")]
+    messages = _format_messages(req.messages, provider_name)
 
     # Create tool executor if tools available
     tool_executor = None

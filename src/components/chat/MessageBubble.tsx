@@ -74,6 +74,27 @@ export const MessageBubble = memo(function MessageBubble({ message, onApplyCode 
           [{timestamp}] [{prefix}]
         </div>
 
+        {/* Attached images */}
+        {message.images && message.images.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-2">
+            {message.images.map((img, i) => (
+              <a
+                key={i}
+                href={`data:${img.media_type};base64,${img.data}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <img
+                  src={`data:${img.media_type};base64,${img.data}`}
+                  alt={`Image ${i + 1}`}
+                  className="max-h-48 max-w-[300px] rounded border border-theme-accent/15 hover:border-theme-accent/40 transition-colors cursor-pointer"
+                />
+              </a>
+            ))}
+          </div>
+        )}
+
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{

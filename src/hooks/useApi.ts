@@ -13,6 +13,7 @@ import type {
   AIProvider,
   ConversationMeta,
   ChatMessage,
+  ImageAttachment,
   GitStatus,
   GitBranch,
   GitCommitResponse,
@@ -42,6 +43,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
 interface ChatMessagePayload {
   role: string;
   content: string;
+  images?: ImageAttachment[];
 }
 
 const api = {

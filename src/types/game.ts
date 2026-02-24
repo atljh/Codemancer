@@ -85,6 +85,11 @@ export interface ActionLogData {
   bytesProcessed?: number;
 }
 
+export interface ImageAttachment {
+  media_type: string; // "image/png", "image/jpeg", etc.
+  data: string; // base64-encoded
+}
+
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant" | "system";
@@ -93,6 +98,7 @@ export interface ChatMessage {
   type?: "message" | "action_card" | "action_log" | "health_alert" | "recall" | "blast_radius" | "command_result" | "proactive_log" | "intel_entry";
   actionCard?: ActionCardData;
   actionLog?: ActionLogData;
+  images?: ImageAttachment[];
 }
 
 export interface ConversationMeta {

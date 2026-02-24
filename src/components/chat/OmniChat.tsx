@@ -16,6 +16,7 @@ import { useApi } from "../../hooks/useApi";
 import { useAudio } from "../../hooks/useAudio";
 import { useTranslation } from "../../hooks/useTranslation";
 import { shortenPath } from "../../utils/paths";
+import type { ImageAttachment } from "../../types/game";
 
 const TOOL_DISPLAY_NAMES: Record<string, string> = {
   list_files: "Scanning sector",
@@ -228,7 +229,7 @@ export function OmniChat() {
   );
 
   const handleSend = useCallback(
-    async (text: string) => {
+    async (text: string, images?: ImageAttachment[]) => {
       // Slash commands
       if (text.startsWith("/")) {
         handleSlashCommand(text);
@@ -256,7 +257,7 @@ export function OmniChat() {
         convId = "";
       }
 
-      addMessage({ role: "user", content: actualText });
+      addMessage({ role: "user", content: actualText, images });
 
       // Intelligence processing for voice commands (and optionally long text)
       if (isVoiceCommand) {
@@ -372,7 +373,11 @@ export function OmniChat() {
       const conversationMessages = useGameStore.getState().messages
         .filter((m) => m.role === "user" || m.role === "assistant")
         .slice(-20)
-        .map((m) => ({ role: m.role, content: m.content }));
+        .map((m) => {
+          const payload: { role: string; content: string; images?: ImageAttachment[] } = { role: m.role, content: m.content };
+          if (m.images && m.images.length > 0) payload.images = m.images;
+          return payload;
+        });
 
       let projectContext = "";
       if (projectScan) {

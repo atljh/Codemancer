@@ -10,6 +10,7 @@ class ChatMessageOut(BaseModel):
     type: Optional[str] = None
     actionCard: Optional[dict[str, Any]] = None
     actionLog: Optional[dict[str, Any]] = None
+    images: Optional[list[dict[str, str]]] = None
 
 
 class ConversationMeta(BaseModel):
