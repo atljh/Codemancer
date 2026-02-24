@@ -75,6 +75,11 @@ interface GameState {
   showQuickOpen: boolean;
   showSearchPanel: boolean;
 
+  // Command palette & go to line
+  showCommandPalette: boolean;
+  showGoToLine: boolean;
+  searchReplaceExpanded: boolean;
+
   // Focus
   focusStatus: FocusStatus | null;
 
@@ -146,6 +151,13 @@ interface GameState {
   // Quick open & search actions
   toggleQuickOpen: () => void;
   toggleSearchPanel: () => void;
+
+  // Command palette & go to line actions
+  toggleCommandPalette: () => void;
+  setShowCommandPalette: (v: boolean) => void;
+  toggleGoToLine: () => void;
+  setShowGoToLine: (v: boolean) => void;
+  setSearchReplaceExpanded: (v: boolean) => void;
 
   // Focus actions
   setFocusStatus: (status: FocusStatus | null) => void;
@@ -220,6 +232,9 @@ export const useGameStore = create<GameState>((set) => ({
   showHealthPanel: false,
   showQuickOpen: false,
   showSearchPanel: false,
+  showCommandPalette: false,
+  showGoToLine: false,
+  searchReplaceExpanded: false,
   focusStatus: null,
 
   setPlayer: (player) => set({ player }),
@@ -389,6 +404,13 @@ export const useGameStore = create<GameState>((set) => ({
   // Quick open & search
   toggleQuickOpen: () => set((s) => ({ showQuickOpen: !s.showQuickOpen })),
   toggleSearchPanel: () => set((s) => ({ showSearchPanel: !s.showSearchPanel })),
+
+  // Command palette & go to line
+  toggleCommandPalette: () => set((s) => ({ showCommandPalette: !s.showCommandPalette })),
+  setShowCommandPalette: (v) => set({ showCommandPalette: v }),
+  toggleGoToLine: () => set((s) => ({ showGoToLine: !s.showGoToLine })),
+  setShowGoToLine: (v) => set({ showGoToLine: v }),
+  setSearchReplaceExpanded: (v) => set({ searchReplaceExpanded: v }),
 
   // Focus
   setFocusStatus: (status) => set({ focusStatus: status }),

@@ -14,6 +14,8 @@ import { ChroniclePanel } from "../chronicle/ChroniclePanel";
 import { HealthPanel } from "../health/HealthPanel";
 import { TacticalMap } from "../map/TacticalMap";
 import { QuickOpenModal } from "../modals/QuickOpenModal";
+import { CommandPaletteModal } from "../modals/CommandPaletteModal";
+import { GoToLineDialog } from "../modals/GoToLineDialog";
 import { SearchPanel } from "../search/SearchPanel";
 import { EditorRefProvider } from "../../hooks/useEditorRef";
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
@@ -88,6 +90,8 @@ export function AppLayout() {
       <ChroniclePanel />
       <HealthPanel />
       <QuickOpenModal />
+      <CommandPaletteModal />
+      <GoToLineDialog />
     </EditorRefProvider>
   );
 }

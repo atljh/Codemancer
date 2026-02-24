@@ -198,3 +198,36 @@ class FileService:
                 message=str(e.msg),
             )
             return [error], False
+
+    def replace_in_files(self, root: str, search: str, replace: str) -> tuple[int, int]:
+        root_path = self._validate_path(root)
+        if not root_path.is_dir():
+            return 0, 0
+
+        files_modified = 0
+        replacements_made = 0
+
+        for dirpath, dirnames, filenames in os.walk(root_path):
+            dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+
+            for fname in filenames:
+                ext = Path(fname).suffix.lower()
+                if ext in self.BINARY_EXTENSIONS:
+                    continue
+
+                fpath = os.path.join(dirpath, fname)
+                try:
+                    with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
+                        content = f.read()
+
+                    count = content.count(search)
+                    if count > 0:
+                        new_content = content.replace(search, replace)
+                        with open(fpath, "w", encoding="utf-8") as f:
+                            f.write(new_content)
+                        files_modified += 1
+                        replacements_made += count
+                except (OSError, UnicodeDecodeError):
+                    continue
+
+        return files_modified, replacements_made

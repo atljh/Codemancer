@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, FileText, Loader2 } from "lucide-react";
+import { Search, X, FileText, Loader2, ChevronRight, Replace } from "lucide-react";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -24,10 +24,15 @@ export function SearchPanel() {
   const fileTreeRoot = useGameStore((s) => s.fileTreeRoot);
   const openFile = useGameStore((s) => s.openFile);
   const setActiveTab = useGameStore((s) => s.setActiveTab);
+  const searchReplaceExpanded = useGameStore((s) => s.searchReplaceExpanded);
+  const setSearchReplaceExpanded = useGameStore((s) => s.setSearchReplaceExpanded);
   const api = useApi();
   const { t } = useTranslation();
 
   const [query, setQuery] = useState("");
+  const [replaceQuery, setReplaceQuery] = useState("");
+  const [showReplace, setShowReplace] = useState(false);
+  const [replacing, setReplacing] = useState(false);
   const [results, setResults] = useState<SearchMatch[]>([]);
   const [truncated, setTruncated] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,12 +43,18 @@ export function SearchPanel() {
   useEffect(() => {
     if (show) {
       setTimeout(() => inputRef.current?.focus(), 50);
+      if (searchReplaceExpanded) {
+        setShowReplace(true);
+        setSearchReplaceExpanded(false);
+      }
     } else {
       setQuery("");
+      setReplaceQuery("");
       setResults([]);
       setSearched(false);
+      setShowReplace(false);
     }
-  }, [show]);
+  }, [show, searchReplaceExpanded, setSearchReplaceExpanded]);
 
   const doSearch = useCallback(
     async (q: string) => {
@@ -75,6 +86,21 @@ export function SearchPanel() {
     },
     [doSearch]
   );
+
+  const handleReplaceAll = useCallback(async () => {
+    if (!query.trim() || !replaceQuery || !fileTreeRoot) return;
+    if (!window.confirm(t("search.replaceConfirm" as any))) return;
+    setReplacing(true);
+    try {
+      await api.replaceInFiles(fileTreeRoot, query, replaceQuery);
+      // Re-search to update results
+      await doSearch(query);
+    } catch {
+      // ignore
+    } finally {
+      setReplacing(false);
+    }
+  }, [query, replaceQuery, fileTreeRoot, api, doSearch, t]);
 
   const handleOpenResult = useCallback(
     async (match: SearchMatch) => {
@@ -136,6 +162,16 @@ export function SearchPanel() {
 
             {/* Search input */}
             <div className="flex items-center gap-2 px-3 py-2 border-b border-theme-accent/10">
+              <button
+                onClick={() => setShowReplace((v) => !v)}
+                className="text-theme-text-dim hover:text-theme-text transition-colors shrink-0"
+                title={t("search.toggleReplace" as any)}
+              >
+                <ChevronRight
+                  className={`w-3.5 h-3.5 transition-transform ${showReplace ? "rotate-90" : ""}`}
+                  strokeWidth={1.5}
+                />
+              </button>
               <Search className="w-3.5 h-3.5 text-theme-text-dim shrink-0" strokeWidth={1.5} />
               <input
                 ref={inputRef}
@@ -149,6 +185,36 @@ export function SearchPanel() {
                 <Loader2 className="w-3.5 h-3.5 text-theme-accent animate-spin shrink-0" strokeWidth={1.5} />
               )}
             </div>
+
+            {/* Replace input (collapsible) */}
+            <AnimatePresence>
+              {showReplace && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="overflow-hidden border-b border-theme-accent/10"
+                >
+                  <div className="flex items-center gap-2 px-3 py-2">
+                    <Replace className="w-3.5 h-3.5 text-theme-text-dim shrink-0 ml-[22px]" strokeWidth={1.5} />
+                    <input
+                      value={replaceQuery}
+                      onChange={(e) => setReplaceQuery(e.target.value)}
+                      placeholder={t("search.replacePlaceholder" as any)}
+                      className="flex-1 bg-transparent text-xs font-mono text-theme-text placeholder:text-theme-text-dim/50 outline-none"
+                    />
+                    <button
+                      onClick={handleReplaceAll}
+                      disabled={replacing || !query.trim() || !replaceQuery}
+                      className="text-[9px] font-mono px-2 py-0.5 rounded bg-theme-accent/20 text-theme-accent hover:bg-theme-accent/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shrink-0"
+                    >
+                      {replacing ? t("search.replacing" as any) : t("search.replaceAll" as any)}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Results */}
             <div className="flex-1 overflow-y-auto scrollbar-thin">

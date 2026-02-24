@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { useGameStore } from "../stores/gameStore";
+import { api } from "./useApi";
+import { cycleTab } from "../commands/commandRegistry";
 
 const ZOOM_KEY = "codemancer-zoom";
 const ZOOM_STEP = 0.1;
@@ -25,27 +27,125 @@ function initZoom() {
   }
 }
 
+// Listen for zoom events from command registry
+function handleZoomEvent(e: Event) {
+  const detail = (e as CustomEvent).detail;
+  if (detail === "in") setZoom(getZoom() + ZOOM_STEP);
+  else if (detail === "out") setZoom(getZoom() - ZOOM_STEP);
+  else if (detail === "reset") setZoom(1.0);
+}
+
 export function useKeyboardShortcuts() {
   useEffect(() => {
     initZoom();
+    window.addEventListener("codemancer:zoom", handleZoomEvent);
 
     function handleKeyDown(e: KeyboardEvent) {
       const mod = e.metaKey || e.ctrlKey;
+
+      // --- Escape chain (no mod required) ---
+      if (e.key === "Escape") {
+        const s = useGameStore.getState();
+        if (s.showCommandPalette) { s.setShowCommandPalette(false); e.preventDefault(); return; }
+        if (s.showQuickOpen) { s.toggleQuickOpen(); e.preventDefault(); return; }
+        if (s.showGoToLine) { s.setShowGoToLine(false); e.preventDefault(); return; }
+        if (s.showSearchPanel) { s.toggleSearchPanel(); e.preventDefault(); return; }
+        if (s.showSettings) { s.toggleSettings(); e.preventDefault(); return; }
+        if (s.diffViewer.show) { s.closeDiffViewer(); e.preventDefault(); return; }
+        if (s.showChronicle) { s.toggleChronicle(); e.preventDefault(); return; }
+        if (s.showHealthPanel) { s.toggleHealthPanel(); e.preventDefault(); return; }
+        return;
+      }
+
+      // --- Ctrl+Tab / Ctrl+Shift+Tab — cycle tabs (no Cmd needed) ---
+      if (e.ctrlKey && e.key === "Tab") {
+        e.preventDefault();
+        cycleTab(e.shiftKey ? -1 : 1);
+        return;
+      }
+
       if (!mod) return;
 
       // Ignore if user is typing in an input/textarea (except for zoom, tab switches, and palette shortcuts)
       const tag = (e.target as HTMLElement)?.tagName;
       const isInput = tag === "INPUT" || tag === "TEXTAREA";
 
-      // Cmd+Shift+F — global search (works even from inputs)
-      if (e.shiftKey && e.key === "f") {
-        e.preventDefault();
-        const { toggleSearchPanel } = useGameStore.getState();
-        toggleSearchPanel();
-        return;
+      // --- Shift combos (before main switch) ---
+      if (e.shiftKey) {
+        switch (e.key) {
+          // Cmd+Shift+P — Command Palette
+          case "p":
+          case "P": {
+            e.preventDefault();
+            useGameStore.getState().toggleCommandPalette();
+            return;
+          }
+          // Cmd+Shift+F — global search
+          case "f":
+          case "F": {
+            e.preventDefault();
+            useGameStore.getState().toggleSearchPanel();
+            return;
+          }
+          // Cmd+Shift+C — toggle Chronicle
+          case "c":
+          case "C": {
+            e.preventDefault();
+            useGameStore.getState().toggleChronicle();
+            return;
+          }
+          // Cmd+Shift+H — toggle Health Panel
+          case "h":
+          case "H": {
+            e.preventDefault();
+            useGameStore.getState().toggleHealthPanel();
+            return;
+          }
+          // Cmd+Shift+M — toggle Focus Mode
+          case "m":
+          case "M": {
+            e.preventDefault();
+            const s = useGameStore.getState();
+            if (s.focusStatus?.active) {
+              api.focusEnd().then((status) => s.setFocusStatus(status));
+            } else {
+              api.focusStart(25).then((status) => s.setFocusStatus(status));
+            }
+            return;
+          }
+          // Cmd+Shift+R — global replace
+          case "r":
+          case "R": {
+            e.preventDefault();
+            const s = useGameStore.getState();
+            s.setSearchReplaceExpanded(true);
+            if (!s.showSearchPanel) s.toggleSearchPanel();
+            return;
+          }
+          // Cmd+Shift+[ — prev tab
+          case "[": {
+            e.preventDefault();
+            cycleTab(-1);
+            return;
+          }
+          // Cmd+Shift+] — next tab
+          case "]": {
+            e.preventDefault();
+            cycleTab(1);
+            return;
+          }
+          default:
+            break;
+        }
       }
 
       switch (e.key) {
+        // Cmd+S — save (always prevent default, CodeEditor handles the actual save)
+        case "s": {
+          e.preventDefault();
+          break;
+        }
+
         // Cmd+T — new conversation
         case "t": {
           if (isInput) return;
@@ -80,6 +180,51 @@ export function useKeyboardShortcuts() {
           e.preventDefault();
           const { toggleQuickOpen } = useGameStore.getState();
           toggleQuickOpen();
+          break;
+        }
+
+        // Cmd+N — new untitled file
+        case "n": {
+          if (isInput) return;
+          e.preventDefault();
+          const s = useGameStore.getState();
+          const name = `untitled-${Date.now()}.txt`;
+          const path = s.fileTreeRoot ? `${s.fileTreeRoot}/${name}` : `/tmp/${name}`;
+          s.openFile({ path, content: "", language: "plaintext", isDirty: true });
+          s.setActiveTab(path);
+          break;
+        }
+
+        // Cmd+G — go to line
+        case "g": {
+          if (isInput) return;
+          e.preventDefault();
+          const s = useGameStore.getState();
+          if (s.openFiles.some((f) => f.path === s.activeTab)) {
+            s.toggleGoToLine();
+          }
+          break;
+        }
+
+        // Cmd+F — find in file (Monaco)
+        case "f": {
+          if (isInput) return;
+          const s = useGameStore.getState();
+          if (s.openFiles.some((f) => f.path === s.activeTab)) {
+            e.preventDefault();
+            window.dispatchEvent(new CustomEvent("codemancer:editor-find"));
+          }
+          break;
+        }
+
+        // Cmd+H — find & replace in file (Monaco)
+        case "h": {
+          if (isInput) return;
+          const s = useGameStore.getState();
+          if (s.openFiles.some((f) => f.path === s.activeTab)) {
+            e.preventDefault();
+            window.dispatchEvent(new CustomEvent("codemancer:editor-replace"));
+          }
           break;
         }
 
@@ -164,7 +309,10 @@ export function useKeyboardShortcuts() {
     }
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("codemancer:zoom", handleZoomEvent);
+    };
   }, []);
 }
 
@@ -175,48 +323,21 @@ async function openProjectDialog() {
     if (!selected) return;
 
     const path = selected as string;
-    const API_BASE = "http://127.0.0.1:8420";
-
-    // Scan the project
-    const scanRes = await fetch(`${API_BASE}/api/project/scan`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ path, award_exp: true }),
-    });
-    if (!scanRes.ok) return;
-    const scan = await scanRes.json();
-
-    // Update settings on backend
     const state = useGameStore.getState();
-    const newSettings = { ...state.settings, workspace_root: path };
-    await fetch(`${API_BASE}/api/settings/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newSettings),
-    });
 
-    // Update store
+    const scan = await api.scanProject(path);
+    const newSettings = { ...state.settings, workspace_root: path };
+    await api.updateSettings(newSettings);
+
     state.setSettings(newSettings);
     state.setFileTreeRoot(path);
     state.setProjectScan(scan);
 
-    // Reload file tree
-    const treeRes = await fetch(`${API_BASE}/api/files/tree`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ root: path, max_depth: 5 }),
-    });
-    if (treeRes.ok) {
-      const tree = await treeRes.json();
-      state.setFileTree(tree);
-    }
+    const tree = await api.getFileTree(path);
+    state.setFileTree(tree);
 
-    // Refresh player state (for exp gained)
-    const playerRes = await fetch(`${API_BASE}/api/game/status`);
-    if (playerRes.ok) {
-      const player = await playerRes.json();
-      state.setPlayer(player);
-    }
+    const player = await api.getStatus();
+    state.setPlayer(player);
   } catch {
     // Not in Tauri environment or user cancelled
   }

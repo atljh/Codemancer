@@ -63,3 +63,14 @@ class FileSearchMatch(BaseModel):
 class FileSearchResponse(BaseModel):
     matches: list[FileSearchMatch]
     truncated: bool = False
+
+
+class FileReplaceRequest(BaseModel):
+    root: str
+    search: str
+    replace: str
+
+
+class FileReplaceResult(BaseModel):
+    files_modified: int
+    replacements_made: int

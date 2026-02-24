@@ -131,7 +131,6 @@ pub fn run() {
                         .separator()
                         .services()
                         .separator()
-                        .hide()
                         .hide_others()
                         .show_all()
                         .separator()

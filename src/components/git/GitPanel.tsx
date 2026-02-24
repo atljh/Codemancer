@@ -279,22 +279,23 @@ export function GitPanel() {
         {/* Commit area */}
         {!error && gitStatus && (
           <div className="border-t border-[var(--theme-glass-border)] p-2 space-y-2">
-            <div className="relative">
+            <div className="space-y-1.5">
               <textarea
                 value={commitMsg}
                 onChange={(e) => setCommitMsg(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={t("git.commitPlaceholder")}
                 rows={2}
-                className="w-full resize-none rounded bg-[var(--theme-bg-deep)] border border-[var(--theme-glass-border)] px-2 py-1.5 pr-8 text-xs font-mono text-theme-text placeholder:text-theme-text-dimmer focus:outline-none focus:border-theme-accent/40 transition-colors"
+                className="w-full resize-none rounded bg-[var(--theme-bg-deep)] border border-[var(--theme-glass-border)] px-2 py-1.5 text-xs font-mono text-theme-text placeholder:text-theme-text-dimmer focus:outline-none focus:border-theme-accent/40 transition-colors"
               />
               <button
                 onClick={handleGenerateMessage}
                 disabled={aiLoading || !gitStatus?.staged.length}
-                className="absolute right-1.5 top-1.5 p-1 rounded hover:bg-theme-accent/15 text-theme-text-dimmer hover:text-theme-accent disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-mono bg-theme-accent/10 text-theme-accent/70 hover:bg-theme-accent/20 hover:text-theme-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 title={t("git.generateMessage")}
               >
                 <Sparkles className={`w-3.5 h-3.5 ${aiLoading ? "animate-pulse" : ""}`} strokeWidth={1.5} />
+                {aiLoading ? t("git.generating") : t("git.generateMessage")}
               </button>
             </div>
             <button

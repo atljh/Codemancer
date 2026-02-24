@@ -10,6 +10,8 @@ from models.file import (
     SyntaxCheckResponse,
     FileSearchRequest,
     FileSearchResponse,
+    FileReplaceRequest,
+    FileReplaceResult,
 )
 from services.file_service import FileService
 
@@ -69,6 +71,21 @@ async def check_syntax(req: SyntaxCheckRequest):
     try:
         errors, valid = file_service.check_syntax(req.path, req.content)
         return SyntaxCheckResponse(errors=errors, valid=valid)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/replace", response_model=FileReplaceResult)
+async def replace_in_files(req: FileReplaceRequest):
+    try:
+        files_modified, replacements_made = file_service.replace_in_files(
+            req.root, req.search, req.replace
+        )
+        return FileReplaceResult(
+            files_modified=files_modified, replacements_made=replacements_made
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:

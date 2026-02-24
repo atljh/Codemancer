@@ -51,6 +51,22 @@ export function CodeEditor() {
     return () => window.removeEventListener("keydown", handler);
   }, [handleSave]);
 
+  // Custom events: find & replace in Monaco
+  useEffect(() => {
+    const onFind = () => {
+      editorRef.current?.getAction("actions.find")?.run();
+    };
+    const onReplace = () => {
+      editorRef.current?.getAction("editor.action.startFindReplaceAction")?.run();
+    };
+    window.addEventListener("codemancer:editor-find", onFind);
+    window.addEventListener("codemancer:editor-replace", onReplace);
+    return () => {
+      window.removeEventListener("codemancer:editor-find", onFind);
+      window.removeEventListener("codemancer:editor-replace", onReplace);
+    };
+  }, [editorRef]);
+
   const handleBeforeMount: BeforeMount = (monaco) => {
     registerMonacoThemes(monaco);
   };

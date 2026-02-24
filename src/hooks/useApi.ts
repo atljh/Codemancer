@@ -265,7 +265,15 @@ const api = {
     fetchJson<FocusStatus>("/api/game/focus/end", { method: "POST" }),
 
   focusStatus: () => fetchJson<FocusStatus>("/api/game/focus/status"),
+
+  replaceInFiles: (root: string, search: string, replace: string) =>
+    fetchJson<{ files_modified: number; replacements_made: number }>("/api/files/replace", {
+      method: "POST",
+      body: JSON.stringify({ root, search, replace }),
+    }),
 };
+
+export { api };
 
 export function useApi() {
   return useMemo(() => api, []);

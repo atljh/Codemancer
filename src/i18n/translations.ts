@@ -235,6 +235,46 @@ const translations = {
     "search.noResults": "No results found",
     "search.truncated": "Results truncated — refine your query",
 
+    // Command Palette
+    "cmd.palette.placeholder": "Type a command...",
+    "cmd.palette.noResults": "No matching commands",
+    "cmd.newConversation": "New Conversation",
+    "cmd.openProject": "Open Project",
+    "cmd.quickOpen": "Quick Open File",
+    "cmd.save": "Save File",
+    "cmd.closeTab": "Close Tab",
+    "cmd.newFile": "New File",
+    "cmd.toggleExplorer": "Toggle Explorer",
+    "cmd.toggleGit": "Toggle Git Panel",
+    "cmd.toggleChronicle": "Toggle Chronicle",
+    "cmd.toggleHealth": "Toggle Health Panel",
+    "cmd.toggleSettings": "Open Settings",
+    "cmd.zoomIn": "Zoom In",
+    "cmd.zoomOut": "Zoom Out",
+    "cmd.zoomReset": "Reset Zoom",
+    "cmd.prevTab": "Previous Tab",
+    "cmd.nextTab": "Next Tab",
+    "cmd.goToLine": "Go to Line",
+    "cmd.findInFile": "Find in File",
+    "cmd.replaceInFile": "Find & Replace in File",
+    "cmd.searchFiles": "Search in Files",
+    "cmd.replaceInFiles": "Replace in Files",
+    "cmd.toggleFocus": "Toggle Focus Mode",
+    "cmd.gitStatus": "Git Status",
+    "cmd.scanTodos": "Scan TODOs",
+    "cmd.commandPalette": "Command Palette",
+
+    // Go to Line
+    "goToLine.label": "Go to Line",
+    "goToLine.placeholder": "Line number",
+
+    // Search Replace
+    "search.toggleReplace": "Toggle Replace",
+    "search.replacePlaceholder": "Replace with...",
+    "search.replaceAll": "Replace All",
+    "search.replacing": "Replacing...",
+    "search.replaceConfirm": "Replace all occurrences in project files?",
+
     // Focus
     "focus.title": "Mission Focus",
     "focus.start": "Focus",
@@ -481,6 +521,46 @@ const translations = {
     "search.hint": "Введите запрос для поиска по файлам проекта",
     "search.noResults": "Ничего не найдено",
     "search.truncated": "Результаты обрезаны — уточните запрос",
+
+    // Command Palette
+    "cmd.palette.placeholder": "Введите команду...",
+    "cmd.palette.noResults": "Команды не найдены",
+    "cmd.newConversation": "Новый диалог",
+    "cmd.openProject": "Открыть проект",
+    "cmd.quickOpen": "Быстрое открытие файла",
+    "cmd.save": "Сохранить файл",
+    "cmd.closeTab": "Закрыть вкладку",
+    "cmd.newFile": "Новый файл",
+    "cmd.toggleExplorer": "Проводник",
+    "cmd.toggleGit": "Git панель",
+    "cmd.toggleChronicle": "Хроника",
+    "cmd.toggleHealth": "Оценка угроз",
+    "cmd.toggleSettings": "Настройки",
+    "cmd.zoomIn": "Увеличить",
+    "cmd.zoomOut": "Уменьшить",
+    "cmd.zoomReset": "Сбросить масштаб",
+    "cmd.prevTab": "Предыдущая вкладка",
+    "cmd.nextTab": "Следующая вкладка",
+    "cmd.goToLine": "Перейти к строке",
+    "cmd.findInFile": "Поиск в файле",
+    "cmd.replaceInFile": "Поиск и замена в файле",
+    "cmd.searchFiles": "Поиск по файлам",
+    "cmd.replaceInFiles": "Замена в файлах",
+    "cmd.toggleFocus": "Режим фокуса",
+    "cmd.gitStatus": "Git статус",
+    "cmd.scanTodos": "Сканировать TODO",
+    "cmd.commandPalette": "Палитра команд",
+
+    // Go to Line
+    "goToLine.label": "Перейти к строке",
+    "goToLine.placeholder": "Номер строки",
+
+    // Search Replace
+    "search.toggleReplace": "Показать замену",
+    "search.replacePlaceholder": "Заменить на...",
+    "search.replaceAll": "Заменить всё",
+    "search.replacing": "Замена...",
+    "search.replaceConfirm": "Заменить все вхождения в файлах проекта?",
 
     // Focus
     "focus.title": "Фокус миссии",
