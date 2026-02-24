@@ -1,6 +1,6 @@
-# Codemancer
+# Codemancer: The Strategic Command Deck for AI-Native Engineering
 
-**Gamified developer companion** — a desktop app that turns your coding workflow into an RPG adventure.
+Codemancer is not just an IDE. It's a **tactical code reality management interface** built for the era where development is not writing lines, but commanding powerful AI agents.
 
 Built with Tauri 2.0 + React 19 + Python FastAPI. Works as a visual companion for CLI tools like Claude Code, providing UI for what terminals can't: visualization, tracking, and interactive panels.
 
@@ -8,11 +8,45 @@ Built with Tauri 2.0 + React 19 + Python FastAPI. Works as a visual companion fo
 
 ![Codemancer Screenshot](docs/screenshot.png)
 
-## Features
+## Vision
+
+Modern tools (VS Code, Cursor) are a legacy of the past. They force a human to work as a "text micromanager". Codemancer elevates you to the level of a **Strategist**.
+
+While your AI agent operates files and terminal, you see the big picture:
+
+- **Intelligence over text** — you interact with your project as a living organism
+- **Dopamine over burnout** — every solved task is a captured sector and growth of your influence
+- **Context over chaos** — visual dependency maps and tech debt radars replace thousands of open tabs
+
+## Key Features
+
+### The Tactical Map
+Interactive dependency graph with "fog of war" effect. See the **Blast Radius** of your changes before they break the system. Orange highlights show affected modules when the AI writes files.
+
+### Agentic Tools (The Hands)
+The agent has full access to `list_files`, `read_file`, `write_file`, `search_text`, and `run_command`. It doesn't just advise — it executes. Failed commands deal HP damage; the agent proposes repair plans automatically.
+
+### Health & Tech Debt Radar
+Radar diagram of anomalies. Turn refactoring into clearing "red zones" of complexity and tech debt. Background health watch alerts you when critical anomalies are detected: `[CRITICAL_ANOMALY]: Instability detected in sector src/logic`.
+
+### Session Chronicle
+Automatic knowledge base of all your actions. Generate PR reports and standups in one click. **Cross-session memory** — the agent recalls previous work on the same code: `[RECALLING_DATA]: We previously worked on this module...`
+
+### Proactive Assistant (Ambient Thinking)
+Background pulse every 5 minutes analyzes `git diff` and error patterns. If something important is found, the agent initiates dialogue: `[PROACTIVE_LOG]: Background analysis complete. Redundancy detected. Operator, shall we stabilize?`
+
+### Neural Voice Link
+Voice input via microphone button in the command line. Web Speech API TTS voices AI responses. Procedural audio engine: scanning tones on tool use, glitch noise on errors, success chimes on completion.
+
+### Deep Dive Mode
+RPG focus timer with experience multiplier (x2 EXP). Working in flow restores your mental "Mana".
+
+### Visual Presence Effects
+Animated waveform in the header pulses when the AI is thinking. When HP drops below 20%, the entire UI gets a glitch distortion effect with a red vignette — your systems are failing, Operator.
 
 ### RPG Progression System
 - **EXP & Levels** — earn experience for coding actions (messages, commits, bug fixes, file saves)
-- **HP / MP** — HP drains after inactivity, MP regenerates during idle
+- **HP / MP** — HP drains from failed commands, MP spent on tool use
 - **Focus Mode** — Pomodoro-style timer with x2 EXP multiplier
 - **Level-up notifications** with visual effects
 
@@ -21,7 +55,7 @@ Built with Tauri 2.0 + React 19 + Python FastAPI. Works as a visual companion fo
 - **Streaming responses** with tool use integration
 - **Persistent conversations** — auto-saved, restorable across sessions
 - **Project context injection** — AI understands your codebase
-- **OAuth authentication** with Anthropic
+- **Tactical personality** — the agent addresses you as "Operator" and reports in analytical style with confidence percentages
 
 ### Built-in Code Editor
 - **Monaco Editor** with 4 sci-fi themes
@@ -37,22 +71,6 @@ Built with Tauri 2.0 + React 19 + Python FastAPI. Works as a visual companion fo
 - **AI-generated commit messages**
 - **Discard changes** per file
 
-### Code Quality Analysis
-- **Health panel** — complexity, test coverage, code cleanliness metrics
-- **Large files & complex functions** detection
-- **Tech debt indicators**
-- **Anomaly detection**
-
-### Dependency Visualization
-- **Tactical Map** — interactive dependency graph
-- **Module-to-module relationship** mapping
-- **Fog of war** visual effect
-
-### Session Tracking (Chronicle)
-- **Timeline of all actions** — commits, edits, AI responses, quests
-- **Session reports** in PR, standup, and Jira formats
-- **Activity history** across sessions
-
 ### Productivity Tools
 - **Command Palette** (Cmd+K) — 20+ built-in commands
 - **Quick Open** (Cmd+P) — fuzzy file search
@@ -65,13 +83,19 @@ Built with Tauri 2.0 + React 19 + Python FastAPI. Works as a visual companion fo
 - **2 languages**: English, Russian
 - **Sci-fi / tactical aesthetic** with glass morphism effects
 
+## The Philosophy
+
+- **AI-First**: The interface is abstracted from files. Code is an artifact, not the center of attention.
+- **Visual Context**: If it can't be seen on the map, it doesn't exist.
+- **Proactive Assistance**: Your agent speaks first when it senses danger in the sector.
+
 ## Architecture
 
 ```
 src/                        # React 19 + TypeScript + Vite 7
-  components/               # 30 components across 13 feature areas
+  components/               # 40+ components across 15 feature areas
     bars/                   # EXP bar, stat bars
-    chat/                   # OmniChat, message bubbles, action cards
+    chat/                   # OmniChat, bubbles (message, health, recall, blast, proactive)
     editor/                 # Monaco editor, file tabs
     explorer/               # File tree browser
     focus/                  # Focus timer
@@ -82,15 +106,15 @@ src/                        # React 19 + TypeScript + Vite 7
     modals/                 # Command palette, settings, diff viewer, etc.
     chronicle/              # Session journal
     welcome/                # Initial setup screen
-    ui/                     # Glass card, glow panel primitives
+    ui/                     # Glass card, glow panel, waveform visualizer
   stores/gameStore.ts       # Zustand 5 — single global store
-  hooks/useApi.ts           # Singleton API client
+  hooks/                    # useApi, useAudio, useHealthWatch, useProactivePulse, etc.
   types/game.ts             # All TypeScript interfaces
-  i18n/translations.ts      # EN/RU translations (200+ keys)
+  i18n/translations.ts      # EN/RU translations (250+ keys)
   themes/                   # CSS custom properties, 4 themes
 
 backend/                    # Python 3.12+ FastAPI
-  routes/                   # 12 API routers, 50+ endpoints
+  routes/                   # 13 API routers, 60+ endpoints
   models/                   # Pydantic models
   services/                 # Business logic
     providers/              # AI providers (Anthropic, OpenAI, Gemini, Custom)
@@ -230,6 +254,7 @@ Select your project directory via the folder icon in the top bar. Codemancer wil
 | Apply code | +50 |
 | Fix bug | +100 |
 | Git commit | variable |
+| Tool execution | +15-25 |
 | Focus mode | x2 multiplier |
 
 **Level formula**: `level = floor(sqrt(total_exp / 100))`
@@ -243,20 +268,18 @@ Select your project directory via the folder icon in the top bar. Codemancer wil
 | Styling | Tailwind CSS 4.2, Framer Motion 12 |
 | State | Zustand 5 |
 | Editor | Monaco Editor |
+| Audio | Web Audio API (procedural), Web Speech API (TTS/STT) |
 | Icons | Lucide React |
 | Backend | Python 3.12+, FastAPI, Uvicorn |
 | AI SDKs | anthropic, openai, google-genai |
 | Package Managers | pnpm (frontend), uv (backend), cargo (Rust) |
 
-## Roadmap
+## What's Next
 
-See [ROADMAP.md](ROADMAP.md) for the full development plan.
-
-- **v0.2** (current) — Visual Git client
-- **v0.3** — Session journal & time tracking
-- **v0.4** — Project dashboard & code metrics
-- **v0.5** — GitHub, CI/CD, Linear/Jira integrations
-- **v0.6** — Focus mode & productivity analytics
+- **Visual Vision** — agent ability to "see" your running application's UI
+- **Skill Trees** — level up as "Architect" or "Debugger", unlocking new agent tools
+- **Multi-agent Orchestration** — coordinate multiple AI agents on complex tasks
+- **GitHub/CI Integration** — PR reviews, pipeline monitoring from the command deck
 
 ## License
 
