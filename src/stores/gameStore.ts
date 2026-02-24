@@ -91,7 +91,7 @@ interface GameState {
   // Actions
   setPlayer: (player: Player) => void;
   setQuests: (quests: Quest[]) => void;
-  addMessage: (msg: Omit<ChatMessage, "id" | "timestamp">) => void;
+  addMessage: (msg: Omit<ChatMessage, "id" | "timestamp"> & { id?: string }) => void;
   triggerLevelUp: (level: number) => void;
   dismissLevelUp: () => void;
   setForging: (v: boolean) => void;
@@ -257,7 +257,7 @@ export const useGameStore = create<GameState>((set) => ({
     set((s) => ({
       messages: [
         ...s.messages,
-        { ...msg, id: (msg as any).id || crypto.randomUUID(), timestamp: Date.now() },
+        { ...msg, id: msg.id || crypto.randomUUID(), timestamp: Date.now() },
       ],
     })),
 

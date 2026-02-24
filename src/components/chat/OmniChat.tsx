@@ -64,7 +64,7 @@ export function OmniChat() {
       const id = convId ?? currentConversationId;
       if (!id) return;
       const msgs = useGameStore.getState().messages.filter(
-        (m) => m.type !== "action_log" && !["health_alert", "recall", "blast_radius", "command_result"].includes(m.type as string)
+        (m) => m.type !== "action_log" && !["health_alert", "recall", "blast_radius", "command_result"].includes(m.type!)
       );
       try {
         const meta = await api.saveMessages(id, msgs);
@@ -302,7 +302,7 @@ export function OmniChat() {
               recallContent += `\n- ${action}`;
             }
           }
-          addMessage({ role: "system", content: recallContent, type: "recall" as any });
+          addMessage({ role: "system", content: recallContent, type: "recall" });
         }
       } catch {
         // recall failed silently — not critical
@@ -326,7 +326,7 @@ export function OmniChat() {
         // Create assistant message with known ID so we can update it by ID
         // even after action logs are added to the message list
         const assistantMsgId = crypto.randomUUID();
-        addMessage({ role: "assistant", content: "", id: assistantMsgId } as any);
+        addMessage({ role: "assistant", content: "", id: assistantMsgId });
 
         const response = await api.chatStream(conversationMessages, projectContext);
 
@@ -459,7 +459,7 @@ export function OmniChat() {
                 addMessage({
                   role: "system",
                   content,
-                  type: "command_result" as any,
+                  type: "command_result",
                 });
               }
 
@@ -476,7 +476,7 @@ export function OmniChat() {
                 addMessage({
                   role: "system",
                   content: `${warningText}\n---meta---\n${meta}`,
-                  type: "blast_radius" as any,
+                  type: "blast_radius",
                 });
                 // Store for map highlighting
                 useGameStore.getState().setBlastRadius(file, dependents);
@@ -543,13 +543,13 @@ export function OmniChat() {
             if (msg.type === "action_log" && msg.actionLog) {
               return <ActionLogLine key={msg.id} log={msg.actionLog} />;
             }
-            if ((msg.type as string) === "health_alert") {
+            if (msg.type === "health_alert") {
               return <HealthAlertBubble key={msg.id} message={msg} />;
             }
-            if ((msg.type as string) === "recall") {
+            if (msg.type === "recall") {
               return <RecallBubble key={msg.id} message={msg} />;
             }
-            if ((msg.type as string) === "blast_radius") {
+            if (msg.type === "blast_radius") {
               return <BlastRadiusBubble key={msg.id} message={msg} />;
             }
             return (

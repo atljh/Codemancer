@@ -104,7 +104,7 @@ export function useHealthWatch() {
         addMessage({
           role: "system",
           content: message,
-          type: "health_alert" as any,
+          type: "health_alert",
         });
       } catch {
         // silently ignore watch errors

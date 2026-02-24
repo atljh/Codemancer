@@ -90,7 +90,7 @@ export interface ChatMessage {
   role: "user" | "assistant" | "system";
   content: string;
   timestamp: number;
-  type?: "message" | "action_card" | "action_log";
+  type?: "message" | "action_card" | "action_log" | "health_alert" | "recall" | "blast_radius" | "command_result";
   actionCard?: ActionCardData;
   actionLog?: ActionLogData;
 }
