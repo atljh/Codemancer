@@ -85,11 +85,15 @@ def _build_system_prompt(project_context: str = "", has_tools: bool = False) -> 
 - read_file: Read file contents
 - write_file: Create or modify files
 - search_text: Search for patterns in code
+- run_command: Run shell commands (npm test, pytest, cargo build, linters, etc.)
 
 IMPORTANT: Always use tools to get accurate information. Do NOT guess file contents or project structure — use list_files and read_file to verify.
 When the user asks about the project, use list_files first to see the actual structure.
 When modifying files, always read the file first, then write the complete updated content.
-Paths can be relative to the project root or absolute."""
+Paths can be relative to the project root or absolute.
+
+When a run_command fails (tests, build, lint), analyze the output and propose a concrete repair plan.
+If you wrote code that caused a test failure, fix it immediately."""
 
     return SYSTEM_PROMPT_TEMPLATE.format(
         player_info=player_info,
@@ -217,6 +221,9 @@ async def chat_stream(req: ChatRequest):
                         player.mp = max(0, player.mp - result.mp_cost)
                         player.total_exp += result.exp_gained
                         player.total_bytes_processed += result.bytes_processed
+                        # HP damage from failed commands
+                        if result.hp_damage > 0:
+                            player.hp = max(0, player.hp - result.hp_damage)
                         if save_state_fn:
                             save_state_fn()
 
@@ -233,6 +240,10 @@ async def chat_stream(req: ChatRequest):
 
                     # Send tool_result event to frontend
                     yield f"data: {json.dumps({'type': 'tool_result', 'tool_id': result.tool_id, 'tool_name': result.tool_name, 'status': result.status, 'summary': result.summary, 'exp_gained': result.exp_gained, 'mp_cost': result.mp_cost, 'bytes_processed': result.bytes_processed})}\n\n"
+
+                    # Send command_result for run_command with output and HP damage
+                    if result.tool_name == "run_command":
+                        yield f"data: {json.dumps({'type': 'command_result', 'tool_id': result.tool_id, 'command': tc['input'].get('command', ''), 'exit_code': result.exit_code, 'output': result.content[:3000], 'hp_damage': result.hp_damage, 'status': result.status})}\n\n"
 
                     # Send tool_diff for write operations
                     if result.tool_name == "write_file" and result.old_content is not None and result.new_content is not None:

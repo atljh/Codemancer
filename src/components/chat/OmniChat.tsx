@@ -18,6 +18,7 @@ const TOOL_DISPLAY_NAMES: Record<string, string> = {
   read_file: "Extracting data",
   write_file: "Deploying patch",
   search_text: "Signal sweep",
+  run_command: "Executing command",
 };
 
 function getToolDisplayName(toolName: string): string {
@@ -63,7 +64,7 @@ export function OmniChat() {
       const id = convId ?? currentConversationId;
       if (!id) return;
       const msgs = useGameStore.getState().messages.filter(
-        (m) => m.type !== "action_log" && (m.type as string) !== "health_alert" && (m.type as string) !== "recall" && (m.type as string) !== "blast_radius"
+        (m) => m.type !== "action_log" && !["health_alert", "recall", "blast_radius", "command_result"].includes(m.type as string)
       );
       try {
         const meta = await api.saveMessages(id, msgs);
@@ -424,6 +425,41 @@ export function OmniChat() {
                   oldContent: data.old_content,
                   newContent: data.new_content,
                   expGained: data.exp_gained,
+                });
+              }
+
+              // Command result event (run_command)
+              if (data.type === "command_result") {
+                const exitCode = data.exit_code as number;
+                const hpDamage = data.hp_damage as number;
+                const cmdOutput = (data.output || "") as string;
+                const command = (data.command || "") as string;
+                const isFail = exitCode !== 0;
+
+                // Refresh player stats (HP may have changed)
+                if (isFail && hpDamage > 0) {
+                  try {
+                    const p = await api.getStatus();
+                    setPlayer(p);
+                  } catch { /* ignore */ }
+                }
+
+                const statusLine = isFail
+                  ? t("tool.cmdFailed", { hp: String(hpDamage) })
+                  : t("tool.cmdSuccess");
+                const outputPreview = cmdOutput.length > 1500
+                  ? cmdOutput.slice(0, 750) + "\n...\n" + cmdOutput.slice(-500)
+                  : cmdOutput;
+
+                let content = `**${statusLine}**\n\n\`\`\`\n$ ${command}\n${outputPreview}\n\`\`\``;
+                if (isFail) {
+                  content += `\n\n_${t("tool.cmdRepairHint")}_`;
+                }
+
+                addMessage({
+                  role: "system",
+                  content,
+                  type: "command_result" as any,
                 });
               }
 
