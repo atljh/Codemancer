@@ -280,6 +280,10 @@ const api = {
       method: "POST",
       body: JSON.stringify({ root, search, replace }),
     }),
+
+  // Proactive analysis
+  proactivePulse: () =>
+    fetchJson<{ has_findings: boolean; findings: { severity: string; type: string; message: string; detail: string }[]; diff_summary: string; changed_files: number }>("/api/proactive/pulse"),
 };
 
 export { api };

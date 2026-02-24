@@ -12,6 +12,7 @@ from routes import game, quests, files, settings, chat, project, commands, conve
 from routes import chronicle as chronicle_route
 from routes import health as health_route
 from routes import dependency as dependency_route
+from routes import proactive as proactive_route
 from services.file_service import FileService
 
 STATE_FILE = Path(__file__).parent / "state.json"
@@ -84,6 +85,7 @@ app.include_router(git.router)
 app.include_router(chronicle_route.router)
 app.include_router(health_route.router)
 app.include_router(dependency_route.router)
+app.include_router(proactive_route.router)
 
 @app.get("/health")
 async def health():

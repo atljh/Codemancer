@@ -20,17 +20,22 @@ import { SearchPanel } from "../search/SearchPanel";
 import { EditorRefProvider } from "../../hooks/useEditorRef";
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
 import { useHealthWatch } from "../../hooks/useHealthWatch";
+import { useProactivePulse } from "../../hooks/useProactivePulse";
 import { useGameStore } from "../../stores/gameStore";
 
 export function AppLayout() {
   useKeyboardShortcuts();
   useHealthWatch();
+  useProactivePulse();
   const appReady = useGameStore((s) => s.appReady);
   const workspaceRoot = useGameStore((s) => s.settings.workspace_root);
   const showGitPanel = useGameStore((s) => s.showGitPanel);
   const showFileExplorer = useGameStore((s) => s.showFileExplorer);
   const showSearchPanel = useGameStore((s) => s.showSearchPanel);
   const activeTab = useGameStore((s) => s.activeTab);
+  const playerHp = useGameStore((s) => s.player.hp);
+  const playerMaxHp = useGameStore((s) => s.player.max_hp);
+  const isLowHp = playerMaxHp > 0 && playerHp / playerMaxHp < 0.2;
 
   const showWelcome = appReady && !workspaceRoot;
 
@@ -59,11 +64,13 @@ export function AppLayout() {
 
   return (
     <EditorRefProvider>
-      <div className="h-screen w-screen flex flex-col bg-theme-bg-deep text-theme-text overflow-hidden">
+      <div className={`h-screen w-screen flex flex-col bg-theme-bg-deep text-theme-text overflow-hidden ${isLowHp ? "low-hp-glitch" : ""}`}>
         {/* Tactical grid background */}
         <div className="tactical-grid" />
         {/* Scanline overlay */}
         <div className="fixed inset-0 pointer-events-none z-[1] animate-scanline" />
+        {/* Low HP vignette */}
+        {isLowHp && <div className="low-hp-vignette" />}
 
         {/* Main content */}
         <div className="relative z-10 flex flex-col h-full">

@@ -310,6 +310,25 @@ const translations = {
     "focus.min50": "50 MIN",
     "focus.lostSync": "Focus lost — window unfocused",
     "focus.expired": "Focus session complete",
+
+    // Voice input
+    "voice.start": "Start voice input",
+    "voice.stop": "Stop recording",
+    "voice.listening": "Listening...",
+    "voice.noSupport": "Voice input not supported in this browser",
+
+    // Audio settings
+    "audio.tts": "Voice Output (TTS)",
+    "audio.sounds": "Sound Effects",
+
+    // Proactive analysis
+    "proactive.header": "[PROACTIVE_LOG]: Background process analysis complete.",
+    "proactive.changedFiles": "Detected {count} modified file(s) in workspace.",
+    "proactive.suggestion": "Operator, shall we initiate stabilization protocol?",
+
+    // Waveform
+    "waveform.thinking": "Processing",
+    "waveform.idle": "Standby",
   },
   ru: {
     // Panels
@@ -622,6 +641,25 @@ const translations = {
     "focus.min50": "50 МИН",
     "focus.lostSync": "Фокус потерян — окно неактивно",
     "focus.expired": "Сессия фокуса завершена",
+
+    // Voice input
+    "voice.start": "Голосовой ввод",
+    "voice.stop": "Остановить запись",
+    "voice.listening": "Слушаю...",
+    "voice.noSupport": "Голосовой ввод не поддерживается в этом браузере",
+
+    // Audio settings
+    "audio.tts": "Голосовой вывод (TTS)",
+    "audio.sounds": "Звуковые эффекты",
+
+    // Proactive analysis
+    "proactive.header": "[PROACTIVE_LOG]: Анализ фоновых процессов завершён.",
+    "proactive.changedFiles": "Обнаружено {count} изменённых файл(ов) в рабочем пространстве.",
+    "proactive.suggestion": "Оператор, инициировать протокол стабилизации?",
+
+    // Waveform
+    "waveform.thinking": "Обработка",
+    "waveform.idle": "Режим ожидания",
   },
 } as const;
 
