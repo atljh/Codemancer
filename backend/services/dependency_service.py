@@ -113,6 +113,20 @@ class DependencyService:
         final_edges = [DepEdge(source=s, target=t) for s, t in edges]
         return DepGraphResponse(nodes=nodes, edges=final_edges)
 
+    def blast_radius(self, file_rel: str) -> dict:
+        """Compute which files depend on the given file (reverse dependencies)."""
+        graph = self.build_graph()
+        dependents: list[str] = []
+        for edge in graph.edges:
+            if edge.target == file_rel:
+                dependents.append(edge.source)
+        return {
+            "file": file_rel,
+            "dependents": dependents,
+            "count": len(dependents),
+            "high": len(dependents) >= 5,
+        }
+
     def _parse_python_imports(self, content: str, file_path: Path) -> list[str]:
         results = []
         for line in content.splitlines():

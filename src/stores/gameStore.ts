@@ -72,6 +72,10 @@ interface GameState {
   showHealthPanel: boolean;
   lastHealthAlertHash: string;
 
+  // Blast radius (pre-commit scan)
+  blastRadiusFiles: string[];
+  blastRadiusSource: string | null;
+
   // Quick open & search
   showQuickOpen: boolean;
   showSearchPanel: boolean;
@@ -149,6 +153,10 @@ interface GameState {
   // Health panel actions
   toggleHealthPanel: () => void;
   setLastHealthAlertHash: (hash: string) => void;
+
+  // Blast radius actions
+  setBlastRadius: (source: string, files: string[]) => void;
+  clearBlastRadius: () => void;
 
   // Quick open & search actions
   toggleQuickOpen: () => void;
@@ -233,6 +241,8 @@ export const useGameStore = create<GameState>((set) => ({
   showChronicle: false,
   showHealthPanel: false,
   lastHealthAlertHash: "",
+  blastRadiusFiles: [],
+  blastRadiusSource: null,
   showQuickOpen: false,
   showSearchPanel: false,
   showCommandPalette: false,
@@ -404,6 +414,10 @@ export const useGameStore = create<GameState>((set) => ({
   // Health panel
   toggleHealthPanel: () => set((s) => ({ showHealthPanel: !s.showHealthPanel })),
   setLastHealthAlertHash: (hash) => set({ lastHealthAlertHash: hash }),
+
+  // Blast radius
+  setBlastRadius: (source, files) => set({ blastRadiusSource: source, blastRadiusFiles: files }),
+  clearBlastRadius: () => set({ blastRadiusSource: null, blastRadiusFiles: [] }),
 
   // Quick open & search
   toggleQuickOpen: () => set((s) => ({ showQuickOpen: !s.showQuickOpen })),

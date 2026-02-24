@@ -26,7 +26,11 @@ export function TacticalMap() {
   const panStart = useRef({ x: 0, y: 0, vx: 0, vy: 0 });
   const [fogOfWar, setFogOfWar] = useState(true);
 
+  const blastRadiusFiles = useGameStore((s) => s.blastRadiusFiles);
+  const blastRadiusSource = useGameStore((s) => s.blastRadiusSource);
+  const clearBlastRadius = useGameStore((s) => s.clearBlastRadius);
   const openFilePaths = useMemo(() => new Set(openFiles.map((f) => f.path)), [openFiles]);
+  const blastSet = useMemo(() => new Set(blastRadiusFiles), [blastRadiusFiles]);
 
   // Observe container size
   useEffect(() => {
@@ -66,6 +70,13 @@ export function TacticalMap() {
     layoutNodes.forEach((n) => m.set(n.id, n));
     return m;
   }, [layoutNodes]);
+
+  // Auto-select blast radius source when entering map
+  useEffect(() => {
+    if (blastRadiusSource && !selectedNode) {
+      setSelectedNode(blastRadiusSource);
+    }
+  }, [blastRadiusSource, selectedNode]);
 
   // Highlight sets
   const activeId = selectedNode || hoveredNode;
@@ -183,6 +194,14 @@ export function TacticalMap() {
         >
           {t("map.fogOfWar")}
         </button>
+        {blastRadiusSource && (
+          <button
+            onClick={clearBlastRadius}
+            className="text-[9px] font-mono px-2 py-1 rounded bg-orange-500/15 text-orange-400 hover:bg-orange-500/25"
+          >
+            BLAST RADIUS
+          </button>
+        )}
         <button
           onClick={resetView}
           className="text-[9px] font-mono px-2 py-1 rounded bg-white/5 text-theme-text-dim hover:text-theme-text hover:bg-white/8"
@@ -275,7 +294,9 @@ export function TacticalMap() {
           const isActive = ln.id === activeId;
           const isDependent = dependentsOf.has(ln.id);
           const isDependency = dependenciesOf.has(ln.id);
-          const showLabel = isActive || isDependent || isDependency;
+          const isBlastSource = ln.id === blastRadiusSource;
+          const isBlastTarget = blastSet.has(ln.id);
+          const showLabel = isActive || isDependent || isDependency || isBlastSource || isBlastTarget;
 
           let fill = "var(--theme-accent)";
           // If fog of war is on but no files are open, show all nodes normally
@@ -285,6 +306,12 @@ export function TacticalMap() {
           if (isActive) {
             fill = "var(--theme-accent)";
             nodeOpacity = 1;
+          } else if (isBlastSource) {
+            fill = "hsl(30, 90%, 55%)";
+            nodeOpacity = 1;
+          } else if (isBlastTarget) {
+            fill = "hsl(30, 70%, 50%)";
+            nodeOpacity = 0.9;
           } else if (isDependent) {
             fill = "hsl(0, 70%, 55%)";
             nodeOpacity = 1;

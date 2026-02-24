@@ -226,6 +226,12 @@ const translations = {
     "health.catCoverage": "COVERAGE",
     "health.catCleanliness": "CLEANLINESS",
 
+    // Blast Radius
+    "blast.warning": "[TACTICAL_WARNING]: High blast radius. Damaging this node will affect {count} dependent systems.",
+    "blast.low": "[PRE_COMMIT_SCAN]: Blast radius: {count} dependent file(s).",
+    "blast.dependents": "Affected systems",
+    "blast.openMap": "Show on tactical map",
+
     // Map
     "map.title": "Tactical Map",
     "map.loading": "Building graph...",
@@ -527,6 +533,12 @@ const translations = {
     "health.catComplexity": "СЛОЖНОСТЬ",
     "health.catCoverage": "ПОКРЫТИЕ",
     "health.catCleanliness": "ЧИСТОТА",
+
+    // Blast Radius
+    "blast.warning": "[TACTICAL_WARNING]: Высокий радиус поражения (Blast Radius). Повреждение этого узла затронет {count} зависимых систем.",
+    "blast.low": "[PRE_COMMIT_SCAN]: Радиус поражения: {count} зависимый файл(ов).",
+    "blast.dependents": "Затронутые системы",
+    "blast.openMap": "Показать на тактической карте",
 
     // Map
     "map.title": "Тактическая карта",

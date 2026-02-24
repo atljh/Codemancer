@@ -5,6 +5,7 @@ import { ActionCard } from "./ActionCard";
 import { ActionLogLine } from "./ActionLogLine";
 import { HealthAlertBubble } from "./HealthAlertBubble";
 import { RecallBubble } from "./RecallBubble";
+import { BlastRadiusBubble } from "./BlastRadiusBubble";
 import { CommandInput } from "./CommandInput";
 import { ConversationDrawer } from "./ConversationDrawer";
 import { useGameStore } from "../../stores/gameStore";
@@ -62,7 +63,7 @@ export function OmniChat() {
       const id = convId ?? currentConversationId;
       if (!id) return;
       const msgs = useGameStore.getState().messages.filter(
-        (m) => m.type !== "action_log" && (m.type as string) !== "health_alert" && (m.type as string) !== "recall"
+        (m) => m.type !== "action_log" && (m.type as string) !== "health_alert" && (m.type as string) !== "recall" && (m.type as string) !== "blast_radius"
       );
       try {
         const meta = await api.saveMessages(id, msgs);
@@ -425,6 +426,25 @@ export function OmniChat() {
                   expGained: data.exp_gained,
                 });
               }
+
+              // Blast radius event (pre-commit scan)
+              if (data.type === "blast_radius") {
+                const count = data.count as number;
+                const isHigh = data.high as boolean;
+                const dependents = (data.dependents || []) as string[];
+                const file = (data.file || "") as string;
+                const warningText = isHigh
+                  ? t("blast.warning", { count: String(count) })
+                  : t("blast.low", { count: String(count) });
+                const meta = JSON.stringify({ dependents, high: isHigh, file });
+                addMessage({
+                  role: "system",
+                  content: `${warningText}\n---meta---\n${meta}`,
+                  type: "blast_radius" as any,
+                });
+                // Store for map highlighting
+                useGameStore.getState().setBlastRadius(file, dependents);
+              }
             } catch {
               // ignore parse errors
             }
@@ -492,6 +512,9 @@ export function OmniChat() {
             }
             if ((msg.type as string) === "recall") {
               return <RecallBubble key={msg.id} message={msg} />;
+            }
+            if ((msg.type as string) === "blast_radius") {
+              return <BlastRadiusBubble key={msg.id} message={msg} />;
             }
             return (
               <MessageBubble

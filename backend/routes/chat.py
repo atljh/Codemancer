@@ -13,6 +13,7 @@ from services.file_service import FileService
 from routes.settings import load_settings as _load_settings_from_file
 
 from services.chronicle_service import ChronicleService
+from services.dependency_service import DependencyService
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
@@ -236,6 +237,17 @@ async def chat_stream(req: ChatRequest):
                     # Send tool_diff for write operations
                     if result.tool_name == "write_file" and result.old_content is not None and result.new_content is not None:
                         yield f"data: {json.dumps({'type': 'tool_diff', 'tool_id': result.tool_id, 'file_path': result.file_path or '', 'file_name': Path(result.file_path).name if result.file_path else '', 'old_content': result.old_content, 'new_content': result.new_content, 'exp_gained': result.exp_gained})}\n\n"
+
+                        # Pre-Commit Scan: compute blast radius
+                        if workspace_root and result.file_path:
+                            try:
+                                dep_svc = DependencyService(workspace_root)
+                                file_rel = str(Path(result.file_path).relative_to(workspace_root))
+                                br = dep_svc.blast_radius(file_rel)
+                                if br["count"] > 0:
+                                    yield f"data: {json.dumps({'type': 'blast_radius', 'file': br['file'], 'dependents': br['dependents'], 'count': br['count'], 'high': br['high']})}\n\n"
+                            except Exception:
+                                pass
 
                     # Build tool result block for LLM context
                     tool_result_blocks.append({
