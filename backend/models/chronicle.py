@@ -28,3 +28,20 @@ class ReportResponse(BaseModel):
     content: str = ""
     format: str = ""
     event_count: int = 0
+
+
+class RecallMatch(BaseModel):
+    session_id: str
+    session_date: str
+    files: list[str] = []
+    actions: list[str] = []
+    total_events: int = 0
+
+
+class RecallRequest(BaseModel):
+    message: str
+
+
+class RecallResponse(BaseModel):
+    has_recall: bool = False
+    matches: list[RecallMatch] = []

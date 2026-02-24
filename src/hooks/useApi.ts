@@ -19,6 +19,7 @@ import type {
   ChronicleEvent,
   ChronicleSession,
   ChronicleReport,
+  RecallResponse,
   HealthScanResult,
   HealthWatchResult,
   DepGraph,
@@ -243,6 +244,12 @@ const api = {
     fetchJson<ChronicleReport>("/api/chronicle/report", {
       method: "POST",
       body: JSON.stringify({ format, session_id: sessionId }),
+    }),
+
+  chronicleRecall: (message: string) =>
+    fetchJson<RecallResponse>("/api/chronicle/recall", {
+      method: "POST",
+      body: JSON.stringify({ message }),
     }),
 
   // Health / Tech Debt

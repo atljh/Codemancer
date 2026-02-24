@@ -203,6 +203,19 @@ export interface ChronicleReport {
   event_count: number;
 }
 
+export interface RecallMatch {
+  session_id: string;
+  session_date: string;
+  files: string[];
+  actions: string[];
+  total_events: number;
+}
+
+export interface RecallResponse {
+  has_recall: boolean;
+  matches: RecallMatch[];
+}
+
 // Health / Tech Debt types
 export interface HealthScores {
   complexity: number;

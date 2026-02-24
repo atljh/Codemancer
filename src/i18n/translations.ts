@@ -195,6 +195,9 @@ const translations = {
     "chronicle.copied": "Copied to clipboard",
     "chronicle.copy": "Copy",
     "chronicle.error": "Report generation failed",
+    "chronicle.recallPrefix": "[RECALLING_DATA]: Previously we worked on this module (session from {date}). Current changes build on the previous patch.",
+    "chronicle.recallFiles": "Files affected",
+    "chronicle.recallActions": "Past actions",
 
     // Health
     "health.title": "THREAT ASSESSMENT",
@@ -494,6 +497,9 @@ const translations = {
     "chronicle.copied": "Скопировано",
     "chronicle.copy": "Копировать",
     "chronicle.error": "Ошибка генерации отчёта",
+    "chronicle.recallPrefix": "[RECALLING_DATA]: Ранее мы работали над этим модулем (сессия от {date}). Текущие изменения дополняют прошлый патч.",
+    "chronicle.recallFiles": "Затронутые файлы",
+    "chronicle.recallActions": "Прошлые действия",
 
     // Health
     "health.title": "ОЦЕНКА УГРОЗ",

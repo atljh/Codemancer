@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from models.chronicle import ChronicleEvent, ChronicleSession, ReportRequest, ReportResponse
+from models.chronicle import ChronicleEvent, ChronicleSession, ReportRequest, ReportResponse, RecallRequest, RecallResponse
 from services.chronicle_service import ChronicleService
 from services.providers import get_provider
 from routes.settings import load_settings
@@ -46,6 +46,14 @@ async def get_sessions(limit: int = 20):
     if not chronicle_service:
         raise HTTPException(status_code=500, detail="Chronicle service not initialized")
     return chronicle_service.get_sessions(limit=limit)
+
+
+@router.post("/recall", response_model=RecallResponse)
+async def recall(req: RecallRequest):
+    if not chronicle_service:
+        return RecallResponse()
+    matches = chronicle_service.recall(req.message)
+    return RecallResponse(has_recall=len(matches) > 0, matches=matches)
 
 
 @router.post("/report", response_model=ReportResponse)

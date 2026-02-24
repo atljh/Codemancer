@@ -4,6 +4,7 @@ import { MessageBubble } from "./MessageBubble";
 import { ActionCard } from "./ActionCard";
 import { ActionLogLine } from "./ActionLogLine";
 import { HealthAlertBubble } from "./HealthAlertBubble";
+import { RecallBubble } from "./RecallBubble";
 import { CommandInput } from "./CommandInput";
 import { ConversationDrawer } from "./ConversationDrawer";
 import { useGameStore } from "../../stores/gameStore";
@@ -61,7 +62,7 @@ export function OmniChat() {
       const id = convId ?? currentConversationId;
       if (!id) return;
       const msgs = useGameStore.getState().messages.filter(
-        (m) => m.type !== "action_log" && (m.type as string) !== "health_alert"
+        (m) => m.type !== "action_log" && (m.type as string) !== "health_alert" && (m.type as string) !== "recall"
       );
       try {
         const meta = await api.saveMessages(id, msgs);
@@ -283,6 +284,28 @@ export function OmniChat() {
 
       setAiResponding(true);
 
+      // Cross-Session Memory: check chronicle for related past work
+      try {
+        const recall = await api.chronicleRecall(text);
+        if (recall.has_recall && recall.matches.length > 0) {
+          const match = recall.matches[0];
+          const dateStr = match.session_date;
+          let recallContent = `**${t("chronicle.recallPrefix", { date: dateStr })}**`;
+          if (match.files.length > 0) {
+            recallContent += `\n\n**${t("chronicle.recallFiles")}:** ${match.files.slice(0, 5).map(f => `\`${f}\``).join(", ")}`;
+          }
+          if (match.actions.length > 0) {
+            recallContent += `\n\n**${t("chronicle.recallActions")}:**`;
+            for (const action of match.actions.slice(0, 3)) {
+              recallContent += `\n- ${action}`;
+            }
+          }
+          addMessage({ role: "system", content: recallContent, type: "recall" as any });
+        }
+      } catch {
+        // recall failed silently — not critical
+      }
+
       const conversationMessages = useGameStore.getState().messages
         .filter((m) => m.role === "user" || m.role === "assistant")
         .slice(-20)
@@ -466,6 +489,9 @@ export function OmniChat() {
             }
             if ((msg.type as string) === "health_alert") {
               return <HealthAlertBubble key={msg.id} message={msg} />;
+            }
+            if ((msg.type as string) === "recall") {
+              return <RecallBubble key={msg.id} message={msg} />;
             }
             return (
               <MessageBubble

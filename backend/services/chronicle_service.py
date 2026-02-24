@@ -4,7 +4,9 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-from models.chronicle import ChronicleEvent, ChronicleSession
+import re
+
+from models.chronicle import ChronicleEvent, ChronicleSession, RecallMatch
 
 DB_PATH = Path(__file__).parent.parent / "chronicle.db"
 
@@ -134,6 +136,111 @@ class ChronicleService:
             )
             for r in rows
         ]
+
+    def recall(self, message: str) -> list[RecallMatch]:
+        """Search past sessions for events related to files/modules mentioned in the message."""
+        keywords = self._extract_keywords(message)
+        if not keywords:
+            return []
+
+        # Build SQL WHERE clauses for keyword matching
+        conditions = []
+        params: list[str] = []
+        for kw in keywords:
+            like = f"%{kw}%"
+            conditions.append("(e.files_affected LIKE ? OR e.description LIKE ?)")
+            params.extend([like, like])
+
+        where = " OR ".join(conditions)
+
+        rows = self._conn.execute(
+            f"""
+            SELECT e.session_id, e.files_affected, e.description, e.action_type,
+                   s.started_at
+            FROM events e
+            JOIN sessions s ON s.id = e.session_id
+            WHERE e.session_id != ? AND ({where})
+            ORDER BY e.id DESC
+            LIMIT 200
+            """,
+            [self._current_session_id or "", *params],
+        ).fetchall()
+
+        if not rows:
+            return []
+
+        # Group by session
+        sessions: dict[str, dict] = {}
+        for r in rows:
+            sid = r["session_id"]
+            if sid not in sessions:
+                sessions[sid] = {
+                    "session_id": sid,
+                    "session_date": r["started_at"][:10] if r["started_at"] else "",
+                    "files": set(),
+                    "actions": [],
+                    "total_events": 0,
+                }
+            entry = sessions[sid]
+            entry["total_events"] += 1
+            try:
+                files = json.loads(r["files_affected"])
+                for f in files:
+                    entry["files"].add(f)
+            except (json.JSONDecodeError, TypeError):
+                pass
+            desc = r["description"] or ""
+            action = r["action_type"] or ""
+            if desc and len(entry["actions"]) < 5:
+                entry["actions"].append(f"{action}: {desc[:80]}")
+
+        # Sort by most recent, limit to top 3 sessions
+        sorted_sessions = sorted(sessions.values(), key=lambda s: s["session_date"], reverse=True)[:3]
+
+        return [
+            RecallMatch(
+                session_id=s["session_id"],
+                session_date=s["session_date"],
+                files=sorted(s["files"])[:10],
+                actions=s["actions"],
+                total_events=s["total_events"],
+            )
+            for s in sorted_sessions
+        ]
+
+    @staticmethod
+    def _extract_keywords(message: str) -> list[str]:
+        """Extract file paths and module names from a user message."""
+        keywords: list[str] = []
+
+        # File paths: anything like path/to/file.ext or file.ext
+        paths = re.findall(r'[\w./\\-]+\.(?:py|ts|tsx|js|jsx|rs|toml|json|css|html)', message)
+        for p in paths:
+            # Use the basename and parent for matching
+            name = p.split("/")[-1]
+            keywords.append(name)
+            if "/" in p:
+                # Also match the relative path
+                keywords.append(p)
+
+        # Module-style names: CamelCase or snake_case identifiers that look like code
+        identifiers = re.findall(r'\b([A-Z][a-zA-Z]{4,}|[a-z][a-z_]{4,}_[a-z]+)\b', message)
+        for ident in identifiers:
+            keywords.append(ident)
+
+        # Common code terms: class, function, component names explicitly mentioned
+        code_refs = re.findall(r'(?:class|function|component|module|service|hook|store)\s+(\w+)', message, re.IGNORECASE)
+        keywords.extend(code_refs)
+
+        # Deduplicate and return
+        seen: set[str] = set()
+        result: list[str] = []
+        for kw in keywords:
+            low = kw.lower()
+            if low not in seen and len(low) >= 3:
+                seen.add(low)
+                result.append(kw)
+        return result[:10]
 
     def get_session_summary(self, session_id: str) -> dict:
         session = self._conn.execute(
