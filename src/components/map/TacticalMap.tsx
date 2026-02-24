@@ -278,7 +278,9 @@ export function TacticalMap() {
           const showLabel = isActive || isDependent || isDependency;
 
           let fill = "var(--theme-accent)";
-          let nodeOpacity = fogOfWar && !isOpen && !isActive ? 0.2 : 0.7;
+          // If fog of war is on but no files are open, show all nodes normally
+          const fogActive = fogOfWar && openFilePaths.size > 0;
+          let nodeOpacity = fogActive && !isOpen && !isActive ? 0.35 : 0.7;
 
           if (isActive) {
             fill = "var(--theme-accent)";

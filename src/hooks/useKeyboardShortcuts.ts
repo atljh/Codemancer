@@ -317,28 +317,41 @@ export function useKeyboardShortcuts() {
 }
 
 async function openProjectDialog() {
+  let path: string;
   try {
     const { open } = await import("@tauri-apps/plugin-dialog");
     const selected = await open({ directory: true, multiple: false });
     if (!selected) return;
+    path = selected as string;
+  } catch {
+    return; // Not in Tauri or user cancelled
+  }
 
-    const path = selected as string;
-    const state = useGameStore.getState();
+  const state = useGameStore.getState();
 
-    const scan = await api.scanProject(path);
-    const newSettings = { ...state.settings, workspace_root: path };
+  // Update settings first (fast, always works)
+  const newSettings = { ...state.settings, workspace_root: path };
+  try {
     await api.updateSettings(newSettings);
+  } catch { /* ignore */ }
+  state.setSettings(newSettings);
+  state.setFileTreeRoot(path);
 
-    state.setSettings(newSettings);
-    state.setFileTreeRoot(path);
+  // Scan project (may be slow for large repos)
+  try {
+    const scan = await api.scanProject(path);
     state.setProjectScan(scan);
+  } catch { /* ignore */ }
 
+  // Load file tree
+  try {
     const tree = await api.getFileTree(path);
     state.setFileTree(tree);
+  } catch { /* ignore */ }
 
+  // Refresh player
+  try {
     const player = await api.getStatus();
     state.setPlayer(player);
-  } catch {
-    // Not in Tauri environment or user cancelled
-  }
+  } catch { /* ignore */ }
 }
