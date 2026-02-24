@@ -4,6 +4,7 @@ use std::sync::Mutex;
 use anthropic_auth::{AsyncOAuthClient, OAuthConfig, OAuthMode};
 use serde::{Deserialize, Serialize};
 use tauri::Manager;
+use tauri::menu::{MenuBuilder, SubmenuBuilder};
 
 struct PythonProcess(Mutex<Option<Child>>);
 
@@ -121,6 +122,36 @@ pub fn run() {
             complete_oauth,
             refresh_oauth_token
         ])
+        .menu(|app| {
+            // Custom menu without Cmd+W (Close Window) so JavaScript can handle it
+            MenuBuilder::new(app)
+                .items(&[
+                    &SubmenuBuilder::new(app, "Codemancer")
+                        .about(None)
+                        .separator()
+                        .services()
+                        .separator()
+                        .hide()
+                        .hide_others()
+                        .show_all()
+                        .separator()
+                        .quit()
+                        .build()?,
+                    &SubmenuBuilder::new(app, "Edit")
+                        .undo()
+                        .redo()
+                        .separator()
+                        .cut()
+                        .copy()
+                        .paste()
+                        .select_all()
+                        .build()?,
+                    &SubmenuBuilder::new(app, "Window")
+                        .minimize()
+                        .build()?,
+                ])
+                .build()
+        })
         .setup(|app| {
             // In dev mode, backend is at ../backend relative to src-tauri (cwd)
             let backend_dir = std::env::current_dir()
