@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, HTTPException
 from models.player import PlayerResponse
@@ -47,6 +47,33 @@ def get_player_response(p) -> PlayerResponse:
         total_bytes_processed=p.total_bytes_processed,
     )
 
+MP_REGEN_INTERVAL = 30  # seconds per 1 MP regen tick
+MP_REGEN_AMOUNT = 1     # MP restored per tick
+
+
+def _regen_mp():
+    """Passively regenerate MP over time (1 MP per 30 seconds)."""
+    if not player or player.mp >= player.max_mp:
+        return
+    now = datetime.now(timezone.utc)
+    if not player.last_mp_regen:
+        player.last_mp_regen = now.isoformat()
+        save_state_fn()
+        return
+    try:
+        last = datetime.fromisoformat(player.last_mp_regen)
+        elapsed = (now - last).total_seconds()
+        ticks = int(elapsed / MP_REGEN_INTERVAL)
+        if ticks > 0:
+            restored = ticks * MP_REGEN_AMOUNT
+            player.mp = min(player.max_mp, player.mp + restored)
+            # Advance timestamp by consumed ticks only (preserve fractional time)
+            player.last_mp_regen = (last + timedelta(seconds=ticks * MP_REGEN_INTERVAL)).isoformat()
+            save_state_fn()
+    except Exception:
+        player.last_mp_regen = now.isoformat()
+
+
 def _check_focus_expired():
     """Auto-expire focus if time is up."""
     if not player or not player.focus_active or not player.focus_started_at:
@@ -65,10 +92,12 @@ def _check_focus_expired():
 
 @router.get("/status", response_model=PlayerResponse)
 async def get_status():
+    _regen_mp()
     return get_player_response(player)
 
 @router.post("/action", response_model=ExpGainResponse)
 async def perform_action(req: ActionRequest):
+    _regen_mp()
     # MP cost for message action
     MP_COSTS: dict[str, int] = {"message": 5}
     cost = MP_COSTS.get(req.action.value, 0)
@@ -76,6 +105,7 @@ async def perform_action(req: ActionRequest):
         raise HTTPException(status_code=400, detail="Not enough MP")
     if cost > 0:
         player.mp -= cost
+        player.last_mp_regen = datetime.now(timezone.utc).isoformat()
 
     _check_focus_expired()
     old_level = player.level
@@ -127,6 +157,7 @@ async def reset():
     player.focus_active = False
     player.focus_started_at = None
     player.focus_duration_minutes = 0
+    player.last_mp_regen = None
     save_state_fn()
     return get_player_response(player)
 

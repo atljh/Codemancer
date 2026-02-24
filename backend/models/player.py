@@ -12,6 +12,7 @@ class Player(BaseModel):
     focus_active: bool = False
     focus_started_at: str | None = None
     focus_duration_minutes: int = 0
+    last_mp_regen: str | None = None  # ISO timestamp for passive MP regeneration
 
     @property
     def level(self) -> int:

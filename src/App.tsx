@@ -117,17 +117,26 @@ function App() {
     return () => clearInterval(timersRef.current.hp);
   }, [sessionStartTime, setPlayer]);
 
-  // MP regen every 30 seconds of idle
+  // MP regen: sync with backend every 30 seconds
   useEffect(() => {
-    timersRef.current.mp = setInterval(() => {
+    timersRef.current.mp = setInterval(async () => {
       const store = useGameStore.getState();
       if (store.player.mp < store.player.max_mp) {
-        setPlayer({ ...store.player, mp: store.player.mp + 1 });
+        try {
+          const player = await api.getStatus();
+          setPlayer(player);
+        } catch {
+          // offline — regen locally as fallback
+          const s = useGameStore.getState();
+          if (s.player.mp < s.player.max_mp) {
+            setPlayer({ ...s.player, mp: s.player.mp + 1 });
+          }
+        }
       }
     }, 30_000);
 
     return () => clearInterval(timersRef.current.mp);
-  }, [setPlayer]);
+  }, [setPlayer, api]);
 
   return <AppLayout />;
 }
