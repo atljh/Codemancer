@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import type {
   TelegramDialog,
   TelegramMessage,
+  TelegramMedia,
   CommsAuthState,
 } from "../types/game";
 import { useGameStore } from "../stores/gameStore";
@@ -19,6 +20,112 @@ async function loadGramJS() {
   const { TelegramClient } = await import("telegram");
   const { StringSession } = await import("telegram/sessions");
   return { TelegramClient, StringSession };
+}
+
+// Convert Telegram entities to markdown syntax
+function entitiesToMarkdown(
+  text: string,
+  entities?: Array<{
+    className: string;
+    offset: number;
+    length: number;
+    url?: string;
+    language?: string;
+  }>,
+): string {
+  if (!entities || entities.length === 0) return text;
+
+  // Sort by offset descending so replacements don't shift earlier offsets
+  const sorted = [...entities].sort((a, b) => {
+    if (b.offset !== a.offset) return b.offset - a.offset;
+    return b.length - a.length;
+  });
+
+  let result = text;
+  for (const entity of sorted) {
+    const start = entity.offset;
+    const end = start + entity.length;
+    const substr = result.slice(start, end);
+
+    let replacement = substr;
+    const cn = entity.className;
+
+    if (cn === "MessageEntityBold") {
+      replacement = `**${substr}**`;
+    } else if (cn === "MessageEntityItalic") {
+      replacement = `*${substr}*`;
+    } else if (cn === "MessageEntityCode") {
+      replacement = `\`${substr}\``;
+    } else if (cn === "MessageEntityPre") {
+      const lang = entity.language || "";
+      replacement = `\n\`\`\`${lang}\n${substr}\n\`\`\`\n`;
+    } else if (cn === "MessageEntityTextUrl" && entity.url) {
+      replacement = `[${substr}](${entity.url})`;
+    } else if (cn === "MessageEntityStrike" || cn === "MessageEntityStrikethrough") {
+      replacement = `~~${substr}~~`;
+    } else if (cn === "MessageEntityBlockquote") {
+      replacement = "\n> " + substr.replace(/\n/g, "\n> ") + "\n";
+    }
+    // MessageEntityUrl — leave as-is, remark-gfm auto-links bare URLs
+    // MessageEntityMention, MessageEntityHashtag — keep as-is
+    // MessageEntityUnderline — no markdown equivalent, keep text
+
+    result = result.slice(0, start) + replacement + result.slice(end);
+  }
+
+  return result;
+}
+
+// Extract media info from a GramJS message without downloading
+function getMediaInfo(m: any): TelegramMedia | undefined {
+  if (!m.media) return undefined;
+
+  const cn = m.media.className;
+
+  if (cn === "MessageMediaPhoto") {
+    return { type: "photo" };
+  }
+
+  if (cn === "MessageMediaDocument") {
+    const doc = m.media.document;
+    if (!doc) return undefined;
+    const mime: string = doc.mimeType || "";
+    const attrs: any[] = doc.attributes || [];
+    const fileNameAttr = attrs.find(
+      (a: any) => a.className === "DocumentAttributeFilename",
+    );
+
+    if (mime === "image/gif" || attrs.some((a: any) => a.className === "DocumentAttributeAnimated")) {
+      return { type: "gif", mimeType: mime };
+    }
+    if (mime.startsWith("video/")) {
+      return { type: "video", mimeType: mime, fileName: fileNameAttr?.fileName };
+    }
+    if (mime.startsWith("audio/") || attrs.some((a: any) => a.className === "DocumentAttributeAudio")) {
+      return { type: "voice", mimeType: mime, fileName: fileNameAttr?.fileName };
+    }
+    if (mime === "image/webp" || attrs.some((a: any) => a.className === "DocumentAttributeSticker")) {
+      return { type: "sticker", mimeType: mime };
+    }
+
+    return {
+      type: "document",
+      mimeType: mime,
+      fileName: fileNameAttr?.fileName || "file",
+    };
+  }
+
+  if (cn === "MessageMediaWebPage" && m.media.webpage) {
+    const wp = m.media.webpage;
+    return {
+      type: "webpage",
+      webpageTitle: wp.title || undefined,
+      webpageDescription: wp.description?.slice(0, 200) || undefined,
+      webpageUrl: wp.url || undefined,
+    };
+  }
+
+  return undefined;
 }
 
 export function useTelegram() {
@@ -173,7 +280,6 @@ export function useTelegram() {
           },
           onError: async (err) => {
             console.warn("[COMMS] QR auth error:", err?.message || err);
-            // Return true to let GramJS retry with a new QR code
             return true;
           },
         },
@@ -181,7 +287,6 @@ export function useTelegram() {
       markConnected();
     } catch (err) {
       console.error("[COMMS] QR auth failed:", err);
-      // Only reset if we're still in qr_pending (not password flow)
       setAuthState((prev) => (prev === "qr_pending" ? "disconnected" : prev));
     }
   }, [
@@ -216,9 +321,12 @@ export function useTelegram() {
     async (dialogId: string) => {
       if (!client || authState !== "connected") return;
       try {
-        const entity = await client.getEntity(dialogId);
-        const msgs = await client.getMessages(entity, { limit: 50 });
-        const mapped: TelegramMessage[] = msgs.map((m) => ({
+        const c = client;
+        const entity = await c.getEntity(dialogId);
+        const rawMsgs = await c.getMessages(entity, { limit: 50 });
+
+        // Phase 1: map messages with entity→markdown conversion + media info
+        const mapped: TelegramMessage[] = rawMsgs.map((m: any) => ({
           id: m.id,
           senderId: String(m.senderId ?? ""),
           senderName:
@@ -228,11 +336,74 @@ export function useTelegram() {
                     "",
                 )
               : "",
-          text: m.message || "",
+          text: entitiesToMarkdown(m.message || "", m.entities),
           date: m.date ?? 0,
           out: m.out ?? false,
+          media: getMediaInfo(m),
         }));
+
         setCommsMessages(mapped);
+
+        // Phase 2: download photos/stickers/gifs in background
+        const downloadable = rawMsgs.filter(
+          (m: any) =>
+            m.media &&
+            (m.media.className === "MessageMediaPhoto" ||
+              (m.media.className === "MessageMediaDocument" &&
+                m.media.document &&
+                (m.media.document.mimeType?.startsWith("image/") ||
+                  m.media.document.attributes?.some(
+                    (a: any) => a.className === "DocumentAttributeSticker",
+                  )))),
+        );
+
+        if (downloadable.length > 0) {
+          const MAX_DOWNLOADS = 20;
+          const toDownload = downloadable.slice(0, MAX_DOWNLOADS);
+
+          const results = await Promise.allSettled(
+            toDownload.map(async (m: any) => {
+              try {
+                const buffer = await c.downloadMedia(m.media, {});
+                if (buffer && buffer instanceof Buffer) {
+                  const mime =
+                    m.media.className === "MessageMediaPhoto"
+                      ? "image/jpeg"
+                      : m.media.document?.mimeType || "image/png";
+                  const b64 = buffer.toString("base64");
+                  return { id: m.id, url: `data:${mime};base64,${b64}` };
+                }
+              } catch {
+                // download failed for this message
+              }
+              return null;
+            }),
+          );
+
+          const urlMap = new Map<number, string>();
+          for (const r of results) {
+            if (r.status === "fulfilled" && r.value) {
+              urlMap.set(r.value.id, r.value.url);
+            }
+          }
+
+          if (urlMap.size > 0) {
+            // Check that the user hasn't navigated away
+            const currentDialog =
+              useGameStore.getState().commsActiveDialogId;
+            if (currentDialog === dialogId) {
+              const current = useGameStore.getState().commsMessages;
+              const updated = current.map((msg) => {
+                const url = urlMap.get(msg.id);
+                if (url && msg.media) {
+                  return { ...msg, media: { ...msg.media, url } };
+                }
+                return msg;
+              });
+              setCommsMessages(updated);
+            }
+          }
+        }
       } catch {
         // error fetching messages
       }
