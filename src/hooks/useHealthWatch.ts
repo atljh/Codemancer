@@ -5,7 +5,7 @@ import translations, { type TranslationKey } from "../i18n/translations";
 import type { CriticalAnomaly, HealthWatchResult } from "../types/game";
 import type { Locale } from "../types/game";
 
-const WATCH_INTERVAL_MS = 60_000; // 60 seconds
+const WATCH_INTERVAL_MS = 300_000; // 5 minutes
 
 function t(locale: Locale, key: TranslationKey, params?: Record<string, string | number>): string {
   let text: string = translations[locale]?.[key] ?? translations.en[key] ?? key;

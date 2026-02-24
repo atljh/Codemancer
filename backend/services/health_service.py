@@ -157,15 +157,15 @@ class HealthService:
 
     def watch(self) -> HealthWatchResponse:
         """Fast check for critical anomalies only."""
-        large_files = self._find_large_files(threshold=500)
-        complex_fns = self._find_complex_functions(threshold=100)
+        large_files = self._find_large_files(threshold=800)
+        complex_fns = self._find_complex_functions(threshold=150)
         anomalies_raw = self._find_anomalies()
         untested = self._find_untested_files()
         scores = self._compute_scores(complex_fns, untested, anomalies_raw, large_files)
 
         critical: list[CriticalAnomaly] = []
 
-        # Critical: files over 500 lines
+        # Critical: files over 800 lines (warning for 500-800)
         if large_files:
             sectors = set()
             details = []
@@ -175,14 +175,14 @@ class HealthService:
                 sectors.add(sector)
                 details.append(f"{lf.file} ({lf.lines} lines)")
             critical.append(CriticalAnomaly(
-                severity="critical",
+                severity="critical" if any(lf.lines >= 1200 for lf in large_files) else "warning",
                 category="file_size",
                 sector=", ".join(sorted(sectors)),
-                message=f"Detected {len(large_files)} file(s) exceeding 500 lines",
+                message=f"Detected {len(large_files)} file(s) exceeding 800 lines",
                 details=details,
             ))
 
-        # Critical: functions over 100 lines
+        # Critical: functions over 150 lines (warning for less)
         if complex_fns:
             sectors = set()
             details = []
@@ -192,17 +192,17 @@ class HealthService:
                 sectors.add(sector)
                 details.append(f"{cf.file}:{cf.name} ({cf.lines} lines)")
             critical.append(CriticalAnomaly(
-                severity="critical",
+                severity="critical" if any(cf.lines >= 300 for cf in complex_fns) else "warning",
                 category="complexity",
                 sector=", ".join(sorted(sectors)),
-                message=f"Detected {len(complex_fns)} function(s) exceeding 100 lines",
+                message=f"Detected {len(complex_fns)} function(s) exceeding 150 lines",
                 details=details,
             ))
 
-        # Critical: any score below 30
-        for field in ("complexity", "coverage", "cleanliness", "file_size"):
+        # Critical: score below 15, Warning: below 30 (coverage exempt — no tests is common)
+        for field in ("complexity", "cleanliness", "file_size"):
             val = getattr(scores, field)
-            if val < 30:
+            if val < 15:
                 critical.append(CriticalAnomaly(
                     severity="critical",
                     category=field,
@@ -210,6 +210,24 @@ class HealthService:
                     message=f"{field.replace('_', ' ').title()} score critically low: {val}/100",
                     details=[],
                 ))
+            elif val < 30:
+                critical.append(CriticalAnomaly(
+                    severity="warning",
+                    category=field,
+                    sector="project-wide",
+                    message=f"{field.replace('_', ' ').title()} score low: {val}/100",
+                    details=[],
+                ))
+
+        # Coverage: only warn, never critical (many projects lack tests)
+        if scores.coverage < 20:
+            critical.append(CriticalAnomaly(
+                severity="warning",
+                category="coverage",
+                sector="project-wide",
+                message=f"Coverage score low: {scores.coverage}/100",
+                details=[],
+            ))
 
         # Warning: BUG/FIXME count high
         bug_tags = [a for a in anomalies_raw if a.tag in ("BUG", "FIXME")]
