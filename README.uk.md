@@ -200,7 +200,7 @@ npm install -g pnpm
 
 ```bash
 # Клонування репозиторію
-git clone https://github.com/fyodorlukashov/codemancer.git
+git clone https://github.com/atljh/codemancer.git
 cd codemancer
 
 # Встановлення фронтенд-залежностей

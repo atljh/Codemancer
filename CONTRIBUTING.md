@@ -125,7 +125,7 @@ Codemancer is modular. New features typically involve:
 ## Development Setup
 
 ```bash
-git clone https://github.com/fyodorlukashov/codemancer.git
+git clone https://github.com/atljh/codemancer.git
 cd codemancer
 ./setup.sh --install
 ```

@@ -36,7 +36,7 @@ Codemancer is not an IDE. It's a **tactical code reality management interface** 
 ## Quick Start
 
 ```bash
-git clone https://github.com/fyodorlukashov/codemancer.git
+git clone https://github.com/atljh/codemancer.git
 cd codemancer
 ./setup.sh
 ```
