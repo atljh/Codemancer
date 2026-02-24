@@ -57,7 +57,7 @@ export function TopStatsBar() {
   const selfRepairActive = useGameStore((s) => s.selfRepairActive);
   const setSelfRepairActive = useGameStore((s) => s.setSelfRepairActive);
   const api = useApi();
-  const { playSound } = useAudio();
+  const { playSound, stopRepairMusic } = useAudio();
   const { t } = useTranslation();
 
   const [recentProjects, setRecentProjects] = useState<RecentProject[]>([]);
@@ -214,6 +214,7 @@ export function TopStatsBar() {
         }
       }
     } catch {
+      stopRepairMusic();
       addActionLog({ action: t("repair.noTools"), status: "error" });
     } finally {
       setSelfRepairActive(false);

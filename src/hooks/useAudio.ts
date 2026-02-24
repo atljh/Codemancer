@@ -218,95 +218,268 @@ function defaultDataBurst() {
   });
 }
 
-// ── Self-repair epic sounds ──────────────────────────────
+// ── DOOM E1M1 "At Doom's Gate" — procedural metal riff ───
+
+// Distortion curve for heavy guitar tone
+function makeDistortionCurve(amount: number): Float32Array {
+  const samples = 44100;
+  const curve = new Float32Array(samples);
+  const deg = Math.PI / 180;
+  for (let i = 0; i < samples; i++) {
+    const x = (i * 2) / samples - 1;
+    curve[i] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
+  }
+  return curve;
+}
+
+let doomMasterGain: GainNode | null = null;
+let doomInterval: ReturnType<typeof setInterval> | null = null;
+let doomNoteIndex = 0;
+
+// E1M1 riff — the iconic Doom opening
+// E2=82.41, D2=73.42, C2=65.41, Bb1=58.27, B1=61.74, A1=55
+const DOOM_BPM = 140;
+const DOOM_NOTE_LEN = 60 / DOOM_BPM / 2; // eighth notes
+
+// Riff pattern: E E(oct) E E(oct) | D D(oct) D D(oct) | C C(oct) C C(oct) | Bb B C D
+const E2 = 82.41,
+  D2 = 73.42,
+  C2 = 65.41,
+  Bb1 = 58.27,
+  B1 = 61.74;
+const DOOM_RIFF = [
+  E2,
+  E2 * 2,
+  E2,
+  E2 * 2, // E power chord pumping
+  E2,
+  D2 * 2,
+  E2,
+  C2 * 2, // classic doom chromatic descend
+  E2,
+  E2 * 2,
+  E2,
+  E2 * 2,
+  Bb1,
+  B1,
+  C2,
+  D2, // ascending turnaround
+];
+
+function doomScheduleNote() {
+  if (!doomMasterGain) return;
+  const ctx = getCtx();
+  const freq = DOOM_RIFF[doomNoteIndex % DOOM_RIFF.length];
+  const now = ctx.currentTime;
+
+  // Distortion node
+  const distortion = ctx.createWaveShaper();
+  distortion.curve = makeDistortionCurve(300);
+  distortion.oversample = "4x";
+
+  // Guitar 1 — main riff (sawtooth for metal crunch)
+  const gtr1 = ctx.createOscillator();
+  const gtr1Gain = ctx.createGain();
+  gtr1.type = "sawtooth";
+  gtr1.frequency.value = freq;
+  gtr1Gain.gain.setValueAtTime(0.7, now);
+  gtr1Gain.gain.exponentialRampToValueAtTime(0.01, now + DOOM_NOTE_LEN * 0.85);
+  gtr1.connect(gtr1Gain).connect(distortion);
+  gtr1.start(now);
+  gtr1.stop(now + DOOM_NOTE_LEN);
+
+  // Guitar 2 — slightly detuned for thickness
+  const gtr2 = ctx.createOscillator();
+  const gtr2Gain = ctx.createGain();
+  gtr2.type = "sawtooth";
+  gtr2.frequency.value = freq * 1.005; // slight detune
+  gtr2Gain.gain.setValueAtTime(0.5, now);
+  gtr2Gain.gain.exponentialRampToValueAtTime(0.01, now + DOOM_NOTE_LEN * 0.85);
+  gtr2.connect(gtr2Gain).connect(distortion);
+  gtr2.start(now);
+  gtr2.stop(now + DOOM_NOTE_LEN);
+
+  // Power chord fifth
+  const fifth = ctx.createOscillator();
+  const fifthGain = ctx.createGain();
+  fifth.type = "sawtooth";
+  fifth.frequency.value = freq * 1.498; // perfect fifth
+  fifthGain.gain.setValueAtTime(0.35, now);
+  fifthGain.gain.exponentialRampToValueAtTime(0.01, now + DOOM_NOTE_LEN * 0.8);
+  fifth.connect(fifthGain).connect(distortion);
+  fifth.start(now);
+  fifth.stop(now + DOOM_NOTE_LEN);
+
+  // Low-pass after distortion to tame harshness
+  const lpFilter = ctx.createBiquadFilter();
+  lpFilter.type = "lowpass";
+  lpFilter.frequency.value = 2500;
+  lpFilter.Q.value = 1.5;
+  distortion.connect(lpFilter).connect(doomMasterGain);
+
+  // Kick drum on beats 1 and 3 (every 4 eighth notes)
+  if (doomNoteIndex % 4 === 0) {
+    const kick = ctx.createOscillator();
+    const kickGain = ctx.createGain();
+    kick.type = "sine";
+    kick.frequency.setValueAtTime(160, now);
+    kick.frequency.exponentialRampToValueAtTime(30, now + 0.12);
+    kickGain.gain.setValueAtTime(0.6, now);
+    kickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    kick.connect(kickGain).connect(doomMasterGain);
+    kick.start(now);
+    kick.stop(now + 0.18);
+
+    // Kick click transient
+    const click = ctx.createOscillator();
+    const clickGain = ctx.createGain();
+    click.type = "square";
+    click.frequency.value = 3500;
+    clickGain.gain.setValueAtTime(0.3, now);
+    clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.01);
+    click.connect(clickGain).connect(doomMasterGain);
+    click.start(now);
+    click.stop(now + 0.01);
+  }
+
+  // Double kick on beats 2 and 4
+  if (doomNoteIndex % 4 === 2) {
+    const kick2 = ctx.createOscillator();
+    const kick2Gain = ctx.createGain();
+    kick2.type = "sine";
+    kick2.frequency.setValueAtTime(140, now);
+    kick2.frequency.exponentialRampToValueAtTime(35, now + 0.1);
+    kick2Gain.gain.setValueAtTime(0.45, now);
+    kick2Gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+    kick2.connect(kick2Gain).connect(doomMasterGain);
+    kick2.start(now);
+    kick2.stop(now + 0.14);
+  }
+
+  // Hi-hat on every eighth note
+  const hhLen = ctx.sampleRate * 0.02;
+  const hhBuf = ctx.createBuffer(1, hhLen, ctx.sampleRate);
+  const hhData = hhBuf.getChannelData(0);
+  for (let j = 0; j < hhLen; j++) hhData[j] = (Math.random() * 2 - 1) * 0.3;
+  const hh = ctx.createBufferSource();
+  hh.buffer = hhBuf;
+  const hhGain = ctx.createGain();
+  const hhFilter = ctx.createBiquadFilter();
+  hhFilter.type = "highpass";
+  hhFilter.frequency.value = 7000;
+  hhGain.gain.setValueAtTime(0.15, now);
+  hhGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+  hh.connect(hhFilter).connect(hhGain).connect(doomMasterGain);
+  hh.start(now);
+  hh.stop(now + 0.03);
+
+  doomNoteIndex++;
+}
+
+function startDoomMusic() {
+  const ctx = getCtx();
+  doomNoteIndex = 0;
+
+  // Master gain for all doom music
+  doomMasterGain = ctx.createGain();
+  doomMasterGain.gain.value = 0.12;
+  doomMasterGain.connect(ctx.destination);
+
+  // Start looping riff
+  doomScheduleNote();
+  doomInterval = setInterval(doomScheduleNote, DOOM_NOTE_LEN * 1000);
+}
+
+function stopDoomMusic() {
+  if (doomInterval) {
+    clearInterval(doomInterval);
+    doomInterval = null;
+  }
+  if (doomMasterGain) {
+    try {
+      const ctx = getCtx();
+      doomMasterGain.gain.exponentialRampToValueAtTime(
+        0.001,
+        ctx.currentTime + 0.4,
+      );
+      const node = doomMasterGain;
+      setTimeout(() => {
+        node.disconnect();
+      }, 500);
+    } catch {
+      doomMasterGain.disconnect();
+    }
+    doomMasterGain = null;
+  }
+}
+
+// Self-repair sound events (one-shots) — work alongside doom music
 
 function selfRepairStart() {
-  const ctx = getCtx();
-  // Dramatic power-up: rising sweep + bass drop + electronic arpeggios
-  // Bass rumble
-  const bass = ctx.createOscillator();
-  const bassGain = ctx.createGain();
-  bass.type = "sine";
-  bass.frequency.setValueAtTime(40, ctx.currentTime);
-  bass.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.8);
-  bassGain.gain.setValueAtTime(0.15, ctx.currentTime);
-  bassGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1);
-  bass.connect(bassGain).connect(ctx.destination);
-  bass.start();
-  bass.stop(ctx.currentTime + 1);
-
-  // Rising sweep
-  const sweep = ctx.createOscillator();
-  const sweepGain = ctx.createGain();
-  sweep.type = "sawtooth";
-  sweep.frequency.setValueAtTime(100, ctx.currentTime);
-  sweep.frequency.exponentialRampToValueAtTime(2000, ctx.currentTime + 0.8);
-  sweepGain.gain.setValueAtTime(0.06, ctx.currentTime);
-  sweepGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.9);
-  sweep.connect(sweepGain).connect(ctx.destination);
-  sweep.start();
-  sweep.stop(ctx.currentTime + 0.9);
-
-  // Arpeggio notes
-  [261.63, 329.63, 392, 523.25, 659.25, 783.99].forEach((freq, i) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "triangle";
-    osc.frequency.value = freq;
-    const t = ctx.currentTime + 0.3 + i * 0.1;
-    gain.gain.setValueAtTime(0, t);
-    gain.gain.linearRampToValueAtTime(0.08, t + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(t);
-    osc.stop(t + 0.2);
-  });
+  startDoomMusic();
 }
 
 function selfRepairTick() {
   const ctx = getCtx();
-  // Quick mechanical ratchet sound
+  // Quick mechanical ratchet — audible over the music
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.type = "square";
-  osc.frequency.setValueAtTime(800 + Math.random() * 400, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.06);
-  gain.gain.setValueAtTime(0.06, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+  osc.frequency.setValueAtTime(1200 + Math.random() * 600, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.05);
+  gain.gain.setValueAtTime(0.1, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07);
   osc.connect(gain).connect(ctx.destination);
   osc.start();
-  osc.stop(ctx.currentTime + 0.08);
+  osc.stop(ctx.currentTime + 0.07);
 }
 
 function selfRepairDone() {
+  stopDoomMusic();
   const ctx = getCtx();
-  // Victory fanfare: chord + shimmer
-  const chord = [523.25, 659.25, 783.99, 1046.5];
+  // Victory power chord — big open E major
+  const chord = [82.41, 123.47, 164.81, 207.65, 329.63, 659.25];
+  const distortion = ctx.createWaveShaper();
+  distortion.curve = makeDistortionCurve(200);
+  const lp = ctx.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.frequency.value = 3000;
+  const masterG = ctx.createGain();
+  masterG.gain.setValueAtTime(0.15, ctx.currentTime);
+  masterG.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.5);
+  distortion.connect(lp).connect(masterG).connect(ctx.destination);
+
   chord.forEach((freq) => {
     const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "sine";
+    const g = ctx.createGain();
+    osc.type = "sawtooth";
     osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.05);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
-    osc.connect(gain).connect(ctx.destination);
+    g.gain.setValueAtTime(0.5, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2);
+    osc.connect(g).connect(distortion);
     osc.start();
-    osc.stop(ctx.currentTime + 1.2);
+    osc.stop(ctx.currentTime + 2.5);
   });
-  // Shimmer cascade
-  [1568, 2093, 2637, 3136].forEach((freq, i) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "sine";
-    osc.frequency.value = freq;
-    const t = ctx.currentTime + 0.3 + i * 0.08;
-    gain.gain.setValueAtTime(0.04, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(t);
-    osc.stop(t + 0.5);
-  });
+
+  // Crash cymbal
+  const crashLen = ctx.sampleRate * 0.8;
+  const crashBuf = ctx.createBuffer(1, crashLen, ctx.sampleRate);
+  const crashData = crashBuf.getChannelData(0);
+  for (let i = 0; i < crashLen; i++) {
+    crashData[i] =
+      (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.3));
+  }
+  const crash = ctx.createBufferSource();
+  crash.buffer = crashBuf;
+  const crashFilter = ctx.createBiquadFilter();
+  crashFilter.type = "highpass";
+  crashFilter.frequency.value = 5000;
+  const crashGain = ctx.createGain();
+  crashGain.gain.setValueAtTime(0.2, ctx.currentTime);
+  crashGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+  crash.connect(crashFilter).connect(crashGain).connect(ctx.destination);
+  crash.start();
+  crash.stop(ctx.currentTime + 1.5);
 }
 
 // ── JARVIS pack (smooth AI assistant) ─────────────────────
@@ -724,7 +897,17 @@ export function useAudio() {
 
   const getIsSpeaking = useCallback(() => isSpeaking(), []);
 
-  return { playSound, sayText, stopTts, isSpeaking: getIsSpeaking };
+  const stopRepairMusic = useCallback(() => {
+    stopDoomMusic();
+  }, []);
+
+  return {
+    playSound,
+    sayText,
+    stopTts,
+    isSpeaking: getIsSpeaking,
+    stopRepairMusic,
+  };
 }
 
 export type { SoundEvent };
