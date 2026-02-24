@@ -10,9 +10,35 @@ struct PythonProcess(Mutex<Option<Child>>);
 impl Drop for PythonProcess {
     fn drop(&mut self) {
         if let Some(mut child) = self.0.lock().unwrap().take() {
-            println!("Stopping Python backend (pid: {})...", child.id());
+            let pid = child.id();
+            println!("Stopping Python backend (pgid: {})...", pid);
+            // Kill entire process group so child workers are also terminated
+            #[cfg(unix)]
+            unsafe {
+                libc::kill(-(pid as i32), libc::SIGTERM);
+            }
+            #[cfg(not(unix))]
             let _ = child.kill();
             let _ = child.wait();
+        }
+    }
+}
+
+/// Kill any leftover process occupying the backend port
+fn kill_stale_backend() {
+    #[cfg(unix)]
+    {
+        if let Ok(output) = Command::new("lsof")
+            .args(["-ti", ":8420"])
+            .output()
+        {
+            let pids = String::from_utf8_lossy(&output.stdout);
+            for pid_str in pids.split_whitespace() {
+                if let Ok(pid) = pid_str.parse::<i32>() {
+                    println!("Killing stale backend process: {}", pid);
+                    unsafe { libc::kill(pid, libc::SIGKILL); }
+                }
+            }
         }
     }
 }
@@ -115,8 +141,11 @@ pub fn run() {
 
             println!("Starting Python backend from: {:?}", backend_dir);
 
-            let child = Command::new("uv")
-                .args([
+            // Clean up any stale backend from previous runs
+            kill_stale_backend();
+
+            let mut cmd = Command::new("uv");
+            cmd.args([
                     "run",
                     "python",
                     "-m",
@@ -128,8 +157,16 @@ pub fn run() {
                     "8420",
                     "--reload",
                 ])
-                .current_dir(&backend_dir)
-                .spawn();
+                .current_dir(&backend_dir);
+
+            // Spawn in its own process group so we can kill the whole tree
+            #[cfg(unix)]
+            {
+                use std::os::unix::process::CommandExt;
+                cmd.process_group(0);
+            }
+
+            let child = cmd.spawn();
 
             match child {
                 Ok(child) => {
