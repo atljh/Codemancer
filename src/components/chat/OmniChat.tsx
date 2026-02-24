@@ -6,10 +6,12 @@ import { ActionLogLine } from "./ActionLogLine";
 import { HealthAlertBubble } from "./HealthAlertBubble";
 import { RecallBubble } from "./RecallBubble";
 import { BlastRadiusBubble } from "./BlastRadiusBubble";
+import { ProactiveLogBubble } from "./ProactiveLogBubble";
 import { CommandInput } from "./CommandInput";
 import { ConversationDrawer } from "./ConversationDrawer";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
+import { useAudio } from "../../hooks/useAudio";
 import { useTranslation } from "../../hooks/useTranslation";
 import { shortenPath } from "../../utils/paths";
 
@@ -49,6 +51,7 @@ export function OmniChat() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const api = useApi();
   const { t } = useTranslation();
+  const { playSound, sayText } = useAudio();
 
   // Auto-scroll
   useEffect(() => {
@@ -64,7 +67,7 @@ export function OmniChat() {
       const id = convId ?? currentConversationId;
       if (!id) return;
       const msgs = useGameStore.getState().messages.filter(
-        (m) => m.type !== "action_log" && !["health_alert", "recall", "blast_radius", "command_result"].includes(m.type!)
+        (m) => m.type !== "action_log" && !["health_alert", "recall", "blast_radius", "command_result", "proactive_log"].includes(m.type!)
       );
       try {
         const meta = await api.saveMessages(id, msgs);
@@ -368,6 +371,8 @@ export function OmniChat() {
                 if (data.total_bytes_processed) {
                   addBytesProcessed(data.total_bytes_processed);
                 }
+                // TTS: speak the beginning of the response
+                if (accumulated) sayText(accumulated.slice(0, 300));
                 // Refresh player to get updated stats
                 try {
                   const updatedPlayer = await api.getStatus();
@@ -393,6 +398,7 @@ export function OmniChat() {
 
               // Tool call event
               if (data.type === "tool_call") {
+                playSound("tool_start");
                 const displayName = getToolDisplayName(data.tool_name);
                 const pathInfo = data.input?.path ? ` ${data.input.path}` : "";
                 addActionLog({
@@ -405,6 +411,7 @@ export function OmniChat() {
 
               // Tool result event
               if (data.type === "tool_result") {
+                playSound(data.status === "success" ? "mission_complete" : "tool_error");
                 const displayName = getToolDisplayName(data.tool_name);
                 addActionLog({
                   action: `[DATA_ACQUIRED]: ${displayName} — ${data.summary}`,
@@ -435,6 +442,7 @@ export function OmniChat() {
                 const cmdOutput = (data.output || "") as string;
                 const command = (data.command || "") as string;
                 const isFail = exitCode !== 0;
+                playSound(isFail ? "glitch" : "mission_complete");
 
                 // Refresh player stats (HP may have changed)
                 if (isFail && hpDamage > 0) {
@@ -465,6 +473,7 @@ export function OmniChat() {
 
               // Blast radius event (pre-commit scan)
               if (data.type === "blast_radius") {
+                playSound("alert");
                 const count = data.count as number;
                 const isHigh = data.high as boolean;
                 const dependents = (data.dependents || []) as string[];
@@ -496,7 +505,7 @@ export function OmniChat() {
       // Auto-save after AI response completes
       if (convId) saveCurrentMessages(convId);
     },
-    [addMessage, api, setPlayer, triggerLevelUp, player.mp, settings.ai_provider, settings.anthropic_api_key, settings.auth_method, settings.oauth_access_token, settings.openai_api_key, settings.gemini_api_key, settings.custom_base_url, projectScan, handleSlashCommand, setAiResponding, updateLastMessage, addActionLog, addActionCard, addBytesProcessed, t, ensureConversation, saveCurrentMessages]
+    [addMessage, api, setPlayer, triggerLevelUp, player.mp, settings.ai_provider, settings.anthropic_api_key, settings.auth_method, settings.oauth_access_token, settings.openai_api_key, settings.gemini_api_key, settings.custom_base_url, projectScan, handleSlashCommand, setAiResponding, updateLastMessage, addActionLog, addActionCard, addBytesProcessed, t, ensureConversation, saveCurrentMessages, playSound, sayText]
   );
 
   const handleApplyCode = useCallback(
@@ -551,6 +560,9 @@ export function OmniChat() {
             }
             if (msg.type === "blast_radius") {
               return <BlastRadiusBubble key={msg.id} message={msg} />;
+            }
+            if (msg.type === "proactive_log") {
+              return <ProactiveLogBubble key={msg.id} message={msg} />;
             }
             return (
               <MessageBubble
