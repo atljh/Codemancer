@@ -6,7 +6,7 @@ from pathlib import Path
 
 import re
 
-from models.chronicle import ChronicleEvent, ChronicleSession, RecallMatch
+from models.chronicle import ChronicleEvent, ChronicleSession, RecallMatch, IntelLog
 
 DB_PATH = Path(__file__).parent.parent / "chronicle.db"
 
@@ -34,6 +34,17 @@ class ChronicleService:
                 description TEXT NOT NULL DEFAULT '',
                 files_affected TEXT DEFAULT '[]',
                 exp_gained INTEGER DEFAULT 0,
+                session_id TEXT REFERENCES sessions(id)
+            );
+            CREATE TABLE IF NOT EXISTS intel_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT NOT NULL,
+                source TEXT NOT NULL DEFAULT 'text',
+                raw_input TEXT NOT NULL DEFAULT '',
+                intent TEXT NOT NULL DEFAULT '',
+                subtasks TEXT DEFAULT '[]',
+                status TEXT NOT NULL DEFAULT 'pending',
+                exp_multiplier REAL DEFAULT 1.0,
                 session_id TEXT REFERENCES sessions(id)
             );
         """)
@@ -241,6 +252,71 @@ class ChronicleService:
                 seen.add(low)
                 result.append(kw)
         return result[:10]
+
+    # ── Intel Logs ───────────────────────────────────────
+
+    def add_intel(
+        self,
+        source: str,
+        raw_input: str,
+        intent: str = "",
+        subtasks: list[str] | None = None,
+        exp_multiplier: float = 1.0,
+    ) -> IntelLog:
+        now = datetime.now(timezone.utc).isoformat()
+        sid = self._current_session_id or ""
+        cursor = self._conn.execute(
+            "INSERT INTO intel_logs (timestamp, source, raw_input, intent, subtasks, status, exp_multiplier, session_id) VALUES (?,?,?,?,?,?,?,?)",
+            (now, source, raw_input, intent, json.dumps(subtasks or []), "pending", exp_multiplier, sid),
+        )
+        self._conn.commit()
+        return IntelLog(
+            id=cursor.lastrowid or 0,
+            timestamp=now,
+            source=source,
+            raw_input=raw_input,
+            intent=intent,
+            subtasks=subtasks or [],
+            status="pending",
+            exp_multiplier=exp_multiplier,
+            session_id=sid,
+        )
+
+    def get_intel_logs(self, status: str | None = None, limit: int = 50) -> list[IntelLog]:
+        if status:
+            rows = self._conn.execute(
+                "SELECT * FROM intel_logs WHERE status=? ORDER BY id DESC LIMIT ?",
+                (status, limit),
+            ).fetchall()
+        else:
+            rows = self._conn.execute(
+                "SELECT * FROM intel_logs ORDER BY id DESC LIMIT ?", (limit,)
+            ).fetchall()
+        result = []
+        for r in rows:
+            try:
+                subtasks = json.loads(r["subtasks"])
+            except (json.JSONDecodeError, TypeError):
+                subtasks = []
+            result.append(IntelLog(
+                id=r["id"],
+                timestamp=r["timestamp"],
+                source=r["source"],
+                raw_input=r["raw_input"],
+                intent=r["intent"],
+                subtasks=subtasks,
+                status=r["status"],
+                exp_multiplier=r["exp_multiplier"] or 1.0,
+                session_id=r["session_id"],
+            ))
+        return result
+
+    def update_intel_status(self, intel_id: int, status: str) -> bool:
+        cursor = self._conn.execute(
+            "UPDATE intel_logs SET status=? WHERE id=?", (status, intel_id)
+        )
+        self._conn.commit()
+        return cursor.rowcount > 0
 
     def get_session_summary(self, session_id: str) -> dict:
         session = self._conn.execute(

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from models.chronicle import ChronicleEvent, ChronicleSession, ReportRequest, ReportResponse, RecallRequest, RecallResponse
+from models.chronicle import ChronicleEvent, ChronicleSession, ReportRequest, ReportResponse, RecallRequest, RecallResponse, IntelLog, IntelLogCreate
 from services.chronicle_service import ChronicleService
 from services.providers import get_provider
 from routes.settings import load_settings
@@ -54,6 +54,36 @@ async def recall(req: RecallRequest):
         return RecallResponse()
     matches = chronicle_service.recall(req.message)
     return RecallResponse(has_recall=len(matches) > 0, matches=matches)
+
+
+@router.get("/intel", response_model=list[IntelLog])
+async def get_intel_logs(status: str | None = None, limit: int = 50):
+    if not chronicle_service:
+        return []
+    return chronicle_service.get_intel_logs(status=status, limit=limit)
+
+
+@router.post("/intel", response_model=IntelLog)
+async def create_intel_log(req: IntelLogCreate):
+    if not chronicle_service:
+        raise HTTPException(status_code=500, detail="Chronicle service not initialized")
+    return chronicle_service.add_intel(
+        source=req.source,
+        raw_input=req.raw_input,
+        intent=req.intent,
+        subtasks=req.subtasks,
+        exp_multiplier=req.exp_multiplier,
+    )
+
+
+@router.patch("/intel/{intel_id}")
+async def update_intel(intel_id: int, status: str):
+    if not chronicle_service:
+        raise HTTPException(status_code=500, detail="Chronicle service not initialized")
+    ok = chronicle_service.update_intel_status(intel_id, status)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Intel log not found")
+    return {"ok": True}
 
 
 @router.post("/report", response_model=ReportResponse)

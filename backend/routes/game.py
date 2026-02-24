@@ -99,6 +99,26 @@ async def perform_action(req: ActionRequest):
         new_level=new_level if leveled_up else None,
     )
 
+class MpRewardRequest(BaseModel):
+    amount: int = 5
+    reason: str = "voice_briefing"
+
+
+@router.post("/mp_reward", response_model=PlayerResponse)
+async def mp_reward(req: MpRewardRequest):
+    """Award MP for specific actions like voice briefings."""
+    player.mp = min(player.max_mp, player.mp + req.amount)
+    save_state_fn()
+
+    if chronicle_service:
+        chronicle_service.log_event(
+            action_type=req.reason,
+            description=f"MP reward: +{req.amount} ({req.reason})",
+        )
+
+    return get_player_response(player)
+
+
 @router.post("/reset")
 async def reset():
     player.total_exp = 0

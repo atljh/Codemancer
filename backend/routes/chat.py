@@ -3,6 +3,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 
 from models.chat import ChatRequest, ChatResponse
 from models.player import Player
@@ -294,6 +295,74 @@ async def chat_stream(req: ChatRequest):
         yield f"data: {json.dumps({'done': True, 'tokens_used': total_tokens, 'total_bytes_processed': total_bytes_processed, 'total_exp_from_tools': total_exp_from_tools})}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+
+INTELLIGENCE_PROMPT = """You are a tactical intelligence processor. The Operator has submitted raw input (voice or text).
+Your job:
+1. Formulate a clear **intent** — what the Operator actually wants accomplished (1-2 sentences).
+2. Break it into **subtasks** — concrete steps an AI agent can execute (3-7 items).
+3. If the input is ambiguous, add a **clarifying_question** that you'd need answered before proceeding.
+
+Respond ONLY in valid JSON with this shape:
+{
+  "intent": "string",
+  "subtasks": ["string", ...],
+  "clarifying_question": "string or null"
+}
+
+Be specific. Convert vague ideas into actionable items. Use the project context if provided.
+If the input is in Russian, respond in Russian. If in English, respond in English."""
+
+
+class IntelligenceRequest(BaseModel):
+    raw_input: str
+    source: str = "text"  # "voice" | "text"
+    project_context: str = ""
+
+
+class IntelligenceResponse(BaseModel):
+    intent: str
+    subtasks: list[str] = []
+    clarifying_question: str | None = None
+
+
+@router.post("/process_intelligence", response_model=IntelligenceResponse)
+async def process_intelligence(req: IntelligenceRequest):
+    settings = _load_settings()
+
+    try:
+        provider = get_provider(settings)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    model = _get_model(settings)
+
+    user_msg = f"Raw input ({req.source}): {req.raw_input}"
+    if req.project_context:
+        user_msg += f"\n\nProject context:\n{req.project_context}"
+
+    messages = [{"role": "user", "content": user_msg}]
+    result = provider.chat(messages, INTELLIGENCE_PROMPT, model)
+
+    content = result.get("content", "")
+    # Parse JSON from response
+    try:
+        # Strip markdown code fences if present
+        cleaned = content.strip()
+        if cleaned.startswith("```"):
+            cleaned = cleaned.split("\n", 1)[1] if "\n" in cleaned else cleaned[3:]
+            if cleaned.endswith("```"):
+                cleaned = cleaned[:-3]
+            cleaned = cleaned.strip()
+        parsed = json.loads(cleaned)
+        return IntelligenceResponse(
+            intent=parsed.get("intent", req.raw_input),
+            subtasks=parsed.get("subtasks", []),
+            clarifying_question=parsed.get("clarifying_question"),
+        )
+    except (json.JSONDecodeError, KeyError):
+        # Fallback: use raw content as intent
+        return IntelligenceResponse(intent=content[:500], subtasks=[])
 
 
 @router.get("/models")

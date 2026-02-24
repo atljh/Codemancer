@@ -45,3 +45,25 @@ class RecallRequest(BaseModel):
 class RecallResponse(BaseModel):
     has_recall: bool = False
     matches: list[RecallMatch] = []
+
+
+# ── Intel Logs ─────────────────────────────────────────
+
+class IntelLog(BaseModel):
+    id: int = 0
+    timestamp: str = ""
+    source: str = "text"  # "voice" | "text" | "proactive"
+    raw_input: str = ""
+    intent: str = ""
+    subtasks: list[str] = []
+    status: str = "pending"  # "pending" | "active" | "done" | "archived"
+    exp_multiplier: float = 1.0
+    session_id: str = ""
+
+
+class IntelLogCreate(BaseModel):
+    source: str = "text"
+    raw_input: str
+    intent: str = ""
+    subtasks: list[str] = []
+    exp_multiplier: float = 1.0
