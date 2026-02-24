@@ -19,10 +19,12 @@ import { GoToLineDialog } from "../modals/GoToLineDialog";
 import { SearchPanel } from "../search/SearchPanel";
 import { EditorRefProvider } from "../../hooks/useEditorRef";
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
+import { useHealthWatch } from "../../hooks/useHealthWatch";
 import { useGameStore } from "../../stores/gameStore";
 
 export function AppLayout() {
   useKeyboardShortcuts();
+  useHealthWatch();
   const appReady = useGameStore((s) => s.appReady);
   const workspaceRoot = useGameStore((s) => s.settings.workspace_root);
   const showGitPanel = useGameStore((s) => s.showGitPanel);

@@ -70,6 +70,7 @@ interface GameState {
 
   // Health panel
   showHealthPanel: boolean;
+  lastHealthAlertHash: string;
 
   // Quick open & search
   showQuickOpen: boolean;
@@ -147,6 +148,7 @@ interface GameState {
 
   // Health panel actions
   toggleHealthPanel: () => void;
+  setLastHealthAlertHash: (hash: string) => void;
 
   // Quick open & search actions
   toggleQuickOpen: () => void;
@@ -230,6 +232,7 @@ export const useGameStore = create<GameState>((set) => ({
   conversations: [],
   showChronicle: false,
   showHealthPanel: false,
+  lastHealthAlertHash: "",
   showQuickOpen: false,
   showSearchPanel: false,
   showCommandPalette: false,
@@ -400,6 +403,7 @@ export const useGameStore = create<GameState>((set) => ({
 
   // Health panel
   toggleHealthPanel: () => set((s) => ({ showHealthPanel: !s.showHealthPanel })),
+  setLastHealthAlertHash: (hash) => set({ lastHealthAlertHash: hash }),
 
   // Quick open & search
   toggleQuickOpen: () => set((s) => ({ showQuickOpen: !s.showQuickOpen })),

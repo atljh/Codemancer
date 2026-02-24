@@ -33,3 +33,17 @@ class HealthScanResponse(BaseModel):
     untested_files: list[str] = []
     anomalies: list[CodeAnomaly] = []
     large_files: list[LargeFile] = []
+
+
+class CriticalAnomaly(BaseModel):
+    severity: str  # "critical" | "warning"
+    category: str  # "file_size" | "complexity" | "coverage" | "cleanliness"
+    sector: str  # affected directory/area
+    message: str
+    details: list[str] = []
+
+
+class HealthWatchResponse(BaseModel):
+    has_critical: bool = False
+    anomalies: list[CriticalAnomaly] = []
+    scores: HealthScores = HealthScores()

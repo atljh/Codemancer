@@ -238,6 +238,20 @@ export interface HealthScanResult {
   large_files: LargeFile[];
 }
 
+export interface CriticalAnomaly {
+  severity: "critical" | "warning";
+  category: string;
+  sector: string;
+  message: string;
+  details: string[];
+}
+
+export interface HealthWatchResult {
+  has_critical: boolean;
+  anomalies: CriticalAnomaly[];
+  scores: HealthScores;
+}
+
 // Dependency graph types
 export interface DepNode {
   id: string;

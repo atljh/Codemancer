@@ -1,3 +1,4 @@
+import { useTranslation } from "../../hooks/useTranslation";
 import type { HealthScores } from "../../types/game";
 
 interface RadarChartProps {
@@ -42,14 +43,17 @@ function scoreColor(score: number): string {
 }
 
 export function RadarChart({ scores, size = 280, onAxisClick }: RadarChartProps) {
-  const cx = size / 2;
-  const cy = size / 2;
+  const { t } = useTranslation();
+  const pad = 50; // padding for labels
+  const full = size + pad * 2;
+  const cx = full / 2;
+  const cy = full / 2;
   const maxR = size * 0.38;
 
   const values = AXES.map((a) => scores[a]);
 
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="block mx-auto">
+    <svg width={full} height={full} viewBox={`0 0 ${full} ${full}`} className="block mx-auto">
       <defs>
         <filter id="radar-glow">
           <feGaussianBlur stdDeviation="3" result="blur" />
@@ -58,12 +62,6 @@ export function RadarChart({ scores, size = 280, onAxisClick }: RadarChartProps)
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <style>{`
-          @keyframes radar-sweep {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
       </defs>
 
       {/* Grid polygons */}
@@ -123,30 +121,15 @@ export function RadarChart({ scores, size = 280, onAxisClick }: RadarChartProps)
         );
       })}
 
-      {/* Sweep line */}
-      <line
-        x1={cx}
-        y1={cy}
-        x2={cx}
-        y2={cy - maxR}
-        stroke="var(--theme-accent)"
-        strokeWidth={1}
-        opacity={0.3}
-        style={{
-          transformOrigin: `${cx}px ${cy}px`,
-          animation: "radar-sweep 4s linear infinite",
-        }}
-      />
-
       {/* Axis labels */}
       {AXES.map((axis, i) => {
-        const labelR = maxR + 20;
+        const labelR = maxR + 24;
         const p = polarToCart(AXIS_ANGLES[axis], labelR, cx, cy);
-        const labels: Record<Axis, string> = {
-          complexity: "CMPLX",
-          coverage: "COVER",
-          cleanliness: "CLEAN",
-          file_size: "SIZE",
+        const labelKeys: Record<Axis, string> = {
+          complexity: t("health.complexity"),
+          coverage: t("health.coverage"),
+          cleanliness: t("health.cleanliness"),
+          file_size: t("health.fileSize"),
         };
         return (
           <text
@@ -155,13 +138,14 @@ export function RadarChart({ scores, size = 280, onAxisClick }: RadarChartProps)
             y={p.y}
             textAnchor="middle"
             dominantBaseline="middle"
-            className="cursor-pointer"
+            className="cursor-pointer select-none"
             fill="var(--theme-text-dim)"
-            fontSize={9}
+            fontSize={10}
             fontFamily="monospace"
+            letterSpacing="0.05em"
             onClick={() => onAxisClick?.(axis)}
           >
-            {labels[axis]} {values[i]}
+            {labelKeys[axis]} {values[i]}
           </text>
         );
       })}

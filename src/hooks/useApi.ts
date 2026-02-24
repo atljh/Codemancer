@@ -20,6 +20,7 @@ import type {
   ChronicleSession,
   ChronicleReport,
   HealthScanResult,
+  HealthWatchResult,
   DepGraph,
   FocusStatus,
 } from "../types/game";
@@ -246,6 +247,7 @@ const api = {
 
   // Health / Tech Debt
   healthScan: () => fetchJson<HealthScanResult>("/api/health/scan"),
+  healthWatch: () => fetchJson<HealthWatchResult>("/api/health/watch"),
 
   // Dependency graph
   getDependencyGraph: (scope?: string) =>

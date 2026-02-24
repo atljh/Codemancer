@@ -3,6 +3,7 @@ import { AnimatePresence } from "framer-motion";
 import { MessageBubble } from "./MessageBubble";
 import { ActionCard } from "./ActionCard";
 import { ActionLogLine } from "./ActionLogLine";
+import { HealthAlertBubble } from "./HealthAlertBubble";
 import { CommandInput } from "./CommandInput";
 import { ConversationDrawer } from "./ConversationDrawer";
 import { useGameStore } from "../../stores/gameStore";
@@ -60,7 +61,7 @@ export function OmniChat() {
       const id = convId ?? currentConversationId;
       if (!id) return;
       const msgs = useGameStore.getState().messages.filter(
-        (m) => m.type !== "action_log"
+        (m) => m.type !== "action_log" && (m.type as string) !== "health_alert"
       );
       try {
         const meta = await api.saveMessages(id, msgs);
@@ -462,6 +463,9 @@ export function OmniChat() {
             }
             if (msg.type === "action_log" && msg.actionLog) {
               return <ActionLogLine key={msg.id} log={msg.actionLog} />;
+            }
+            if ((msg.type as string) === "health_alert") {
+              return <HealthAlertBubble key={msg.id} message={msg} />;
             }
             return (
               <MessageBubble
