@@ -1,13 +1,29 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 // @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
 export default defineConfig(async () => ({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    nodePolyfills({
+      // buffer excluded — handled via resolve.alias to avoid duplicate Buffer classes (GramJS compat)
+      include: ["util", "events", "stream", "string_decoder", "path", "os", "crypto", "net", "assert"],
+      globals: { Buffer: false, global: true, process: true },
+    }),
+  ],
+
+  resolve: {
+    alias: {
+      // Single Buffer class for all modules — prevents "Bytes or str expected, not Buffer3"
+      buffer: "buffer",
+    },
+  },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //

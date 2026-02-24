@@ -28,6 +28,8 @@ DEFAULT_SETTINGS = {
     "custom_base_url": "",
     "custom_api_key": "",
     "custom_model": "",
+    "telegram_api_id": "",
+    "telegram_api_hash": "",
 }
 
 
@@ -50,6 +52,8 @@ class AppSettings(BaseModel):
     custom_base_url: str = ""
     custom_api_key: str = ""
     custom_model: str = ""
+    telegram_api_id: str = ""
+    telegram_api_hash: str = ""
 
 
 def load_settings() -> dict:

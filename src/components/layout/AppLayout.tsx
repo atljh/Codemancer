@@ -14,6 +14,7 @@ import { ChroniclePanel } from "../chronicle/ChroniclePanel";
 import { IntelFeedPanel } from "../chronicle/IntelFeedPanel";
 import { HealthPanel } from "../health/HealthPanel";
 import { TacticalMap } from "../map/TacticalMap";
+import { CommsPanel } from "../comms/CommsPanel";
 import { QuickOpenModal } from "../modals/QuickOpenModal";
 import { CommandPaletteModal } from "../modals/CommandPaletteModal";
 import { GoToLineDialog } from "../modals/GoToLineDialog";
@@ -85,7 +86,7 @@ export function AppLayout() {
             </AnimatePresence>
             <div className="flex-1 flex flex-col min-w-0">
               <EditorTabs />
-              {activeTab === "chat" ? <OmniChat /> : activeTab === "map" ? <TacticalMap /> : <CodeEditor />}
+              {activeTab === "chat" ? <OmniChat /> : activeTab === "map" ? <TacticalMap /> : activeTab === "comms" ? <CommsPanel /> : <CodeEditor />}
             </div>
             <AnimatePresence>
               {showGitPanel && <GitPanel />}

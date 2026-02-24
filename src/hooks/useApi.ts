@@ -27,6 +27,7 @@ import type {
   FocusStatus,
   IntelLog,
   IntelligenceResult,
+  TelegramAnalysis,
 } from "../types/game";
 
 const API_BASE = "http://127.0.0.1:8420";
@@ -317,6 +318,19 @@ const api = {
     fetchJson<IntelligenceResult>("/api/chat/process_intelligence", {
       method: "POST",
       body: JSON.stringify({ raw_input: rawInput, source, project_context: projectContext }),
+    }),
+
+  // Telegram / COMMS
+  analyzeTelegramMessage: (messageText: string, senderName: string, projectContext: string, projectFiles: string[]) =>
+    fetchJson<TelegramAnalysis>("/api/telegram/analyze", {
+      method: "POST",
+      body: JSON.stringify({ message_text: messageText, sender_name: senderName, project_context: projectContext, project_files: projectFiles }),
+    }),
+
+  extractTelegramQuest: (messageText: string, senderName: string, linkedFiles: string[], questTitle?: string) =>
+    fetchJson<Quest>("/api/telegram/extract_quest", {
+      method: "POST",
+      body: JSON.stringify({ message_text: messageText, sender_name: senderName, linked_files: linkedFiles, quest_title: questTitle || "" }),
     }),
 };
 

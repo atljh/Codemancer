@@ -19,3 +19,4 @@ class QuestCreate(BaseModel):
     title: str
     description: str = ""
     exp_reward: int = 50
+    source_file: str | None = None

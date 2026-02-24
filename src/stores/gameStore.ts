@@ -14,6 +14,8 @@ import type {
   ConversationMeta,
   GitStatus,
   FocusStatus,
+  TelegramDialog,
+  TelegramMessage,
 } from "../types/game";
 
 interface GameState {
@@ -95,6 +97,14 @@ interface GameState {
 
   // Intel Feed
   showIntelFeed: boolean;
+
+  // Comms (Telegram)
+  commsConnected: boolean;
+  commsDialogs: TelegramDialog[];
+  commsActiveDialogId: string | null;
+  commsMessages: TelegramMessage[];
+  bountyZoneFiles: string[];
+  bountyZoneSource: string | null;
 
   // Actions
   setPlayer: (player: Player) => void;
@@ -187,6 +197,14 @@ interface GameState {
 
   // Intel Feed actions
   toggleIntelFeed: () => void;
+
+  // Comms actions
+  setCommsConnected: (v: boolean) => void;
+  setCommsDialogs: (dialogs: TelegramDialog[]) => void;
+  setCommsActiveDialogId: (id: string | null) => void;
+  setCommsMessages: (msgs: TelegramMessage[]) => void;
+  setBountyZone: (source: string, files: string[]) => void;
+  clearBountyZone: () => void;
 }
 
 const defaultPlayer: Player = {
@@ -220,6 +238,8 @@ const defaultSettings: AppSettings = {
   custom_base_url: "",
   custom_api_key: "",
   custom_model: "",
+  telegram_api_id: "",
+  telegram_api_hash: "",
 };
 
 export const useGameStore = create<GameState>((set) => ({
@@ -269,6 +289,12 @@ export const useGameStore = create<GameState>((set) => ({
   soundEnabled: true,
   isListening: false,
   showIntelFeed: false,
+  commsConnected: false,
+  commsDialogs: [],
+  commsActiveDialogId: null,
+  commsMessages: [],
+  bountyZoneFiles: [],
+  bountyZoneSource: null,
 
   setPlayer: (player) => set({ player }),
   setQuests: (quests) => set({ quests }),
@@ -460,4 +486,12 @@ export const useGameStore = create<GameState>((set) => ({
 
   // Intel Feed
   toggleIntelFeed: () => set((s) => ({ showIntelFeed: !s.showIntelFeed })),
+
+  // Comms
+  setCommsConnected: (v) => set({ commsConnected: v }),
+  setCommsDialogs: (dialogs) => set({ commsDialogs: dialogs }),
+  setCommsActiveDialogId: (id) => set({ commsActiveDialogId: id }),
+  setCommsMessages: (msgs) => set({ commsMessages: msgs }),
+  setBountyZone: (source, files) => set({ bountyZoneSource: source, bountyZoneFiles: files }),
+  clearBountyZone: () => set({ bountyZoneSource: null, bountyZoneFiles: [] }),
 }));

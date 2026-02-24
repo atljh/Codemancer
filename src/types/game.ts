@@ -169,6 +169,8 @@ export interface AppSettings {
   custom_base_url: string;
   custom_api_key: string;
   custom_model: string;
+  telegram_api_id: string;
+  telegram_api_hash: string;
 }
 
 export interface ProjectScanResult {
@@ -318,6 +320,36 @@ export interface IntelligenceResult {
   subtasks: string[];
   clarifying_question: string | null;
 }
+
+export interface TelegramDialog {
+  id: string;
+  title: string;
+  unreadCount: number;
+  isUser: boolean;
+  isGroup: boolean;
+  isChannel: boolean;
+  lastMessage: string;
+  lastMessageDate: number;
+}
+
+export interface TelegramMessage {
+  id: number;
+  senderId: string;
+  senderName: string;
+  text: string;
+  date: number;
+  out: boolean;
+  linkedFiles?: string[];
+}
+
+export interface TelegramAnalysis {
+  has_references: boolean;
+  linked_files: string[];
+  summary: string;
+  quest_suggestion: string | null;
+}
+
+export type CommsAuthState = "disconnected" | "qr_pending" | "phone_pending" | "code_pending" | "password_pending" | "connected";
 
 /** @deprecated Use AIModel instead */
 export type ClaudeModel = AIModel;

@@ -400,6 +400,18 @@ body,
   animation: listening-ring 1.5s ease-out infinite;
 }
 
+/* ═══════════════════════════════════════════════
+   BOUNTY ZONE PULSE (COMMS)
+   ═══════════════════════════════════════════════ */
+@keyframes bounty-pulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.5; }
+}
+
+.animate-bounty-pulse {
+  animation: bounty-pulse 1.5s ease-in-out infinite;
+}
+
 /* Selection color */
 ::selection {
   background: rgba(var(--theme-accent-rgb), 0.25);

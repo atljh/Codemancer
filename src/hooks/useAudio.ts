@@ -6,7 +6,7 @@ import { useGameStore } from "../stores/gameStore";
 //  No external files needed — all sounds are synthesized
 // ══════════════════════════════════════════════════════════
 
-type SoundEvent = "tool_start" | "tool_error" | "mission_complete" | "alert" | "glitch" | "recall" | "recording_start" | "data_crunch" | "agent_question" | "plan_confirm";
+type SoundEvent = "tool_start" | "tool_error" | "mission_complete" | "alert" | "glitch" | "recall" | "recording_start" | "data_crunch" | "agent_question" | "plan_confirm" | "data_burst";
 
 let audioCtx: AudioContext | null = null;
 
@@ -187,6 +187,34 @@ function playPlanConfirm() {
   ring.stop(ctx.currentTime + 0.5);
 }
 
+function playDataBurst() {
+  const ctx = getCtx();
+  // Low pulse
+  const pulse = ctx.createOscillator();
+  const pulseGain = ctx.createGain();
+  pulse.type = "sine";
+  pulse.frequency.value = 80;
+  pulseGain.gain.setValueAtTime(0.1, ctx.currentTime);
+  pulseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+  pulse.connect(pulseGain).connect(ctx.destination);
+  pulse.start();
+  pulse.stop(ctx.currentTime + 0.3);
+  // Cascading pings
+  const freqs = [1200, 1400, 1100, 1600, 1000];
+  freqs.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = freq;
+    const t = ctx.currentTime + 0.05 + i * 0.06;
+    gain.gain.setValueAtTime(0.06, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.1);
+  });
+}
+
 const SOUND_MAP: Record<SoundEvent, () => void> = {
   tool_start: playScanTone,
   tool_error: playGlitchNoise,
@@ -198,6 +226,7 @@ const SOUND_MAP: Record<SoundEvent, () => void> = {
   data_crunch: playDataCrunch,
   agent_question: playAgentQuestion,
   plan_confirm: playPlanConfirm,
+  data_burst: playDataBurst,
 };
 
 // ── TTS via Web Speech API ─────────────────────────────

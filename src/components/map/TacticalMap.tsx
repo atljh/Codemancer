@@ -29,8 +29,12 @@ export function TacticalMap() {
   const blastRadiusFiles = useGameStore((s) => s.blastRadiusFiles);
   const blastRadiusSource = useGameStore((s) => s.blastRadiusSource);
   const clearBlastRadius = useGameStore((s) => s.clearBlastRadius);
+  const bountyZoneFiles = useGameStore((s) => s.bountyZoneFiles);
+  const bountyZoneSource = useGameStore((s) => s.bountyZoneSource);
+  const clearBountyZone = useGameStore((s) => s.clearBountyZone);
   const openFilePaths = useMemo(() => new Set(openFiles.map((f) => f.path)), [openFiles]);
   const blastSet = useMemo(() => new Set(blastRadiusFiles), [blastRadiusFiles]);
+  const bountySet = useMemo(() => new Set(bountyZoneFiles), [bountyZoneFiles]);
 
   // Observe container size
   useEffect(() => {
@@ -202,6 +206,14 @@ export function TacticalMap() {
             BLAST RADIUS
           </button>
         )}
+        {bountyZoneSource && (
+          <button
+            onClick={clearBountyZone}
+            className="text-[9px] font-mono px-2 py-1 rounded bg-red-500/15 text-red-400 hover:bg-red-500/25 animate-bounty-pulse"
+          >
+            BOUNTY ZONE
+          </button>
+        )}
         <button
           onClick={resetView}
           className="text-[9px] font-mono px-2 py-1 rounded bg-white/5 text-theme-text-dim hover:text-theme-text hover:bg-white/8"
@@ -296,7 +308,9 @@ export function TacticalMap() {
           const isDependency = dependenciesOf.has(ln.id);
           const isBlastSource = ln.id === blastRadiusSource;
           const isBlastTarget = blastSet.has(ln.id);
-          const showLabel = isActive || isDependent || isDependency || isBlastSource || isBlastTarget;
+          const isBountySource = ln.id === bountyZoneSource;
+          const isBountyTarget = bountySet.has(ln.id);
+          const showLabel = isActive || isDependent || isDependency || isBlastSource || isBlastTarget || isBountySource || isBountyTarget;
 
           let fill = "var(--theme-accent)";
           // If fog of war is on but no files are open, show all nodes normally
@@ -306,6 +320,12 @@ export function TacticalMap() {
           if (isActive) {
             fill = "var(--theme-accent)";
             nodeOpacity = 1;
+          } else if (isBountySource) {
+            fill = "hsl(0, 80%, 50%)";
+            nodeOpacity = 1;
+          } else if (isBountyTarget) {
+            fill = "hsl(0, 80%, 50%)";
+            nodeOpacity = 0.9;
           } else if (isBlastSource) {
             fill = "hsl(30, 90%, 55%)";
             nodeOpacity = 1;
@@ -341,6 +361,7 @@ export function TacticalMap() {
                 stroke={fill}
                 strokeWidth={isActive ? 2 : 1}
                 filter={isActive ? "url(#map-glow)" : undefined}
+                className={(isBountySource || isBountyTarget) ? "animate-bounty-pulse" : undefined}
               />
               {showLabel && (
                 <text

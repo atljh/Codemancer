@@ -7,7 +7,7 @@ class QuestService:
 
     def create(self, data: QuestCreate) -> Quest:
         quest_id = str(uuid.uuid4())[:8]
-        quest = Quest(id=quest_id, title=data.title, description=data.description, exp_reward=data.exp_reward)
+        quest = Quest(id=quest_id, title=data.title, description=data.description, exp_reward=data.exp_reward, source_file=data.source_file)
         self.quests[quest_id] = quest
         return quest
 

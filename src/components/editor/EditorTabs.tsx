@@ -1,4 +1,4 @@
-import { MessageSquare, FileText, X, Map } from "lucide-react";
+import { MessageSquare, FileText, X, Map, Radio } from "lucide-react";
 import { useGameStore } from "../../stores/gameStore";
 import { useTranslation } from "../../hooks/useTranslation";
 
@@ -35,6 +35,19 @@ export function EditorTabs() {
       >
         <Map className="w-3 h-3" strokeWidth={1.5} />
         {t("map.tab")}
+      </button>
+
+      {/* COMMS tab */}
+      <button
+        onClick={() => setActiveTab("comms")}
+        className={`flex items-center gap-1.5 px-3 h-full text-[11px] font-mono shrink-0 border-r border-[var(--theme-glass-border)] transition-colors ${
+          activeTab === "comms"
+            ? "bg-theme-accent/10 text-theme-accent"
+            : "text-theme-text-dim hover:text-theme-text hover:bg-white/3"
+        }`}
+      >
+        <Radio className="w-3 h-3" strokeWidth={1.5} />
+        {t("comms.tab")}
       </button>
 
       {/* File tabs */}
