@@ -10,6 +10,7 @@ class ActionType(str, Enum):
     project_scan = "project_scan"          # +50 EXP
     tool_write = "tool_write"              # +25 EXP
     tool_search = "tool_search"            # +10 EXP
+    git_commit = "git_commit"              # +50 EXP
 
 EXP_REWARDS: dict[ActionType, int] = {
     ActionType.message: 10,
@@ -21,7 +22,13 @@ EXP_REWARDS: dict[ActionType, int] = {
     ActionType.project_scan: 50,
     ActionType.tool_write: 25,
     ActionType.tool_search: 10,
+    ActionType.git_commit: 50,
 }
 
 def calculate_exp(action: ActionType) -> int:
     return EXP_REWARDS.get(action, 0)
+
+
+def calculate_exp_with_focus(action: ActionType, player) -> int:
+    base = EXP_REWARDS.get(action, 0)
+    return base * 2 if getattr(player, "focus_active", False) else base

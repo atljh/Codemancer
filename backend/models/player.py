@@ -9,6 +9,9 @@ class Player(BaseModel):
     mp: int = 50
     max_mp: int = 50
     total_bytes_processed: int = 0
+    focus_active: bool = False
+    focus_started_at: str | None = None
+    focus_duration_minutes: int = 0
 
     @property
     def level(self) -> int:

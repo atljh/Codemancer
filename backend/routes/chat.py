@@ -12,12 +12,15 @@ from services.tool_schemas import get_anthropic_tools, get_openai_tools
 from services.file_service import FileService
 from routes.settings import load_settings as _load_settings_from_file
 
+from services.chronicle_service import ChronicleService
+
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
 player: Player | None = None
 quest_service = None
 file_service: FileService | None = None
 save_state_fn = None
+chronicle_service: ChronicleService | None = None
 
 PROVIDER_MODELS = {
     "anthropic": [
@@ -218,6 +221,14 @@ async def chat_stream(req: ChatRequest):
 
                     total_bytes_processed += result.bytes_processed
                     total_exp_from_tools += result.exp_gained
+
+                    if chronicle_service:
+                        chronicle_service.log_event(
+                            action_type=f"tool_{result.tool_name}",
+                            description=result.summary[:120] if result.summary else f"Tool: {result.tool_name}",
+                            files_affected=[result.file_path] if result.file_path else [],
+                            exp_gained=result.exp_gained,
+                        )
 
                     # Send tool_result event to frontend
                     yield f"data: {json.dumps({'type': 'tool_result', 'tool_id': result.tool_id, 'tool_name': result.tool_name, 'status': result.status, 'summary': result.summary, 'exp_gained': result.exp_gained, 'mp_cost': result.mp_cost, 'bytes_processed': result.bytes_processed})}\n\n"

@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 from models.project import ProjectScanRequest, ProjectScanResponse, ProjectContextResponse
 from models.player import Player
 from services.file_service import FileService
-from services.exp_service import ActionType, calculate_exp
+from services.exp_service import ActionType, calculate_exp_with_focus
 
 router = APIRouter(prefix="/api/project", tags=["project"])
 
@@ -25,7 +25,7 @@ async def scan_project(req: ProjectScanRequest):
 
     exp_gained = 0
     if req.award_exp and player:
-        exp_gained = calculate_exp(ActionType.project_scan)
+        exp_gained = calculate_exp_with_focus(ActionType.project_scan, player)
         player.total_exp += exp_gained
         if save_state_fn:
             save_state_fn()
@@ -57,7 +57,7 @@ async def get_project_context(req: ProjectScanRequest):
 
     exp_gained = 0
     if req.award_exp and player:
-        exp_gained = calculate_exp(ActionType.project_scan)
+        exp_gained = calculate_exp_with_focus(ActionType.project_scan, player)
         player.total_exp += exp_gained
         if save_state_fn:
             save_state_fn()
