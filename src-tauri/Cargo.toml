@@ -26,3 +26,6 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 anthropic-auth = { version = "0.1", features = ["async"] }
 tokio = { version = "1", features = ["full"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"

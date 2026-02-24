@@ -3902,6 +3902,7 @@ name = "tauri-app"
 version = "0.1.0"
 dependencies = [
  "anthropic-auth",
+ "libc",
  "serde",
  "serde_json",
  "tauri",
