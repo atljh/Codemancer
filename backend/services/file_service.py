@@ -2,7 +2,7 @@ import ast
 import os
 from pathlib import Path
 
-from models.file import FileTreeNode, SyntaxError_
+from models.file import FileTreeNode, FileSearchMatch, SyntaxError_
 
 EXTENSION_LANGUAGE_MAP: dict[str, str] = {
     ".py": "python",
@@ -135,6 +135,51 @@ class FileService:
             "key_files": sorted(key_files),
             "file_types": dict(sorted(file_types.items(), key=lambda x: -x[1])),
         }
+
+    BINARY_EXTENSIONS = {
+        ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".webp",
+        ".woff", ".woff2", ".ttf", ".eot", ".otf",
+        ".zip", ".tar", ".gz", ".bz2", ".7z",
+        ".exe", ".dll", ".so", ".dylib",
+        ".pdf", ".doc", ".docx",
+        ".mp3", ".mp4", ".wav", ".avi", ".mov",
+        ".pyc", ".pyo", ".class",
+    }
+
+    def search_files(self, root: str, query: str, max_results: int = 100) -> tuple[list[FileSearchMatch], bool]:
+        root_path = self._validate_path(root)
+        if not root_path.is_dir():
+            return [], False
+
+        query_lower = query.lower()
+        matches: list[FileSearchMatch] = []
+        truncated = False
+
+        for dirpath, dirnames, filenames in os.walk(root_path):
+            dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+
+            for fname in filenames:
+                ext = Path(fname).suffix.lower()
+                if ext in self.BINARY_EXTENSIONS:
+                    continue
+
+                fpath = os.path.join(dirpath, fname)
+                try:
+                    with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
+                        for line_num, line in enumerate(f, 1):
+                            if query_lower in line.lower():
+                                matches.append(FileSearchMatch(
+                                    path=fpath,
+                                    line=line_num,
+                                    text=line.rstrip("\n\r")[:200],
+                                ))
+                                if len(matches) >= max_results:
+                                    truncated = True
+                                    return matches, truncated
+                except (OSError, UnicodeDecodeError):
+                    continue
+
+        return matches, truncated
 
     def check_syntax(self, path: str, content: str) -> tuple[list[SyntaxError_], bool]:
         language = self.detect_language(path)

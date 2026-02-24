@@ -13,14 +13,19 @@ import { SettingsModal } from "../modals/SettingsModal";
 import { ChroniclePanel } from "../chronicle/ChroniclePanel";
 import { HealthPanel } from "../health/HealthPanel";
 import { TacticalMap } from "../map/TacticalMap";
+import { QuickOpenModal } from "../modals/QuickOpenModal";
+import { SearchPanel } from "../search/SearchPanel";
 import { EditorRefProvider } from "../../hooks/useEditorRef";
+import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
 import { useGameStore } from "../../stores/gameStore";
 
 export function AppLayout() {
+  useKeyboardShortcuts();
   const appReady = useGameStore((s) => s.appReady);
   const workspaceRoot = useGameStore((s) => s.settings.workspace_root);
   const showGitPanel = useGameStore((s) => s.showGitPanel);
   const showFileExplorer = useGameStore((s) => s.showFileExplorer);
+  const showSearchPanel = useGameStore((s) => s.showSearchPanel);
   const activeTab = useGameStore((s) => s.activeTab);
 
   const showWelcome = appReady && !workspaceRoot;
@@ -63,6 +68,9 @@ export function AppLayout() {
             <AnimatePresence>
               {showFileExplorer && <FileExplorer />}
             </AnimatePresence>
+            <AnimatePresence>
+              {showSearchPanel && <SearchPanel />}
+            </AnimatePresence>
             <div className="flex-1 flex flex-col min-w-0">
               <EditorTabs />
               {activeTab === "chat" ? <OmniChat /> : activeTab === "map" ? <TacticalMap /> : <CodeEditor />}
@@ -79,6 +87,7 @@ export function AppLayout() {
       <SettingsModal />
       <ChroniclePanel />
       <HealthPanel />
+      <QuickOpenModal />
     </EditorRefProvider>
   );
 }

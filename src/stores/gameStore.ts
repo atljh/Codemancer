@@ -71,6 +71,10 @@ interface GameState {
   // Health panel
   showHealthPanel: boolean;
 
+  // Quick open & search
+  showQuickOpen: boolean;
+  showSearchPanel: boolean;
+
   // Focus
   focusStatus: FocusStatus | null;
 
@@ -138,6 +142,10 @@ interface GameState {
 
   // Health panel actions
   toggleHealthPanel: () => void;
+
+  // Quick open & search actions
+  toggleQuickOpen: () => void;
+  toggleSearchPanel: () => void;
 
   // Focus actions
   setFocusStatus: (status: FocusStatus | null) => void;
@@ -210,6 +218,8 @@ export const useGameStore = create<GameState>((set) => ({
   conversations: [],
   showChronicle: false,
   showHealthPanel: false,
+  showQuickOpen: false,
+  showSearchPanel: false,
   focusStatus: null,
 
   setPlayer: (player) => set({ player }),
@@ -375,6 +385,10 @@ export const useGameStore = create<GameState>((set) => ({
 
   // Health panel
   toggleHealthPanel: () => set((s) => ({ showHealthPanel: !s.showHealthPanel })),
+
+  // Quick open & search
+  toggleQuickOpen: () => set((s) => ({ showQuickOpen: !s.showQuickOpen })),
+  toggleSearchPanel: () => set((s) => ({ showSearchPanel: !s.showSearchPanel })),
 
   // Focus
   setFocusStatus: (status) => set({ focusStatus: status }),

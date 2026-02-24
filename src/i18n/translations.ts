@@ -224,6 +224,17 @@ const translations = {
     "map.resetView": "Reset View",
     "map.fogOfWar": "Fog of War",
 
+    // Quick Open
+    "quickOpen.placeholder": "Search files by name...",
+    "quickOpen.noResults": "No matching files",
+
+    // Search
+    "search.title": "Search in Files",
+    "search.placeholder": "Search...",
+    "search.hint": "Type to search across project files",
+    "search.noResults": "No results found",
+    "search.truncated": "Results truncated — refine your query",
+
     // Focus
     "focus.title": "Mission Focus",
     "focus.start": "Focus",
@@ -459,6 +470,17 @@ const translations = {
     "map.tab": "КАРТА",
     "map.resetView": "Сброс вида",
     "map.fogOfWar": "Туман войны",
+
+    // Quick Open
+    "quickOpen.placeholder": "Поиск файлов по имени...",
+    "quickOpen.noResults": "Файлы не найдены",
+
+    // Search
+    "search.title": "Поиск по файлам",
+    "search.placeholder": "Поиск...",
+    "search.hint": "Введите запрос для поиска по файлам проекта",
+    "search.noResults": "Ничего не найдено",
+    "search.truncated": "Результаты обрезаны — уточните запрос",
 
     // Focus
     "focus.title": "Фокус миссии",

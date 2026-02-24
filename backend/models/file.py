@@ -46,3 +46,20 @@ class SyntaxError_(BaseModel):
 class SyntaxCheckResponse(BaseModel):
     errors: list[SyntaxError_] = []
     valid: bool
+
+
+class FileSearchRequest(BaseModel):
+    query: str
+    root: str
+    max_results: int = 100
+
+
+class FileSearchMatch(BaseModel):
+    path: str
+    line: int
+    text: str
+
+
+class FileSearchResponse(BaseModel):
+    matches: list[FileSearchMatch]
+    truncated: bool = False

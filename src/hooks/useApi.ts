@@ -99,6 +99,15 @@ const api = {
       body: JSON.stringify({ path, content }),
     }),
 
+  searchFiles: (root: string, query: string, max_results = 100) =>
+    fetchJson<{ matches: { path: string; line: number; text: string }[]; truncated: boolean }>(
+      "/api/files/search",
+      {
+        method: "POST",
+        body: JSON.stringify({ root, query, max_results }),
+      }
+    ),
+
   // Settings
   getSettings: () => fetchJson<AppSettings>("/api/settings/"),
 

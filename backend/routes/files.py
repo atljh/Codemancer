@@ -8,6 +8,8 @@ from models.file import (
     FileTreeNode,
     SyntaxCheckRequest,
     SyntaxCheckResponse,
+    FileSearchRequest,
+    FileSearchResponse,
 )
 from services.file_service import FileService
 
@@ -45,6 +47,17 @@ async def write_file(req: FileWriteRequest):
 async def get_file_tree(req: FileTreeRequest):
     try:
         return file_service.get_file_tree(req.root, req.max_depth)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/search", response_model=FileSearchResponse)
+async def search_files(req: FileSearchRequest):
+    try:
+        matches, truncated = file_service.search_files(req.root, req.query, req.max_results)
+        return FileSearchResponse(matches=matches, truncated=truncated)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
