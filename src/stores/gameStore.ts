@@ -93,6 +93,9 @@ interface GameState {
   soundEnabled: boolean;
   isListening: boolean;
 
+  // Intel Feed
+  showIntelFeed: boolean;
+
   // Actions
   setPlayer: (player: Player) => void;
   setQuests: (quests: Quest[]) => void;
@@ -181,6 +184,9 @@ interface GameState {
   setTtsEnabled: (v: boolean) => void;
   setSoundEnabled: (v: boolean) => void;
   setListening: (v: boolean) => void;
+
+  // Intel Feed actions
+  toggleIntelFeed: () => void;
 }
 
 const defaultPlayer: Player = {
@@ -262,6 +268,7 @@ export const useGameStore = create<GameState>((set) => ({
   ttsEnabled: false,
   soundEnabled: true,
   isListening: false,
+  showIntelFeed: false,
 
   setPlayer: (player) => set({ player }),
   setQuests: (quests) => set({ quests }),
@@ -450,4 +457,7 @@ export const useGameStore = create<GameState>((set) => ({
   setTtsEnabled: (v) => set({ ttsEnabled: v }),
   setSoundEnabled: (v) => set({ soundEnabled: v }),
   setListening: (v) => set({ isListening: v }),
+
+  // Intel Feed
+  toggleIntelFeed: () => set((s) => ({ showIntelFeed: !s.showIntelFeed })),
 }));

@@ -7,6 +7,7 @@ import { HealthAlertBubble } from "./HealthAlertBubble";
 import { RecallBubble } from "./RecallBubble";
 import { BlastRadiusBubble } from "./BlastRadiusBubble";
 import { ProactiveLogBubble } from "./ProactiveLogBubble";
+import { IntelBubble } from "./IntelBubble";
 import { MissionObjective } from "./MissionObjective";
 import { CommandInput } from "./CommandInput";
 import { ConversationDrawer } from "./ConversationDrawer";
@@ -68,7 +69,7 @@ export function OmniChat() {
       const id = convId ?? currentConversationId;
       if (!id) return;
       const msgs = useGameStore.getState().messages.filter(
-        (m) => m.type !== "action_log" && !["health_alert", "recall", "blast_radius", "command_result", "proactive_log"].includes(m.type!)
+        (m) => m.type !== "action_log" && !["health_alert", "recall", "blast_radius", "command_result", "proactive_log", "intel_entry"].includes(m.type!)
       );
       try {
         const meta = await api.saveMessages(id, msgs);
@@ -242,6 +243,10 @@ export function OmniChat() {
         return;
       }
 
+      // Voice command processing: strip prefix and run intelligence pipeline
+      const isVoiceCommand = text.startsWith("[VOICE_COMMAND] ");
+      const actualText = isVoiceCommand ? text.slice(16) : text;
+
       // Ensure conversation exists before first user message
       let convId: string;
       try {
@@ -251,7 +256,59 @@ export function OmniChat() {
         convId = "";
       }
 
-      addMessage({ role: "user", content: text });
+      addMessage({ role: "user", content: actualText });
+
+      // Intelligence processing for voice commands (and optionally long text)
+      if (isVoiceCommand) {
+        playSound("data_crunch");
+        try {
+          let projectCtx = "";
+          if (projectScan) {
+            projectCtx = `Project: ${projectScan.path}\nFiles: ${projectScan.total_files}`;
+          }
+          const intelResult = await api.processIntelligence(actualText, "voice", projectCtx);
+
+          // Play appropriate sound
+          if (intelResult.clarifying_question) {
+            playSound("agent_question");
+          } else {
+            playSound("plan_confirm");
+          }
+
+          // Save intel log with voice bonus
+          const intelLog = await api.createIntelLog({
+            source: "voice",
+            raw_input: actualText,
+            intent: intelResult.intent,
+            subtasks: intelResult.subtasks,
+            exp_multiplier: 1.5,
+          });
+
+          // Show intel bubble in chat
+          const meta = JSON.stringify({
+            intent: intelResult.intent,
+            subtasks: intelResult.subtasks,
+            clarifying_question: intelResult.clarifying_question,
+            source: "voice",
+            intel_id: intelLog.id,
+          });
+          addMessage({
+            role: "system",
+            content: `${t("intel.processed")}\n---meta---\n${meta}`,
+            type: "intel_entry",
+          });
+
+          // Voice briefing MP reward: +5 MP
+          try {
+            const updatedPlayer = await api.awardMp(5, "voice_briefing");
+            setPlayer(updatedPlayer);
+          } catch {
+            // ignore
+          }
+        } catch {
+          // Intelligence processing failed, continue with normal chat
+        }
+      }
 
       // Save immediately after user message so it's never lost
       if (convId) saveCurrentMessages(convId);
@@ -567,6 +624,9 @@ export function OmniChat() {
             }
             if (msg.type === "proactive_log") {
               return <ProactiveLogBubble key={msg.id} message={msg} />;
+            }
+            if (msg.type === "intel_entry") {
+              return <IntelBubble key={msg.id} message={msg} />;
             }
             return (
               <MessageBubble

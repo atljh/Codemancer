@@ -336,6 +336,26 @@ const translations = {
     // Waveform
     "waveform.thinking": "Processing",
     "waveform.idle": "Standby",
+
+    // Intel Feed
+    "intel.title": "INTEL FEED",
+    "intel.empty": "No intelligence entries yet. Use voice or text briefings to add operational data.",
+    "intel.voiceTag": "VOICE",
+    "intel.textTag": "TEXT",
+    "intel.proactiveTag": "AUTO",
+    "intel.intent": "Intent",
+    "intel.subtasks": "Subtasks",
+    "intel.question": "Clarification needed",
+    "intel.pending": "Pending",
+    "intel.active": "Active",
+    "intel.done": "Complete",
+    "intel.archived": "Archived",
+    "intel.processing": "Processing intelligence...",
+    "intel.processed": "[INTEL_PROCESSED]: Briefing analyzed. Intent formulated. Subtasks generated.",
+    "intel.voiceCommand": "[VOICE_COMMAND]",
+    "intel.expBonus": "x1.5 EXP (briefing bonus)",
+    "intel.mpReward": "+5 MP (voice briefing)",
+    "cmd.toggleIntelFeed": "Intel Feed",
   },
   ru: {
     // Panels
@@ -674,6 +694,26 @@ const translations = {
     // Waveform
     "waveform.thinking": "Обработка",
     "waveform.idle": "Режим ожидания",
+
+    // Intel Feed
+    "intel.title": "РАЗВЕДДАННЫЕ",
+    "intel.empty": "Записей нет. Используй голосовые или текстовые брифинги для добавления оперативных данных.",
+    "intel.voiceTag": "ГОЛОС",
+    "intel.textTag": "ТЕКСТ",
+    "intel.proactiveTag": "АВТО",
+    "intel.intent": "Намерение",
+    "intel.subtasks": "Подзадачи",
+    "intel.question": "Требуется уточнение",
+    "intel.pending": "Ожидание",
+    "intel.active": "Активно",
+    "intel.done": "Выполнено",
+    "intel.archived": "В архиве",
+    "intel.processing": "Обработка разведданных...",
+    "intel.processed": "[INTEL_PROCESSED]: Брифинг проанализирован. Намерение сформулировано. Подзадачи сгенерированы.",
+    "intel.voiceCommand": "[VOICE_COMMAND]",
+    "intel.expBonus": "x1.5 EXP (бонус брифинга)",
+    "intel.mpReward": "+5 MP (голосовой брифинг)",
+    "cmd.toggleIntelFeed": "Разведданные",
   },
 } as const;
 

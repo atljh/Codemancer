@@ -90,7 +90,7 @@ export interface ChatMessage {
   role: "user" | "assistant" | "system";
   content: string;
   timestamp: number;
-  type?: "message" | "action_card" | "action_log" | "health_alert" | "recall" | "blast_radius" | "command_result" | "proactive_log";
+  type?: "message" | "action_card" | "action_log" | "health_alert" | "recall" | "blast_radius" | "command_result" | "proactive_log" | "intel_entry";
   actionCard?: ActionCardData;
   actionLog?: ActionLogData;
 }
@@ -292,6 +292,25 @@ export interface FocusStatus {
   duration_minutes: number;
   remaining_seconds: number;
   exp_multiplier: number;
+}
+
+// Intel log types
+export interface IntelLog {
+  id: number;
+  timestamp: string;
+  source: string;
+  raw_input: string;
+  intent: string;
+  subtasks: string[];
+  status: string;
+  exp_multiplier: number;
+  session_id: string;
+}
+
+export interface IntelligenceResult {
+  intent: string;
+  subtasks: string[];
+  clarifying_question: string | null;
 }
 
 /** @deprecated Use AIModel instead */

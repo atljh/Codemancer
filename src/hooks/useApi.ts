@@ -24,6 +24,8 @@ import type {
   HealthWatchResult,
   DepGraph,
   FocusStatus,
+  IntelLog,
+  IntelligenceResult,
 } from "../types/game";
 
 const API_BASE = "http://127.0.0.1:8420";
@@ -53,6 +55,12 @@ const api = {
 
   resetPlayer: () =>
     fetchJson<Player>("/api/game/reset", { method: "POST" }),
+
+  awardMp: (amount = 5, reason = "voice_briefing") =>
+    fetchJson<Player>("/api/game/mp_reward", {
+      method: "POST",
+      body: JSON.stringify({ amount, reason }),
+    }),
 
   getQuests: () => fetchJson<Quest[]>("/api/quests/"),
 
@@ -284,6 +292,30 @@ const api = {
   // Proactive analysis
   proactivePulse: () =>
     fetchJson<{ has_findings: boolean; findings: { severity: string; type: string; message: string; detail: string }[]; diff_summary: string; changed_files: number }>("/api/proactive/pulse"),
+
+  // Intel logs
+  getIntelLogs: (status?: string, limit = 50) =>
+    fetchJson<IntelLog[]>(
+      `/api/chronicle/intel?limit=${limit}${status ? `&status=${status}` : ""}`
+    ),
+
+  createIntelLog: (data: { source: string; raw_input: string; intent: string; subtasks: string[]; exp_multiplier?: number }) =>
+    fetchJson<IntelLog>("/api/chronicle/intel", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  updateIntelStatus: (intelId: number, status: string) =>
+    fetchJson<{ ok: boolean }>(`/api/chronicle/intel/${intelId}?status=${status}`, {
+      method: "PATCH",
+    }),
+
+  // Intelligence processing
+  processIntelligence: (rawInput: string, source = "text", projectContext = "") =>
+    fetchJson<IntelligenceResult>("/api/chat/process_intelligence", {
+      method: "POST",
+      body: JSON.stringify({ raw_input: rawInput, source, project_context: projectContext }),
+    }),
 };
 
 export { api };

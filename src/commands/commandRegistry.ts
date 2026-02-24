@@ -126,6 +126,13 @@ export function getCommands(): Command[] {
       execute: () => useGameStore.getState().toggleHealthPanel(),
     },
     {
+      id: "view.toggleIntelFeed",
+      labelKey: "cmd.toggleIntelFeed",
+      shortcut: "⇧⌘I",
+      category: "View",
+      execute: () => useGameStore.getState().toggleIntelFeed(),
+    },
+    {
       id: "view.toggleSettings",
       labelKey: "cmd.toggleSettings",
       shortcut: "⌘,",

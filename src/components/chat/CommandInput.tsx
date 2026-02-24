@@ -3,6 +3,8 @@ import { Send, Mic, MicOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useGameStore } from "../../stores/gameStore";
+import { useAudio } from "../../hooks/useAudio";
+import { VoiceWaveform } from "../ui/VoiceWaveform";
 
 interface CommandInputProps {
   onSend: (text: string) => void;
@@ -27,6 +29,7 @@ export function CommandInput({ onSend, disabled }: CommandInputProps) {
   const setListening = useGameStore((s) => s.setListening);
   const locale = useGameStore((s) => s.locale);
   const recognitionRef = useRef<any>(null);
+  const { playSound } = useAudio();
 
   useEffect(() => {
     textareaRef.current?.focus();
@@ -82,10 +85,10 @@ export function CommandInput({ onSend, disabled }: CommandInputProps) {
       }
       setText(transcript);
 
-      // Auto-send on final result
+      // Auto-send on final result with [VOICE_COMMAND] prefix
       const lastResult = event.results[event.results.length - 1];
       if (lastResult.isFinal && transcript.trim()) {
-        onSend(transcript.trim());
+        onSend(`[VOICE_COMMAND] ${transcript.trim()}`);
         setText("");
         setListening(false);
       }
@@ -104,7 +107,8 @@ export function CommandInput({ onSend, disabled }: CommandInputProps) {
     recognitionRef.current = recognition;
     recognition.start();
     setListening(true);
-  }, [isListening, locale, setListening, onSend]);
+    playSound("recording_start");
+  }, [isListening, locale, setListening, onSend, playSound]);
 
   const hasSpeechApi =
     typeof window !== "undefined" &&
@@ -116,6 +120,11 @@ export function CommandInput({ onSend, disabled }: CommandInputProps) {
       <div className="absolute -inset-0.5 rounded-lg bg-gradient-to-r from-theme-accent/8 via-transparent to-theme-accent/8 opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 blur-sm" />
 
       <div className="relative flex items-end gap-3 rounded-lg glass-panel p-3">
+        {/* Voice waveform overlay */}
+        <AnimatePresence>
+          <VoiceWaveform isActive={isListening} />
+        </AnimatePresence>
+
         {/* Command prompt indicator */}
         <span className="text-theme-accent/40 text-xs font-bold tracking-wider self-center shrink-0 select-none">
           &gt;_

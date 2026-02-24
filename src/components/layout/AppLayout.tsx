@@ -11,6 +11,7 @@ import { ForgingOverlay } from "../forging/ForgingOverlay";
 import { LevelUpModal } from "../modals/LevelUpModal";
 import { SettingsModal } from "../modals/SettingsModal";
 import { ChroniclePanel } from "../chronicle/ChroniclePanel";
+import { IntelFeedPanel } from "../chronicle/IntelFeedPanel";
 import { HealthPanel } from "../health/HealthPanel";
 import { TacticalMap } from "../map/TacticalMap";
 import { QuickOpenModal } from "../modals/QuickOpenModal";
@@ -97,6 +98,7 @@ export function AppLayout() {
       <LevelUpModal />
       <SettingsModal />
       <ChroniclePanel />
+      <IntelFeedPanel />
       <HealthPanel />
       <QuickOpenModal />
       <CommandPaletteModal />
