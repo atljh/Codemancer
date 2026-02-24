@@ -311,6 +311,13 @@ const translations = {
     "focus.lostSync": "Focus lost — window unfocused",
     "focus.expired": "Focus session complete",
 
+    // Mission Objective
+    "mission.label": "CURRENT OBJECTIVE",
+    "mission.noObjective": "No active objective — scan TODOs or create one",
+    "mission.scanHint": "No objectives found. Scan your project for TODOs or create one manually.",
+    "mission.scanTodos": "Scan TODOs from code",
+    "mission.complete": "Mark as complete",
+
     // Voice input
     "voice.start": "Start voice input",
     "voice.stop": "Stop recording",
@@ -641,6 +648,13 @@ const translations = {
     "focus.min50": "50 МИН",
     "focus.lostSync": "Фокус потерян — окно неактивно",
     "focus.expired": "Сессия фокуса завершена",
+
+    // Mission Objective
+    "mission.label": "ТЕКУЩАЯ ЦЕЛЬ",
+    "mission.noObjective": "Нет активной цели — сканируй TODO или создай вручную",
+    "mission.scanHint": "Цели не найдены. Сканируй проект на TODO или создай задачу вручную.",
+    "mission.scanTodos": "Сканировать TODO из кода",
+    "mission.complete": "Завершить задачу",
 
     // Voice input
     "voice.start": "Голосовой ввод",

@@ -7,6 +7,7 @@ import { HealthAlertBubble } from "./HealthAlertBubble";
 import { RecallBubble } from "./RecallBubble";
 import { BlastRadiusBubble } from "./BlastRadiusBubble";
 import { ProactiveLogBubble } from "./ProactiveLogBubble";
+import { MissionObjective } from "./MissionObjective";
 import { CommandInput } from "./CommandInput";
 import { ConversationDrawer } from "./ConversationDrawer";
 import { useGameStore } from "../../stores/gameStore";
@@ -530,6 +531,9 @@ export function OmniChat() {
           onDeleteConversation={handleDeleteConversation}
         />
       </div>
+
+      {/* Current Mission Objective */}
+      <MissionObjective />
 
       {/* Messages area */}
       <div
