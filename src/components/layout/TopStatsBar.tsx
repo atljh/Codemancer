@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Settings, FolderOpen, Shield, HardDrive, ChevronDown, GitBranch, FolderTree, ScrollText, Radar } from "lucide-react";
+import { Settings, FolderOpen, Shield, HardDrive, ChevronDown, GitBranch, FolderTree, ScrollText, Radar, Volume2, VolumeX } from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { StatBar } from "../bars/StatBar";
 import { ExpBar } from "../bars/ExpBar";
 import { FocusTimer } from "../focus/FocusTimer";
+import { WaveformVisualizer } from "../ui/WaveformVisualizer";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -35,6 +36,10 @@ export function TopStatsBar() {
   const toggleChronicle = useGameStore((s) => s.toggleChronicle);
   const showHealthPanel = useGameStore((s) => s.showHealthPanel);
   const toggleHealthPanel = useGameStore((s) => s.toggleHealthPanel);
+  const soundEnabled = useGameStore((s) => s.soundEnabled);
+  const setSoundEnabled = useGameStore((s) => s.setSoundEnabled);
+  const ttsEnabled = useGameStore((s) => s.ttsEnabled);
+  const setTtsEnabled = useGameStore((s) => s.setTtsEnabled);
   const api = useApi();
   const { t } = useTranslation();
 
@@ -203,10 +208,39 @@ export function TopStatsBar() {
       {/* Focus timer */}
       <FocusTimer />
 
+      {/* Waveform + Audio toggle */}
+      <div className="ml-auto flex items-center gap-1.5">
+        <WaveformVisualizer className="opacity-70" />
+        <button
+          onClick={() => {
+            if (soundEnabled && ttsEnabled) {
+              setTtsEnabled(false);
+            } else if (soundEnabled) {
+              setSoundEnabled(false);
+            } else {
+              setSoundEnabled(true);
+              setTtsEnabled(true);
+            }
+          }}
+          className={`p-1 rounded transition-colors ${
+            soundEnabled
+              ? "text-theme-accent/60 hover:text-theme-accent"
+              : "text-theme-text-dimmer hover:text-theme-text-dim"
+          }`}
+          title={soundEnabled ? (ttsEnabled ? "TTS + SFX" : "SFX only") : "Muted"}
+        >
+          {soundEnabled ? (
+            <Volume2 className="w-3 h-3" strokeWidth={1.5} />
+          ) : (
+            <VolumeX className="w-3 h-3" strokeWidth={1.5} />
+          )}
+        </button>
+      </div>
+
       {/* Chronicle + Health + Explorer + Git + Settings */}
       <button
         onClick={toggleChronicle}
-        className={`ml-auto p-1.5 rounded transition-colors ${
+        className={`p-1.5 rounded transition-colors ${
           showChronicle
             ? "bg-theme-accent/15 text-theme-accent"
             : "hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent"

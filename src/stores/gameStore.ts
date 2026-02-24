@@ -88,6 +88,11 @@ interface GameState {
   // Focus
   focusStatus: FocusStatus | null;
 
+  // Audio
+  ttsEnabled: boolean;
+  soundEnabled: boolean;
+  isListening: boolean;
+
   // Actions
   setPlayer: (player: Player) => void;
   setQuests: (quests: Quest[]) => void;
@@ -171,6 +176,11 @@ interface GameState {
 
   // Focus actions
   setFocusStatus: (status: FocusStatus | null) => void;
+
+  // Audio actions
+  setTtsEnabled: (v: boolean) => void;
+  setSoundEnabled: (v: boolean) => void;
+  setListening: (v: boolean) => void;
 }
 
 const defaultPlayer: Player = {
@@ -249,6 +259,9 @@ export const useGameStore = create<GameState>((set) => ({
   showGoToLine: false,
   searchReplaceExpanded: false,
   focusStatus: null,
+  ttsEnabled: false,
+  soundEnabled: true,
+  isListening: false,
 
   setPlayer: (player) => set({ player }),
   setQuests: (quests) => set({ quests }),
@@ -432,4 +445,9 @@ export const useGameStore = create<GameState>((set) => ({
 
   // Focus
   setFocusStatus: (status) => set({ focusStatus: status }),
+
+  // Audio
+  setTtsEnabled: (v) => set({ ttsEnabled: v }),
+  setSoundEnabled: (v) => set({ soundEnabled: v }),
+  setListening: (v) => set({ isListening: v }),
 }));

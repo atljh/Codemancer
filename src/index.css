@@ -340,6 +340,66 @@ body,
   }
 }
 
+/* ═══════════════════════════════════════════════
+   LOW HP GLITCH OVERLAY
+   ═══════════════════════════════════════════════ */
+@keyframes critical-glitch {
+  0%, 92%, 100% {
+    transform: translate(0);
+    filter: none;
+  }
+  93% {
+    transform: translate(-3px, 1px) skewX(-0.5deg);
+    filter: hue-rotate(90deg) saturate(2);
+  }
+  95% {
+    transform: translate(3px, -1px) skewX(0.5deg);
+    filter: hue-rotate(-90deg) brightness(1.3);
+  }
+  97% {
+    transform: translate(-1px, 0);
+    filter: hue-rotate(45deg);
+  }
+}
+
+.low-hp-glitch {
+  animation: critical-glitch 3s ease-in-out infinite;
+}
+
+/* Red vignette overlay for critical HP */
+.low-hp-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(200, 0, 0, 0.08) 100%);
+  animation: vignette-pulse 2s ease-in-out infinite;
+}
+
+@keyframes vignette-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════
+   LISTENING PULSE (voice input active)
+   ═══════════════════════════════════════════════ */
+@keyframes listening-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 60, 60, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(255, 60, 60, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 60, 60, 0);
+  }
+}
+
+.animate-listening-ring {
+  animation: listening-ring 1.5s ease-out infinite;
+}
+
 /* Selection color */
 ::selection {
   background: rgba(var(--theme-accent-rgb), 0.25);
