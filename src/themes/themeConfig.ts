@@ -1,5 +1,18 @@
 export type ThemeId = "dark-ops" | "midnight" | "phantom" | "arctic";
 
+export interface MonacoColors {
+  bg: string;
+  surface: string;
+  border: string;
+  text: string;
+  textDim: string;
+  accent: string;
+  lineHighlight: string;
+  selection: string;
+  lineNumber: string;
+  lineNumberActive: string;
+}
+
 export interface ThemeConfig {
   id: ThemeId;
   label: string;
@@ -8,7 +21,8 @@ export interface ThemeConfig {
   previewBg: string;
   previewAccent: string;
   previewSurface: string;
-  monacoTheme: "vs-dark" | "vs";
+  monacoBase: "vs-dark" | "vs";
+  monaco: MonacoColors;
 }
 
 export const themes: Record<ThemeId, ThemeConfig> = {
@@ -20,7 +34,19 @@ export const themes: Record<ThemeId, ThemeConfig> = {
     previewBg: "#0a0c10",
     previewAccent: "#00d4ff",
     previewSurface: "#111820",
-    monacoTheme: "vs-dark",
+    monacoBase: "vs-dark",
+    monaco: {
+      bg: "#0a0c10",
+      surface: "#0d1117",
+      border: "#1a2535",
+      text: "#c8d6e5",
+      textDim: "#5a6b7f",
+      accent: "#00d4ff",
+      lineHighlight: "#111820",
+      selection: "#00d4ff20",
+      lineNumber: "#3a4a5f",
+      lineNumberActive: "#c8d6e5",
+    },
   },
   midnight: {
     id: "midnight",
@@ -30,7 +56,19 @@ export const themes: Record<ThemeId, ThemeConfig> = {
     previewBg: "#050608",
     previewAccent: "#4d9fff",
     previewSurface: "#0f1520",
-    monacoTheme: "vs-dark",
+    monacoBase: "vs-dark",
+    monaco: {
+      bg: "#050608",
+      surface: "#0a0e14",
+      border: "#152030",
+      text: "#b8c8dc",
+      textDim: "#4a5e78",
+      accent: "#4d9fff",
+      lineHighlight: "#0f1520",
+      selection: "#4d9fff20",
+      lineNumber: "#2e3e54",
+      lineNumberActive: "#b8c8dc",
+    },
   },
   phantom: {
     id: "phantom",
@@ -40,7 +78,19 @@ export const themes: Record<ThemeId, ThemeConfig> = {
     previewBg: "#0f0d0a",
     previewAccent: "#ffaa00",
     previewSurface: "#1e1a15",
-    monacoTheme: "vs-dark",
+    monacoBase: "vs-dark",
+    monaco: {
+      bg: "#0f0d0a",
+      surface: "#161310",
+      border: "#2a2418",
+      text: "#d4c8b0",
+      textDim: "#7a6e5a",
+      accent: "#ffaa00",
+      lineHighlight: "#1e1a15",
+      selection: "#ffaa0020",
+      lineNumber: "#4a4235",
+      lineNumberActive: "#d4c8b0",
+    },
   },
   arctic: {
     id: "arctic",
@@ -50,7 +100,19 @@ export const themes: Record<ThemeId, ThemeConfig> = {
     previewBg: "#f0f4f8",
     previewAccent: "#0077b6",
     previewSurface: "#ffffff",
-    monacoTheme: "vs",
+    monacoBase: "vs",
+    monaco: {
+      bg: "#f0f4f8",
+      surface: "#e8edf3",
+      border: "#cfd8e3",
+      text: "#1a2a3a",
+      textDim: "#5a6e82",
+      accent: "#0077b6",
+      lineHighlight: "#e0e8f0",
+      selection: "#0077b620",
+      lineNumber: "#8a9bb0",
+      lineNumberActive: "#1a2a3a",
+    },
   },
 };
 

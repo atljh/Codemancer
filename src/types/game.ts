@@ -18,7 +18,35 @@ export type ActionType =
   | "lines_written"
   | "syntax_check_pass"
   | "file_save"
-  | "project_scan";
+  | "project_scan"
+  | "git_commit";
+
+export interface GitFileEntry {
+  path: string;
+  status: string;
+  original_path: string | null;
+}
+
+export interface GitStatus {
+  branch: string;
+  remote_branch: string | null;
+  ahead: number;
+  behind: number;
+  staged: GitFileEntry[];
+  unstaged: GitFileEntry[];
+  untracked: GitFileEntry[];
+}
+
+export interface GitBranch {
+  name: string;
+  current: boolean;
+}
+
+export interface GitCommitResponse {
+  hash: string;
+  message: string;
+  exp_gained: number;
+}
 
 export interface ExpGainResponse {
   exp_gained: number;
@@ -65,6 +93,14 @@ export interface ChatMessage {
   type?: "message" | "action_card" | "action_log";
   actionCard?: ActionCardData;
   actionLog?: ActionLogData;
+}
+
+export interface ConversationMeta {
+  id: string;
+  title: string;
+  created_at: number;
+  updated_at: number;
+  message_count: number;
 }
 
 export interface DiffViewerState {
@@ -140,6 +176,95 @@ export interface ProjectScanResult {
 
 export interface ProjectContextResult extends ProjectScanResult {
   summary: string;
+}
+
+// Chronicle types
+export interface ChronicleEvent {
+  id: number;
+  timestamp: string;
+  action_type: string;
+  description: string;
+  files_affected: string[];
+  exp_gained: number;
+  session_id: string;
+}
+
+export interface ChronicleSession {
+  id: string;
+  started_at: string;
+  ended_at: string | null;
+  total_exp: number;
+  total_actions: number;
+}
+
+export interface ChronicleReport {
+  content: string;
+  format: string;
+  event_count: number;
+}
+
+// Health / Tech Debt types
+export interface HealthScores {
+  complexity: number;
+  coverage: number;
+  cleanliness: number;
+  file_size: number;
+}
+
+export interface ComplexFunction {
+  file: string;
+  name: string;
+  lines: number;
+  start_line: number;
+}
+
+export interface CodeAnomaly {
+  file: string;
+  line: number;
+  tag: string;
+  text: string;
+}
+
+export interface LargeFile {
+  file: string;
+  lines: number;
+}
+
+export interface HealthScanResult {
+  scores: HealthScores;
+  complex_functions: ComplexFunction[];
+  untested_files: string[];
+  anomalies: CodeAnomaly[];
+  large_files: LargeFile[];
+}
+
+// Dependency graph types
+export interface DepNode {
+  id: string;
+  path: string;
+  name: string;
+  type: string;
+  lines: number;
+  extension: string;
+}
+
+export interface DepEdge {
+  source: string;
+  target: string;
+}
+
+export interface DepGraph {
+  nodes: DepNode[];
+  edges: DepEdge[];
+}
+
+// Focus types
+export interface FocusStatus {
+  active: boolean;
+  started_at: string | null;
+  duration_minutes: number;
+  remaining_seconds: number;
+  exp_multiplier: number;
 }
 
 /** @deprecated Use AIModel instead */

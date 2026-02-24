@@ -1,0 +1,104 @@
+import { useCallback, useEffect } from "react";
+import Editor, { type OnMount, type BeforeMount } from "@monaco-editor/react";
+import { useGameStore } from "../../stores/gameStore";
+import { useApi } from "../../hooks/useApi";
+import { useEditorRef } from "../../hooks/useEditorRef";
+import { useTranslation } from "../../hooks/useTranslation";
+import { registerMonacoThemes, getMonacoThemeName } from "../../themes/monacoThemes";
+import type { ThemeId } from "../../types/game";
+
+export function CodeEditor() {
+  const api = useApi();
+  const { t } = useTranslation();
+  const editorRef = useEditorRef();
+  const activeTab = useGameStore((s) => s.activeTab);
+  const openFiles = useGameStore((s) => s.openFiles);
+  const updateFileContent = useGameStore((s) => s.updateFileContent);
+  const markFileSaved = useGameStore((s) => s.markFileSaved);
+  const setPlayer = useGameStore((s) => s.setPlayer);
+  const addActionLog = useGameStore((s) => s.addActionLog);
+  const themeId = useGameStore((s) => s.settings.theme) as ThemeId;
+  const fontSize = useGameStore((s) => s.settings.font_size);
+
+  const file = openFiles.find((f) => f.path === activeTab) ?? null;
+
+  const handleSave = useCallback(async () => {
+    if (!file) return;
+    try {
+      await api.writeFile(file.path, file.content);
+      markFileSaved(file.path);
+      const result = await api.performAction("file_save");
+      setPlayer(result.player);
+      addActionLog({
+        action: t("editor.savedSuccess"),
+        status: "done",
+        expGained: result.exp_gained,
+      });
+    } catch {
+      addActionLog({ action: "Save failed", status: "error" });
+    }
+  }, [file, api, markFileSaved, setPlayer, addActionLog, t]);
+
+  // Ctrl+S keybinding
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [handleSave]);
+
+  const handleBeforeMount: BeforeMount = (monaco) => {
+    registerMonacoThemes(monaco);
+  };
+
+  const handleEditorMount: OnMount = (editor) => {
+    editorRef.current = editor;
+  };
+
+  const handleChange = (value: string | undefined) => {
+    if (file && value !== undefined) {
+      updateFileContent(file.path, value);
+    }
+  };
+
+  if (!file) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-xs text-theme-text-dimmer font-mono">
+        {t("editor.selectFile")}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 min-h-0">
+      <Editor
+        height="100%"
+        language={file.language}
+        value={file.content}
+        theme={getMonacoThemeName(themeId)}
+        onChange={handleChange}
+        beforeMount={handleBeforeMount}
+        onMount={handleEditorMount}
+        options={{
+          fontSize,
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+          wordWrap: "on",
+          lineNumbers: "on",
+          renderLineHighlight: "line",
+          padding: { top: 8 },
+          overviewRulerBorder: false,
+          hideCursorInOverviewRuler: true,
+          scrollbar: {
+            verticalScrollbarSize: 6,
+            horizontalScrollbarSize: 6,
+          },
+        }}
+      />
+    </div>
+  );
+}

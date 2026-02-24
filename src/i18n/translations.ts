@@ -20,6 +20,10 @@ const translations = {
     "chat.spellReceived": "Command acknowledged.",
     "chat.connectionLost": "Connection to command server lost...",
     "chat.noMp": "Insufficient energy for this operation!",
+    "chat.missionLogs": "Mission Logs",
+    "chat.newMission": "New Mission",
+    "chat.deleteConfirm": "Delete this conversation?",
+    "chat.noConversations": "No missions yet",
 
     // Command Input
     "command.placeholder": "Enter your command...",
@@ -97,8 +101,24 @@ const translations = {
     "quests.noActive": "No active objectives",
 
     // File Explorer
+    "explorer.title": "Explorer",
     "explorer.refresh": "Refresh",
     "explorer.noRoot": "Set a workspace root in settings",
+    "explorer.empty": "No project loaded",
+    "explorer.collapse": "Collapse",
+    "explorer.openFile": "Open",
+
+    // Editor tabs
+    "editor.tabs.chat": "Chat",
+    "editor.closeTab": "Close",
+    "editor.save": "Save",
+    "editor.savedSuccess": "File saved +5 EXP",
+
+    // AI commit
+    "git.generateMessage": "Generate commit message",
+    "git.generating": "Generating...",
+    "git.noStagedForAi": "Stage files first",
+    "git.aiError": "Failed to generate message",
 
     // Project
     "project.selectFolder": "Select project folder",
@@ -145,6 +165,75 @@ const translations = {
     "settings.customModel": "Model Name",
     "settings.customModelHint": "Enter the model identifier (e.g. llama3, mixtral).",
     "settings.customModelPlaceholder": "model-name",
+
+    // Git panel
+    "git.panelTitle": "Git Status",
+    "git.staged": "Staged",
+    "git.unstaged": "Changes",
+    "git.untracked": "Untracked",
+    "git.commit": "Commit",
+    "git.commitPlaceholder": "Commit message...",
+    "git.noChanges": "Working tree clean",
+    "git.notARepo": "Not a git repository",
+    "git.discardConfirm": "Discard changes to {path}?",
+    "git.committed": "Committed",
+    "git.stageAll": "Stage All",
+    "git.unstageAll": "Unstage All",
+    "git.discard": "Discard",
+
+    // Chronicle
+    "chronicle.title": "Session Chronicle",
+    "chronicle.events": "Events",
+    "chronicle.sessions": "Sessions",
+    "chronicle.noEvents": "No events recorded yet",
+    "chronicle.generateReport": "GENERATE INTEL REPORT",
+    "chronicle.generating": "Generating...",
+    "chronicle.reportFormat": "Report Format",
+    "chronicle.pr": "Pull Request",
+    "chronicle.standup": "Standup",
+    "chronicle.jira": "Jira",
+    "chronicle.copied": "Copied to clipboard",
+    "chronicle.copy": "Copy",
+    "chronicle.error": "Report generation failed",
+
+    // Health
+    "health.title": "THREAT ASSESSMENT",
+    "health.scanning": "Scanning...",
+    "health.complexity": "Complexity",
+    "health.coverage": "Coverage",
+    "health.cleanliness": "Cleanliness",
+    "health.fileSize": "File Size",
+    "health.complexFunctions": "Complex Functions",
+    "health.untestedFiles": "Untested Files",
+    "health.anomalies": "Code Anomalies",
+    "health.largeFiles": "Large Files",
+    "health.lines": "lines",
+    "health.noIssues": "All clear",
+    "health.error": "Scan failed",
+
+    // Map
+    "map.title": "Tactical Map",
+    "map.loading": "Building graph...",
+    "map.noData": "No dependency data",
+    "map.dependencies": "Dependencies",
+    "map.dependents": "Dependents",
+    "map.files": "files",
+    "map.lines": "lines",
+    "map.error": "Graph build failed",
+    "map.tab": "MAP",
+    "map.resetView": "Reset View",
+    "map.fogOfWar": "Fog of War",
+
+    // Focus
+    "focus.title": "Mission Focus",
+    "focus.start": "Focus",
+    "focus.stop": "End Focus",
+    "focus.active": "DEEP FOCUS",
+    "focus.expBoost": "x2 EXP",
+    "focus.min25": "25 MIN",
+    "focus.min50": "50 MIN",
+    "focus.lostSync": "Focus lost — window unfocused",
+    "focus.expired": "Focus session complete",
   },
   ru: {
     // Panels
@@ -167,6 +256,10 @@ const translations = {
     "chat.spellReceived": "Команда принята.",
     "chat.connectionLost": "Связь с командным сервером потеряна...",
     "chat.noMp": "Недостаточно энергии для операции!",
+    "chat.missionLogs": "Журнал миссий",
+    "chat.newMission": "Новая миссия",
+    "chat.deleteConfirm": "Удалить этот диалог?",
+    "chat.noConversations": "Миссий пока нет",
 
     // Command Input
     "command.placeholder": "Введите команду...",
@@ -244,8 +337,24 @@ const translations = {
     "quests.noActive": "Нет активных задач",
 
     // File Explorer
+    "explorer.title": "Проводник",
     "explorer.refresh": "Обновить",
     "explorer.noRoot": "Укажите корень проекта в настройках",
+    "explorer.empty": "Проект не загружен",
+    "explorer.collapse": "Свернуть",
+    "explorer.openFile": "Открыть",
+
+    // Editor tabs
+    "editor.tabs.chat": "Чат",
+    "editor.closeTab": "Закрыть",
+    "editor.save": "Сохранить",
+    "editor.savedSuccess": "Файл сохранён +5 EXP",
+
+    // AI commit
+    "git.generateMessage": "Сгенерировать сообщение коммита",
+    "git.generating": "Генерация...",
+    "git.noStagedForAi": "Сначала добавьте файлы",
+    "git.aiError": "Не удалось сгенерировать сообщение",
 
     // Project
     "project.selectFolder": "Выбрать папку проекта",
@@ -292,6 +401,75 @@ const translations = {
     "settings.customModel": "Имя модели",
     "settings.customModelHint": "Введите идентификатор модели (напр. llama3, mixtral).",
     "settings.customModelPlaceholder": "имя-модели",
+
+    // Git panel
+    "git.panelTitle": "Git статус",
+    "git.staged": "Подготовлено",
+    "git.unstaged": "Изменения",
+    "git.untracked": "Неотслеживаемые",
+    "git.commit": "Коммит",
+    "git.commitPlaceholder": "Сообщение коммита...",
+    "git.noChanges": "Рабочее дерево чисто",
+    "git.notARepo": "Не git-репозиторий",
+    "git.discardConfirm": "Откатить изменения в {path}?",
+    "git.committed": "Закоммичено",
+    "git.stageAll": "Добавить всё",
+    "git.unstageAll": "Убрать всё",
+    "git.discard": "Откатить",
+
+    // Chronicle
+    "chronicle.title": "Хроника сессии",
+    "chronicle.events": "События",
+    "chronicle.sessions": "Сессии",
+    "chronicle.noEvents": "Событий пока нет",
+    "chronicle.generateReport": "СГЕНЕРИРОВАТЬ ОТЧЁТ",
+    "chronicle.generating": "Генерация...",
+    "chronicle.reportFormat": "Формат отчёта",
+    "chronicle.pr": "Pull Request",
+    "chronicle.standup": "Стендап",
+    "chronicle.jira": "Jira",
+    "chronicle.copied": "Скопировано",
+    "chronicle.copy": "Копировать",
+    "chronicle.error": "Ошибка генерации отчёта",
+
+    // Health
+    "health.title": "ОЦЕНКА УГРОЗ",
+    "health.scanning": "Сканирование...",
+    "health.complexity": "Сложность",
+    "health.coverage": "Покрытие",
+    "health.cleanliness": "Чистота",
+    "health.fileSize": "Размер файлов",
+    "health.complexFunctions": "Сложные функции",
+    "health.untestedFiles": "Непротестированные файлы",
+    "health.anomalies": "Аномалии кода",
+    "health.largeFiles": "Большие файлы",
+    "health.lines": "строк",
+    "health.noIssues": "Всё чисто",
+    "health.error": "Ошибка сканирования",
+
+    // Map
+    "map.title": "Тактическая карта",
+    "map.loading": "Построение графа...",
+    "map.noData": "Нет данных о зависимостях",
+    "map.dependencies": "Зависимости",
+    "map.dependents": "Зависимые",
+    "map.files": "файлов",
+    "map.lines": "строк",
+    "map.error": "Ошибка построения графа",
+    "map.tab": "КАРТА",
+    "map.resetView": "Сброс вида",
+    "map.fogOfWar": "Туман войны",
+
+    // Focus
+    "focus.title": "Фокус миссии",
+    "focus.start": "Фокус",
+    "focus.stop": "Завершить",
+    "focus.active": "ГЛУБОКИЙ ФОКУС",
+    "focus.expBoost": "x2 EXP",
+    "focus.min25": "25 МИН",
+    "focus.min50": "50 МИН",
+    "focus.lostSync": "Фокус потерян — окно неактивно",
+    "focus.expired": "Сессия фокуса завершена",
   },
 } as const;
 

@@ -11,6 +11,17 @@ import type {
   ProjectContextResult,
   AIModel,
   AIProvider,
+  ConversationMeta,
+  ChatMessage,
+  GitStatus,
+  GitBranch,
+  GitCommitResponse,
+  ChronicleEvent,
+  ChronicleSession,
+  ChronicleReport,
+  HealthScanResult,
+  DepGraph,
+  FocusStatus,
 } from "../types/game";
 
 const API_BASE = "http://127.0.0.1:8420";
@@ -146,6 +157,105 @@ const api = {
       method: "POST",
       body: JSON.stringify({ path, name: name || "" }),
     }),
+
+  // Conversations
+  getConversations: () =>
+    fetchJson<ConversationMeta[]>("/api/conversations/"),
+
+  createConversation: () =>
+    fetchJson<ConversationMeta>("/api/conversations/", { method: "POST" }),
+
+  getConversation: (id: string) =>
+    fetchJson<{ id: string; title: string; created_at: number; updated_at: number; messages: ChatMessage[] }>(
+      `/api/conversations/${id}`
+    ),
+
+  saveMessages: (id: string, messages: ChatMessage[]) =>
+    fetchJson<ConversationMeta>(`/api/conversations/${id}/messages`, {
+      method: "PUT",
+      body: JSON.stringify({ messages }),
+    }),
+
+  deleteConversation: (id: string) =>
+    fetchJson<{ ok: boolean }>(`/api/conversations/${id}`, { method: "DELETE" }),
+
+  renameConversation: (id: string, title: string) =>
+    fetchJson<ConversationMeta>(`/api/conversations/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ title }),
+    }),
+
+  // Git
+  gitStatus: () => fetchJson<GitStatus>("/api/git/status"),
+
+  gitBranches: () =>
+    fetchJson<{ branches: GitBranch[] }>("/api/git/branches"),
+
+  gitStage: (paths: string[]) =>
+    fetchJson<{ ok: boolean }>("/api/git/stage", {
+      method: "POST",
+      body: JSON.stringify({ paths }),
+    }),
+
+  gitUnstage: (paths: string[]) =>
+    fetchJson<{ ok: boolean }>("/api/git/unstage", {
+      method: "POST",
+      body: JSON.stringify({ paths }),
+    }),
+
+  gitCommit: (message: string) =>
+    fetchJson<GitCommitResponse>("/api/git/commit", {
+      method: "POST",
+      body: JSON.stringify({ message }),
+    }),
+
+  gitDiscard: (paths: string[]) =>
+    fetchJson<{ ok: boolean }>("/api/git/discard", {
+      method: "POST",
+      body: JSON.stringify({ paths }),
+    }),
+
+  gitGenerateMessage: () =>
+    fetchJson<{ message: string }>("/api/git/generate-message", {
+      method: "POST",
+    }),
+
+  // Chronicle
+  getChronicleEvents: (sessionId?: string, limit = 50, offset = 0) =>
+    fetchJson<ChronicleEvent[]>(
+      `/api/chronicle/events?limit=${limit}&offset=${offset}${sessionId ? `&session_id=${sessionId}` : ""}`
+    ),
+
+  getChronicleSessions: (limit = 20) =>
+    fetchJson<ChronicleSession[]>(`/api/chronicle/sessions?limit=${limit}`),
+
+  generateReport: (format: string, sessionId?: string) =>
+    fetchJson<ChronicleReport>("/api/chronicle/report", {
+      method: "POST",
+      body: JSON.stringify({ format, session_id: sessionId }),
+    }),
+
+  // Health / Tech Debt
+  healthScan: () => fetchJson<HealthScanResult>("/api/health/scan"),
+
+  // Dependency graph
+  getDependencyGraph: (scope?: string) =>
+    fetchJson<DepGraph>("/api/deps/graph", {
+      method: "POST",
+      body: JSON.stringify({ scope: scope || null }),
+    }),
+
+  // Focus
+  focusStart: (durationMinutes: number) =>
+    fetchJson<FocusStatus>("/api/game/focus/start", {
+      method: "POST",
+      body: JSON.stringify({ duration_minutes: durationMinutes }),
+    }),
+
+  focusEnd: () =>
+    fetchJson<FocusStatus>("/api/game/focus/end", { method: "POST" }),
+
+  focusStatus: () => fetchJson<FocusStatus>("/api/game/focus/status"),
 };
 
 export function useApi() {

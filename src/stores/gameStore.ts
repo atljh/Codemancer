@@ -11,6 +11,9 @@ import type {
   ActionCardData,
   ActionLogData,
   ProjectScanResult,
+  ConversationMeta,
+  GitStatus,
+  FocusStatus,
 } from "../types/game";
 
 interface GameState {
@@ -49,6 +52,27 @@ interface GameState {
 
   // App lifecycle
   appReady: boolean;
+
+  // File explorer
+  showFileExplorer: boolean;
+  activeTab: string; // "chat" or file path
+
+  // Git panel
+  showGitPanel: boolean;
+  gitStatus: GitStatus | null;
+
+  // Conversations
+  currentConversationId: string | null;
+  conversations: ConversationMeta[];
+
+  // Chronicle
+  showChronicle: boolean;
+
+  // Health panel
+  showHealthPanel: boolean;
+
+  // Focus
+  focusStatus: FocusStatus | null;
 
   // Actions
   setPlayer: (player: Player) => void;
@@ -94,6 +118,29 @@ interface GameState {
 
   // App lifecycle
   setAppReady: (v: boolean) => void;
+
+  // File explorer actions
+  toggleFileExplorer: () => void;
+  setActiveTab: (tab: string) => void;
+
+  // Git panel actions
+  toggleGitPanel: () => void;
+  setGitStatus: (status: GitStatus | null) => void;
+
+  // Conversation actions
+  setCurrentConversationId: (id: string | null) => void;
+  setConversations: (list: ConversationMeta[]) => void;
+  setMessages: (msgs: ChatMessage[]) => void;
+  clearMessages: () => void;
+
+  // Chronicle actions
+  toggleChronicle: () => void;
+
+  // Health panel actions
+  toggleHealthPanel: () => void;
+
+  // Focus actions
+  setFocusStatus: (status: FocusStatus | null) => void;
 }
 
 const defaultPlayer: Player = {
@@ -155,6 +202,15 @@ export const useGameStore = create<GameState>((set) => ({
   isAiResponding: false,
   totalBytesProcessed: 0,
   appReady: false,
+  showFileExplorer: false,
+  activeTab: "chat",
+  showGitPanel: false,
+  gitStatus: null,
+  currentConversationId: null,
+  conversations: [],
+  showChronicle: false,
+  showHealthPanel: false,
+  focusStatus: null,
 
   setPlayer: (player) => set({ player }),
   setQuests: (quests) => set({ quests }),
@@ -191,7 +247,11 @@ export const useGameStore = create<GameState>((set) => ({
         s.currentFile?.path === path
           ? filtered[filtered.length - 1] ?? null
           : s.currentFile;
-      return { openFiles: filtered, currentFile: newCurrent };
+      const newActiveTab =
+        s.activeTab === path
+          ? (newCurrent?.path ?? "chat")
+          : s.activeTab;
+      return { openFiles: filtered, currentFile: newCurrent, activeTab: newActiveTab };
     }),
 
   updateFileContent: (path, content) =>
@@ -295,4 +355,27 @@ export const useGameStore = create<GameState>((set) => ({
     set((s) => ({ totalBytesProcessed: s.totalBytesProcessed + bytes })),
 
   setAppReady: (v) => set({ appReady: v }),
+
+  // File explorer actions
+  toggleFileExplorer: () => set((s) => ({ showFileExplorer: !s.showFileExplorer })),
+  setActiveTab: (tab) => set({ activeTab: tab }),
+
+  // Git panel actions
+  toggleGitPanel: () => set((s) => ({ showGitPanel: !s.showGitPanel })),
+  setGitStatus: (status) => set({ gitStatus: status }),
+
+  // Conversation actions
+  setCurrentConversationId: (id) => set({ currentConversationId: id }),
+  setConversations: (list) => set({ conversations: list }),
+  setMessages: (msgs) => set({ messages: msgs }),
+  clearMessages: () => set({ messages: [], currentConversationId: null }),
+
+  // Chronicle
+  toggleChronicle: () => set((s) => ({ showChronicle: !s.showChronicle })),
+
+  // Health panel
+  toggleHealthPanel: () => set((s) => ({ showHealthPanel: !s.showHealthPanel })),
+
+  // Focus
+  setFocusStatus: (status) => set({ focusStatus: status }),
 }));

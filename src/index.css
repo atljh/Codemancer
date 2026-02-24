@@ -330,6 +330,16 @@ body,
   font-family: "JetBrains Mono", monospace;
 }
 
+/* Radar sweep animation for health scanner */
+@keyframes radar-sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Selection color */
 ::selection {
   background: rgba(var(--theme-accent-rgb), 0.25);

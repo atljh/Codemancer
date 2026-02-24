@@ -4,6 +4,7 @@ import { MessageBubble } from "./MessageBubble";
 import { ActionCard } from "./ActionCard";
 import { ActionLogLine } from "./ActionLogLine";
 import { CommandInput } from "./CommandInput";
+import { ConversationDrawer } from "./ConversationDrawer";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -36,6 +37,11 @@ export function OmniChat() {
   const addActionCard = useGameStore((s) => s.addActionCard);
   const addBytesProcessed = useGameStore((s) => s.addBytesProcessed);
   const showDiffViewer = useGameStore((s) => s.showDiffViewer);
+  const currentConversationId = useGameStore((s) => s.currentConversationId);
+  const setCurrentConversationId = useGameStore((s) => s.setCurrentConversationId);
+  const setConversations = useGameStore((s) => s.setConversations);
+  const setMessages = useGameStore((s) => s.setMessages);
+  const clearMessages = useGameStore((s) => s.clearMessages);
   const scrollRef = useRef<HTMLDivElement>(null);
   const api = useApi();
   const { t } = useTranslation();
@@ -47,6 +53,84 @@ export function OmniChat() {
       behavior: "smooth",
     });
   }, [messages]);
+
+  // Save current messages to backend
+  const saveCurrentMessages = useCallback(
+    async (convId?: string | null) => {
+      const id = convId ?? currentConversationId;
+      if (!id) return;
+      const msgs = useGameStore.getState().messages.filter(
+        (m) => m.type !== "action_log"
+      );
+      try {
+        const meta = await api.saveMessages(id, msgs);
+        // Update conversation in list
+        setConversations(
+          useGameStore.getState().conversations.map((c) =>
+            c.id === meta.id ? meta : c
+          )
+        );
+      } catch {
+        // save failed silently
+      }
+    },
+    [api, currentConversationId, setConversations]
+  );
+
+  // Ensure conversation exists, create if needed. Returns conversation id.
+  const ensureConversation = useCallback(async (): Promise<string> => {
+    const id = useGameStore.getState().currentConversationId;
+    if (id) return id;
+    const meta = await api.createConversation();
+    setCurrentConversationId(meta.id);
+    setConversations([meta, ...useGameStore.getState().conversations]);
+    return meta.id;
+  }, [api, setCurrentConversationId, setConversations]);
+
+  // Conversation drawer handlers
+  const handleNewMission = useCallback(async () => {
+    await saveCurrentMessages();
+    clearMessages();
+  }, [saveCurrentMessages, clearMessages]);
+
+  const handleSelectConversation = useCallback(
+    async (id: string) => {
+      await saveCurrentMessages();
+      try {
+        const conv = await api.getConversation(id);
+        setMessages(conv.messages);
+        setCurrentConversationId(id);
+      } catch {
+        // load failed
+      }
+    },
+    [api, saveCurrentMessages, setMessages, setCurrentConversationId]
+  );
+
+  const handleDeleteConversation = useCallback(
+    async (id: string) => {
+      try {
+        await api.deleteConversation(id);
+        const updated = useGameStore
+          .getState()
+          .conversations.filter((c) => c.id !== id);
+        setConversations(updated);
+        if (currentConversationId === id) {
+          if (updated.length > 0) {
+            const next = updated[0];
+            const conv = await api.getConversation(next.id);
+            setMessages(conv.messages);
+            setCurrentConversationId(next.id);
+          } else {
+            clearMessages();
+          }
+        }
+      } catch {
+        // delete failed
+      }
+    },
+    [api, currentConversationId, setConversations, setMessages, setCurrentConversationId, clearMessages]
+  );
 
   const handleGitCommand = useCallback(
     async (cmd: string, args: string[] = []) => {
@@ -139,6 +223,9 @@ export function OmniChat() {
       // Slash commands
       if (text.startsWith("/")) {
         handleSlashCommand(text);
+        // Auto-save after slash command
+        const cid = useGameStore.getState().currentConversationId;
+        if (cid) saveCurrentMessages(cid);
         return;
       }
 
@@ -147,7 +234,19 @@ export function OmniChat() {
         return;
       }
 
+      // Ensure conversation exists before first user message
+      let convId: string;
+      try {
+        convId = await ensureConversation();
+      } catch {
+        // conversation creation failed, continue without persistence
+        convId = "";
+      }
+
       addMessage({ role: "user", content: text });
+
+      // Save immediately after user message so it's never lost
+      if (convId) saveCurrentMessages(convId);
 
       try {
         const result = await api.performAction("message");
@@ -156,8 +255,8 @@ export function OmniChat() {
         if (result.leveled_up && result.new_level !== null) {
           triggerLevelUp(result.new_level);
         }
-      } catch {
-        // EXP/MP update failed
+      } catch (e) {
+        console.warn("[OmniChat] performAction failed:", e);
       }
 
       // Check for authentication based on provider
@@ -177,6 +276,7 @@ export function OmniChat() {
       })();
       if (!hasAuth) {
         addMessage({ role: "system", content: t("ai.noApiKey") });
+        if (convId) saveCurrentMessages(convId);
         return;
       }
 
@@ -206,15 +306,19 @@ export function OmniChat() {
 
         if (!response.ok) {
           const err = await response.text();
+          console.error("[OmniChat] Stream response not ok:", response.status, err);
           updateMessageById(assistantMsgId, t("ai.streamError") + `: ${err}`);
           setAiResponding(false);
+          if (convId) saveCurrentMessages(convId);
           return;
         }
 
         const reader = response.body?.getReader();
         if (!reader) {
+          console.error("[OmniChat] No reader from response body");
           updateMessageById(assistantMsgId, t("ai.streamError"));
           setAiResponding(false);
+          if (convId) saveCurrentMessages(convId);
           return;
         }
 
@@ -250,6 +354,7 @@ export function OmniChat() {
 
               // Error event from backend
               if (data.type === "error") {
+                console.error("[OmniChat] Backend error event:", data.error);
                 updateMessageById(assistantMsgId, data.error || t("ai.streamError"));
                 break;
               }
@@ -301,13 +406,17 @@ export function OmniChat() {
             }
           }
         }
-      } catch {
-        updateLastMessage(t("ai.streamError"));
+      } catch (e) {
+        console.error("[OmniChat] Stream error:", e);
+        updateLastMessage(t("ai.streamError") + (e instanceof Error ? `: ${e.message}` : ""));
       }
 
       setAiResponding(false);
+
+      // Auto-save after AI response completes
+      if (convId) saveCurrentMessages(convId);
     },
-    [addMessage, api, setPlayer, triggerLevelUp, player.mp, settings.ai_provider, settings.anthropic_api_key, settings.auth_method, settings.oauth_access_token, settings.openai_api_key, settings.gemini_api_key, settings.custom_base_url, projectScan, handleSlashCommand, setAiResponding, updateLastMessage, addActionLog, addActionCard, addBytesProcessed, t]
+    [addMessage, api, setPlayer, triggerLevelUp, player.mp, settings.ai_provider, settings.anthropic_api_key, settings.auth_method, settings.oauth_access_token, settings.openai_api_key, settings.gemini_api_key, settings.custom_base_url, projectScan, handleSlashCommand, setAiResponding, updateLastMessage, addActionLog, addActionCard, addBytesProcessed, t, ensureConversation, saveCurrentMessages]
   );
 
   const handleApplyCode = useCallback(
@@ -324,6 +433,15 @@ export function OmniChat() {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Conversation header */}
+      <div className="flex items-center px-4 py-2 border-b border-theme-accent/8">
+        <ConversationDrawer
+          onNewMission={handleNewMission}
+          onSelectConversation={handleSelectConversation}
+          onDeleteConversation={handleDeleteConversation}
+        />
+      </div>
+
       {/* Messages area */}
       <div
         ref={scrollRef}

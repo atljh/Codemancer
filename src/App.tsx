@@ -12,6 +12,10 @@ function App() {
   const setFileTreeRoot = useGameStore((s) => s.setFileTreeRoot);
   const setProjectScan = useGameStore((s) => s.setProjectScan);
   const setAppReady = useGameStore((s) => s.setAppReady);
+  const setConversations = useGameStore((s) => s.setConversations);
+  const setCurrentConversationId = useGameStore((s) => s.setCurrentConversationId);
+  const setMessages = useGameStore((s) => s.setMessages);
+  const setFocusStatus = useGameStore((s) => s.setFocusStatus);
   const sessionStartTime = useGameStore((s) => s.sessionStartTime);
   const theme = useGameStore((s) => s.settings.theme);
   const api = useApi();
@@ -49,16 +53,46 @@ function App() {
       try {
         const player = await api.getStatus();
         setPlayer(player);
-
-        const ws = useGameStore.getState().settings.workspace_root;
-        if (ws) {
-          const msg = translations[locale]["welcome.back"]
-            .replace("{name}", player.name)
-            .replace("{level}", String(player.level));
-          addMessage({ role: "system", content: msg });
-        }
       } catch {
         // player load failed
+      }
+
+      // Load conversations and restore last one
+      let restoredConversation = false;
+      try {
+        const convList = await api.getConversations();
+        setConversations(convList);
+        if (convList.length > 0) {
+          const last = convList[0]; // sorted by updated_at desc
+          const conv = await api.getConversation(last.id);
+          if (conv.messages.length > 0) {
+            setMessages(conv.messages);
+            setCurrentConversationId(last.id);
+            restoredConversation = true;
+          }
+        }
+      } catch {
+        // conversations not critical
+      }
+
+      // Restore focus timer
+      try {
+        const focus = await api.focusStatus();
+        if (focus.active) setFocusStatus(focus);
+      } catch {
+        // not critical
+      }
+
+      // Show welcome message only for fresh sessions (no restored conversation)
+      if (!restoredConversation) {
+        const ws = useGameStore.getState().settings.workspace_root;
+        const p = useGameStore.getState().player;
+        if (ws) {
+          const msg = translations[locale]["welcome.back"]
+            .replace("{name}", p.name)
+            .replace("{level}", String(p.level));
+          addMessage({ role: "system", content: msg });
+        }
       }
 
       setAppReady(true);

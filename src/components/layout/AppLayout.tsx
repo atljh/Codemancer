@@ -1,16 +1,27 @@
+import { AnimatePresence } from "framer-motion";
 import { TopStatsBar } from "./TopStatsBar";
 import { OmniChat } from "../chat/OmniChat";
+import { GitPanel } from "../git/GitPanel";
+import { FileExplorer } from "../explorer/FileExplorer";
+import { EditorTabs } from "../editor/EditorTabs";
+import { CodeEditor } from "../editor/CodeEditor";
 import { WelcomeScreen } from "../welcome/WelcomeScreen";
 import { DiffViewerModal } from "../modals/DiffViewerModal";
 import { ForgingOverlay } from "../forging/ForgingOverlay";
 import { LevelUpModal } from "../modals/LevelUpModal";
 import { SettingsModal } from "../modals/SettingsModal";
+import { ChroniclePanel } from "../chronicle/ChroniclePanel";
+import { HealthPanel } from "../health/HealthPanel";
+import { TacticalMap } from "../map/TacticalMap";
 import { EditorRefProvider } from "../../hooks/useEditorRef";
 import { useGameStore } from "../../stores/gameStore";
 
 export function AppLayout() {
   const appReady = useGameStore((s) => s.appReady);
   const workspaceRoot = useGameStore((s) => s.settings.workspace_root);
+  const showGitPanel = useGameStore((s) => s.showGitPanel);
+  const showFileExplorer = useGameStore((s) => s.showFileExplorer);
+  const activeTab = useGameStore((s) => s.activeTab);
 
   const showWelcome = appReady && !workspaceRoot;
 
@@ -48,10 +59,17 @@ export function AppLayout() {
         {/* Main content */}
         <div className="relative z-10 flex flex-col h-full">
           <TopStatsBar />
-          <main className="flex-1 flex justify-center overflow-hidden">
-            <div className="w-full max-w-[80%] flex flex-col">
-              <OmniChat />
+          <main className="flex-1 flex overflow-hidden">
+            <AnimatePresence>
+              {showFileExplorer && <FileExplorer />}
+            </AnimatePresence>
+            <div className="flex-1 flex flex-col min-w-0">
+              <EditorTabs />
+              {activeTab === "chat" ? <OmniChat /> : activeTab === "map" ? <TacticalMap /> : <CodeEditor />}
             </div>
+            <AnimatePresence>
+              {showGitPanel && <GitPanel />}
+            </AnimatePresence>
           </main>
         </div>
       </div>
@@ -59,6 +77,8 @@ export function AppLayout() {
       <ForgingOverlay />
       <LevelUpModal />
       <SettingsModal />
+      <ChroniclePanel />
+      <HealthPanel />
     </EditorRefProvider>
   );
 }

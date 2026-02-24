@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Settings, FolderOpen, Shield, HardDrive, ChevronDown } from "lucide-react";
+import { Settings, FolderOpen, Shield, HardDrive, ChevronDown, GitBranch, FolderTree, ScrollText, Radar } from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { StatBar } from "../bars/StatBar";
 import { ExpBar } from "../bars/ExpBar";
+import { FocusTimer } from "../focus/FocusTimer";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -26,6 +27,14 @@ export function TopStatsBar() {
   const addActionCard = useGameStore((s) => s.addActionCard);
   const addActionLog = useGameStore((s) => s.addActionLog);
   const totalBytesProcessed = useGameStore((s) => s.totalBytesProcessed);
+  const showGitPanel = useGameStore((s) => s.showGitPanel);
+  const toggleGitPanel = useGameStore((s) => s.toggleGitPanel);
+  const showFileExplorer = useGameStore((s) => s.showFileExplorer);
+  const toggleFileExplorer = useGameStore((s) => s.toggleFileExplorer);
+  const showChronicle = useGameStore((s) => s.showChronicle);
+  const toggleChronicle = useGameStore((s) => s.toggleChronicle);
+  const showHealthPanel = useGameStore((s) => s.showHealthPanel);
+  const toggleHealthPanel = useGameStore((s) => s.toggleHealthPanel);
   const api = useApi();
   const { t } = useTranslation();
 
@@ -191,10 +200,57 @@ export function TopStatsBar() {
         </>
       )}
 
-      {/* Settings */}
+      {/* Focus timer */}
+      <FocusTimer />
+
+      {/* Chronicle + Health + Explorer + Git + Settings */}
+      <button
+        onClick={toggleChronicle}
+        className={`ml-auto p-1.5 rounded transition-colors ${
+          showChronicle
+            ? "bg-theme-accent/15 text-theme-accent"
+            : "hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent"
+        }`}
+        title={t("chronicle.title")}
+      >
+        <ScrollText className="w-4 h-4" strokeWidth={1.5} />
+      </button>
+      <button
+        onClick={toggleHealthPanel}
+        className={`p-1.5 rounded transition-colors ${
+          showHealthPanel
+            ? "bg-theme-accent/15 text-theme-accent"
+            : "hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent"
+        }`}
+        title={t("health.title")}
+      >
+        <Radar className="w-4 h-4" strokeWidth={1.5} />
+      </button>
+      <button
+        onClick={toggleFileExplorer}
+        className={`p-1.5 rounded transition-colors ${
+          showFileExplorer
+            ? "bg-theme-accent/15 text-theme-accent"
+            : "hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent"
+        }`}
+        title={t("explorer.title")}
+      >
+        <FolderTree className="w-4 h-4" strokeWidth={1.5} />
+      </button>
+      <button
+        onClick={toggleGitPanel}
+        className={`p-1.5 rounded transition-colors ${
+          showGitPanel
+            ? "bg-theme-accent/15 text-theme-accent"
+            : "hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent"
+        }`}
+        title={t("git.panelTitle")}
+      >
+        <GitBranch className="w-4 h-4" strokeWidth={1.5} />
+      </button>
       <button
         onClick={toggleSettings}
-        className="ml-auto p-1.5 rounded hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent transition-colors"
+        className="p-1.5 rounded hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent transition-colors"
       >
         <Settings className="w-4 h-4" strokeWidth={1.5} />
       </button>

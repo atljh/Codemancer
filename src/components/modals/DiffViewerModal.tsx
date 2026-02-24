@@ -1,10 +1,10 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Loader2 } from "lucide-react";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
-import { themes } from "../../themes/themeConfig";
+import { registerMonacoThemes, getMonacoThemeName } from "../../themes/monacoThemes";
 import type { ThemeId } from "../../types/game";
 
 const DiffEditor = lazy(() =>
@@ -19,8 +19,12 @@ export function DiffViewerModal() {
   const addMessage = useGameStore((s) => s.addMessage);
   const api = useApi();
   const { t } = useTranslation();
-  const currentTheme = useGameStore((s) => s.settings.theme);
+  const currentTheme = useGameStore((s) => s.settings.theme) as ThemeId;
   const [applying, setApplying] = useState(false);
+
+  const handleBeforeMount = useCallback((monaco: any) => {
+    registerMonacoThemes(monaco);
+  }, []);
 
   const handleApply = async () => {
     setApplying(true);
@@ -91,7 +95,8 @@ export function DiffViewerModal() {
                   original={diffViewer.oldContent}
                   modified={diffViewer.newContent}
                   language="typescript"
-                  theme={themes[currentTheme as ThemeId]?.monacoTheme ?? "vs-dark"}
+                  theme={getMonacoThemeName(currentTheme)}
+                  beforeMount={handleBeforeMount}
                   options={{
                     readOnly: true,
                     renderSideBySide: true,
