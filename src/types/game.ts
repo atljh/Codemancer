@@ -344,6 +344,16 @@ export interface TelegramDialog {
   lastMessageDate: number;
 }
 
+export interface TelegramMedia {
+  type: "photo" | "video" | "document" | "gif" | "sticker" | "voice" | "webpage";
+  url?: string;
+  fileName?: string;
+  mimeType?: string;
+  webpageTitle?: string;
+  webpageDescription?: string;
+  webpageUrl?: string;
+}
+
 export interface TelegramMessage {
   id: number;
   senderId: string;
@@ -352,6 +362,7 @@ export interface TelegramMessage {
   date: number;
   out: boolean;
   linkedFiles?: string[];
+  media?: TelegramMedia;
 }
 
 export interface TelegramAnalysis {
@@ -359,6 +370,48 @@ export interface TelegramAnalysis {
   linked_files: string[];
   summary: string;
   quest_suggestion: string | null;
+}
+
+// MissionControl types
+export type SignalSource = "TELEGRAM" | "CODE_TODO" | "LSP_ERRORS";
+
+export type OperationStatus = "ANALYSIS" | "DEPLOYING" | "TESTING" | "COMPLETED";
+
+export interface MissionSignal {
+  id: string;
+  source: SignalSource;
+  content: string;
+  file_path: string | null;
+  line_number: number | null;
+  timestamp: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface Operation {
+  id: string;
+  title: string;
+  description: string;
+  status: OperationStatus;
+  signals: MissionSignal[];
+  related_sectors: string[];
+  exp_reward: number;
+  created_at: string;
+  updated_at: string;
+  children: string[];
+  parent_id: string | null;
+}
+
+export interface MissionScanResult {
+  signals: MissionSignal[];
+  operations_created: number;
+  total_signals: number;
+}
+
+export interface MissionStatus {
+  total_operations: number;
+  by_status: Record<OperationStatus, number>;
+  total_signals: number;
+  last_scan: string | null;
 }
 
 export type CommsAuthState =

@@ -16,6 +16,7 @@ import type {
   FocusStatus,
   TelegramDialog,
   TelegramMessage,
+  Operation,
 } from "../types/game";
 
 interface GameState {
@@ -108,6 +109,12 @@ interface GameState {
 
   // Self-repair
   selfRepairActive: boolean;
+
+  // MissionControl
+  operations: Operation[];
+  selectedOperationId: string | null;
+  showMissionControl: boolean;
+  missionBriefingActive: boolean;
 
   // Actions
   setPlayer: (player: Player) => void;
@@ -218,6 +225,15 @@ interface GameState {
 
   // Self-repair actions
   setSelfRepairActive: (v: boolean) => void;
+
+  // MissionControl actions
+  setOperations: (ops: Operation[]) => void;
+  addOperation: (op: Operation) => void;
+  updateOperation: (id: string, updates: Partial<Operation>) => void;
+  removeOperation: (id: string) => void;
+  selectOperation: (id: string | null) => void;
+  toggleMissionControl: () => void;
+  setMissionBriefingActive: (v: boolean) => void;
 }
 
 const defaultPlayer: Player = {
@@ -316,6 +332,10 @@ export const useGameStore = create<GameState>((set) => ({
   bountyZoneFiles: [],
   bountyZoneSource: null,
   selfRepairActive: false,
+  operations: [],
+  selectedOperationId: null,
+  showMissionControl: false,
+  missionBriefingActive: false,
 
   setPlayer: (player) => set({ player }),
   setQuests: (quests) => set({ quests }),
@@ -526,4 +546,25 @@ export const useGameStore = create<GameState>((set) => ({
 
   // Self-repair
   setSelfRepairActive: (v) => set({ selfRepairActive: v }),
+
+  // MissionControl
+  setOperations: (ops) => set({ operations: ops }),
+  addOperation: (op) =>
+    set((s) => ({ operations: [op, ...s.operations] })),
+  updateOperation: (id, updates) =>
+    set((s) => ({
+      operations: s.operations.map((o) =>
+        o.id === id ? { ...o, ...updates } : o,
+      ),
+    })),
+  removeOperation: (id) =>
+    set((s) => ({
+      operations: s.operations.filter((o) => o.id !== id),
+      selectedOperationId:
+        s.selectedOperationId === id ? null : s.selectedOperationId,
+    })),
+  selectOperation: (id) => set({ selectedOperationId: id }),
+  toggleMissionControl: () =>
+    set((s) => ({ showMissionControl: !s.showMissionControl })),
+  setMissionBriefingActive: (v) => set({ missionBriefingActive: v }),
 }));

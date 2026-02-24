@@ -28,6 +28,10 @@ import type {
   IntelLog,
   IntelligenceResult,
   TelegramAnalysis,
+  Operation,
+  MissionSignal,
+  MissionScanResult,
+  MissionStatus,
 } from "../types/game";
 
 const API_BASE = "http://127.0.0.1:8420";
@@ -405,6 +409,73 @@ const api = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
     }),
+
+  // MissionControl
+  getOperations: () => fetchJson<Operation[]>("/api/missions/operations"),
+
+  getActiveOperations: () =>
+    fetchJson<Operation[]>("/api/missions/operations/active"),
+
+  getOperation: (opId: string) =>
+    fetchJson<Operation>(`/api/missions/operations/${opId}`),
+
+  createOperation: (
+    title: string,
+    description = "",
+    relatedSectors: string[] = [],
+    status = "ANALYSIS",
+  ) =>
+    fetchJson<Operation>("/api/missions/operations", {
+      method: "POST",
+      body: JSON.stringify({
+        title,
+        description,
+        related_sectors: relatedSectors,
+        status,
+      }),
+    }),
+
+  updateOperation: (
+    opId: string,
+    data: { status?: string; title?: string; description?: string },
+  ) =>
+    fetchJson<Operation>(`/api/missions/operations/${opId}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
+  completeOperation: (opId: string) =>
+    fetchJson<{ operation: Operation; player: Player; exp_gained: number }>(
+      `/api/missions/operations/${opId}/complete`,
+      { method: "POST" },
+    ),
+
+  deleteOperation: (opId: string) =>
+    fetchJson<{ ok: boolean }>(`/api/missions/operations/${opId}`, {
+      method: "DELETE",
+    }),
+
+  missionScan: (
+    directory: string,
+    telegramMessages: Record<string, unknown>[] = [],
+    lspErrors: Record<string, unknown>[] = [],
+  ) =>
+    fetchJson<MissionScanResult>("/api/missions/scan", {
+      method: "POST",
+      body: JSON.stringify({
+        directory,
+        telegram_messages: telegramMessages,
+        lsp_errors: lspErrors,
+      }),
+    }),
+
+  getMissionSignals: (source?: string, limit = 100) =>
+    fetchJson<MissionSignal[]>(
+      `/api/missions/signals?limit=${limit}${source ? `&source=${source}` : ""}`,
+    ),
+
+  getMissionStatus: () =>
+    fetchJson<MissionStatus>("/api/missions/status"),
 };
 
 export { api };

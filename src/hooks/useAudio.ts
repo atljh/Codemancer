@@ -21,7 +21,13 @@ type SoundEvent =
   | "data_burst"
   | "self_repair_start"
   | "self_repair_tick"
-  | "self_repair_done";
+  | "self_repair_done"
+  | "bridge_ambient"
+  | "relay_click"
+  | "hydraulic_hiss"
+  | "radio_static"
+  | "mission_registered"
+  | "scan_sweep";
 
 let audioCtx: AudioContext | null = null;
 
@@ -482,6 +488,170 @@ function selfRepairDone() {
   crash.stop(ctx.currentTime + 1.5);
 }
 
+// ── BRIDGE sounds (industrial / command bridge) ───────────
+
+function bridgeRelayClick() {
+  const ctx = getCtx();
+  // Hard relay click — short burst + resonance
+  const click = ctx.createOscillator();
+  const clickGain = ctx.createGain();
+  click.type = "square";
+  click.frequency.value = 4500;
+  clickGain.gain.setValueAtTime(0.12, ctx.currentTime);
+  clickGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.015);
+  click.connect(clickGain).connect(ctx.destination);
+  click.start();
+  click.stop(ctx.currentTime + 0.015);
+  // Low resonance thud
+  const thud = ctx.createOscillator();
+  const thudGain = ctx.createGain();
+  thud.type = "sine";
+  thud.frequency.setValueAtTime(90, ctx.currentTime + 0.01);
+  thud.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.08);
+  thudGain.gain.setValueAtTime(0.08, ctx.currentTime + 0.01);
+  thudGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+  thud.connect(thudGain).connect(ctx.destination);
+  thud.start(ctx.currentTime + 0.01);
+  thud.stop(ctx.currentTime + 0.1);
+}
+
+function bridgeHydraulicHiss() {
+  const ctx = getCtx();
+  // Filtered white noise — pneumatic hiss
+  const bufSize = ctx.sampleRate * 0.3;
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) {
+    const env = Math.exp(-i / (ctx.sampleRate * 0.08));
+    data[i] = (Math.random() * 2 - 1) * env * 0.4;
+  }
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const hp = ctx.createBiquadFilter();
+  hp.type = "highpass";
+  hp.frequency.value = 3000;
+  hp.Q.value = 0.5;
+  const lp = ctx.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.frequency.setValueAtTime(8000, ctx.currentTime);
+  lp.frequency.exponentialRampToValueAtTime(2000, ctx.currentTime + 0.25);
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.06, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+  src.connect(hp).connect(lp).connect(gain).connect(ctx.destination);
+  src.start();
+  src.stop(ctx.currentTime + 0.3);
+}
+
+function bridgeRadioStatic() {
+  const ctx = getCtx();
+  // White noise with band-pass — radio crackle
+  const bufSize = ctx.sampleRate * 0.6;
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) {
+    const env = i < bufSize * 0.05 ? i / (bufSize * 0.05) : Math.exp(-(i - bufSize * 0.05) / (ctx.sampleRate * 0.15));
+    data[i] = (Math.random() * 2 - 1) * env * 0.3;
+  }
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const bp = ctx.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.frequency.value = 1800;
+  bp.Q.value = 2;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.07, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+  src.connect(bp).connect(gain).connect(ctx.destination);
+  src.start();
+  src.stop(ctx.currentTime + 0.6);
+}
+
+function bridgeMissionRegistered() {
+  const ctx = getCtx();
+  // Low frequency confirmation tone + ascending data chirp
+  const bass = ctx.createOscillator();
+  const bassGain = ctx.createGain();
+  bass.type = "sine";
+  bass.frequency.value = 60;
+  bassGain.gain.setValueAtTime(0.1, ctx.currentTime);
+  bassGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+  bass.connect(bassGain).connect(ctx.destination);
+  bass.start();
+  bass.stop(ctx.currentTime + 0.4);
+  // Relay click at start
+  bridgeRelayClick();
+  // Data chirp sequence
+  [800, 1000, 1200, 1500, 1800].forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = "square";
+    osc.frequency.value = freq;
+    const t = ctx.currentTime + 0.08 + i * 0.04;
+    g.gain.setValueAtTime(0.03, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+    osc.connect(g).connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.03);
+  });
+}
+
+function bridgeScanSweep() {
+  const ctx = getCtx();
+  // Low-frequency sweep — sonar-like ping
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(200, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.6);
+  gain.gain.setValueAtTime(0.08, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.7);
+  // High ping reflection
+  const ping = ctx.createOscillator();
+  const pingGain = ctx.createGain();
+  ping.type = "sine";
+  ping.frequency.value = 2400;
+  pingGain.gain.setValueAtTime(0.05, ctx.currentTime + 0.1);
+  pingGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+  ping.connect(pingGain).connect(ctx.destination);
+  ping.start(ctx.currentTime + 0.1);
+  ping.stop(ctx.currentTime + 0.3);
+}
+
+let bridgeAmbientSource: AudioBufferSourceNode | null = null;
+let bridgeAmbientGain: GainNode | null = null;
+
+function bridgeAmbientStart() {
+  const ctx = getCtx();
+  // Very low volume server room hum — continuous
+  if (bridgeAmbientSource) return;
+  const bufLen = ctx.sampleRate * 4;
+  const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  // Layered low-frequency hum with subtle noise
+  for (let i = 0; i < bufLen; i++) {
+    const t = i / ctx.sampleRate;
+    const hum60 = Math.sin(2 * Math.PI * 60 * t) * 0.3;
+    const hum120 = Math.sin(2 * Math.PI * 120 * t) * 0.15;
+    const hum180 = Math.sin(2 * Math.PI * 180 * t) * 0.05;
+    const noise = (Math.random() * 2 - 1) * 0.02;
+    data[i] = hum60 + hum120 + hum180 + noise;
+  }
+  bridgeAmbientSource = ctx.createBufferSource();
+  bridgeAmbientSource.buffer = buf;
+  bridgeAmbientSource.loop = true;
+  bridgeAmbientGain = ctx.createGain();
+  bridgeAmbientGain.gain.value = 0.015; // Very quiet
+  const lp = ctx.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.frequency.value = 250;
+  bridgeAmbientSource.connect(lp).connect(bridgeAmbientGain).connect(ctx.destination);
+  bridgeAmbientSource.start();
+}
+
 // ── JARVIS pack (smooth AI assistant) ─────────────────────
 
 function jarvisScanTone() {
@@ -775,6 +945,12 @@ const DEFAULT_PACK: SoundMap = {
   self_repair_start: selfRepairStart,
   self_repair_tick: selfRepairTick,
   self_repair_done: selfRepairDone,
+  bridge_ambient: bridgeAmbientStart,
+  relay_click: bridgeRelayClick,
+  hydraulic_hiss: bridgeHydraulicHiss,
+  radio_static: bridgeRadioStatic,
+  mission_registered: bridgeMissionRegistered,
+  scan_sweep: bridgeScanSweep,
 };
 
 const JARVIS_PACK: SoundMap = {
@@ -788,6 +964,12 @@ const JARVIS_PACK: SoundMap = {
   data_crunch: jarvisDataCrunch,
   agent_question: jarvisAlert,
   data_burst: jarvisDataCrunch,
+  bridge_ambient: bridgeAmbientStart,
+  relay_click: bridgeRelayClick,
+  hydraulic_hiss: bridgeHydraulicHiss,
+  radio_static: bridgeRadioStatic,
+  mission_registered: bridgeMissionRegistered,
+  scan_sweep: bridgeScanSweep,
 };
 
 const PIPBOY_PACK: SoundMap = {
@@ -801,6 +983,12 @@ const PIPBOY_PACK: SoundMap = {
   data_crunch: pipboyDataCrunch,
   agent_question: pipboyAlert,
   data_burst: pipboyDataCrunch,
+  bridge_ambient: bridgeAmbientStart,
+  relay_click: bridgeRelayClick,
+  hydraulic_hiss: bridgeHydraulicHiss,
+  radio_static: bridgeRadioStatic,
+  mission_registered: bridgeMissionRegistered,
+  scan_sweep: bridgeScanSweep,
 };
 
 const RETRO_PACK: SoundMap = {
@@ -814,6 +1002,12 @@ const RETRO_PACK: SoundMap = {
   data_crunch: retroDataCrunch,
   agent_question: retroAlert,
   data_burst: retroDataCrunch,
+  bridge_ambient: bridgeAmbientStart,
+  relay_click: bridgeRelayClick,
+  hydraulic_hiss: bridgeHydraulicHiss,
+  radio_static: bridgeRadioStatic,
+  mission_registered: bridgeMissionRegistered,
+  scan_sweep: bridgeScanSweep,
 };
 
 const SOUND_PACKS: Record<SoundPackId, SoundMap> = {

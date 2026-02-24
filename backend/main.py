@@ -15,6 +15,7 @@ from routes import dependency as dependency_route
 from routes import proactive as proactive_route
 from routes import telegram as telegram_route
 from routes import repair as repair_route
+from routes import missions as missions_route
 from services.file_service import FileService
 
 STATE_FILE = Path(__file__).parent / "state.json"
@@ -62,6 +63,9 @@ async def lifespan(app: FastAPI):
     git.chronicle_service = chronicle_service
     chronicle_route.chronicle_service = chronicle_service
     telegram_route.quest_service = quest_service
+    missions_route.player = player
+    missions_route.save_state_fn = save_state
+    missions_route.chronicle_service = chronicle_service
     yield
     chronicle_service.end_session()
     save_state()
@@ -91,6 +95,7 @@ app.include_router(dependency_route.router)
 app.include_router(proactive_route.router)
 app.include_router(telegram_route.router)
 app.include_router(repair_route.router)
+app.include_router(missions_route.router)
 
 @app.get("/health")
 async def health():
