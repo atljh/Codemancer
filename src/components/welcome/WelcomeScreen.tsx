@@ -45,7 +45,9 @@ export function WelcomeScreen() {
       try {
         const updatedPlayer = await api.getStatus();
         setPlayer(updatedPlayer);
-      } catch { /* ok */ }
+      } catch {
+        /* ok */
+      }
 
       addActionCard({
         fileName: `[PROJECT LOADED]: ${shortenPath(path)}`,
@@ -112,7 +114,10 @@ export function WelcomeScreen() {
             disabled={isScanning}
             className="flex items-center gap-3 px-6 py-3 rounded-lg glass-panel-bright hover:bg-theme-accent/6 transition-all text-sm group tactical-corners"
           >
-            <FolderOpen className="w-4 h-4 text-theme-text-dim group-hover:text-theme-accent transition-colors" strokeWidth={1.5} />
+            <FolderOpen
+              className="w-4 h-4 text-theme-text-dim group-hover:text-theme-accent transition-colors"
+              strokeWidth={1.5}
+            />
             <span className="text-theme-text/70 group-hover:text-white transition-colors font-mono text-xs tracking-wider uppercase">
               {isScanning ? t("project.scanning") : t("welcome.openProject")}
             </span>
@@ -161,7 +166,9 @@ export function WelcomeScreen() {
               <div className="text-[9px] font-mono text-theme-text-dim leading-relaxed">
                 <div className="text-theme-status-warning/50">TODO</div>
                 <div className="text-theme-text/30">fix auth</div>
-                <div className="text-theme-status-success/50 mt-0.5">+50 EXP</div>
+                <div className="text-theme-status-success/50 mt-0.5">
+                  +50 EXP
+                </div>
               </div>
             }
           />

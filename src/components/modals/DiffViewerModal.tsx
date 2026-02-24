@@ -4,11 +4,14 @@ import { X, Check, Loader2 } from "lucide-react";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
-import { registerMonacoThemes, getMonacoThemeName } from "../../themes/monacoThemes";
+import {
+  registerMonacoThemes,
+  getMonacoThemeName,
+} from "../../themes/monacoThemes";
 import type { ThemeId } from "../../types/game";
 
 const DiffEditor = lazy(() =>
-  import("@monaco-editor/react").then((mod) => ({ default: mod.DiffEditor }))
+  import("@monaco-editor/react").then((mod) => ({ default: mod.DiffEditor })),
 );
 
 export function DiffViewerModal() {
@@ -86,8 +89,13 @@ export function DiffViewerModal() {
               <Suspense
                 fallback={
                   <div className="flex items-center justify-center h-full text-theme-text-dim">
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" strokeWidth={1.5} />
-                    <span className="text-xs font-mono tracking-wider">{t("diff.loading")}</span>
+                    <Loader2
+                      className="w-5 h-5 animate-spin mr-2"
+                      strokeWidth={1.5}
+                    />
+                    <span className="text-xs font-mono tracking-wider">
+                      {t("diff.loading")}
+                    </span>
                   </div>
                 }
               >
@@ -125,7 +133,10 @@ export function DiffViewerModal() {
                 className="flex items-center gap-2 px-4 py-1.5 rounded glass-panel-bright text-xs font-mono font-bold text-theme-accent tracking-wider uppercase hover:bg-theme-accent/10 transition-all disabled:opacity-50"
               >
                 {applying ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" strokeWidth={1.5} />
+                  <Loader2
+                    className="w-3.5 h-3.5 animate-spin"
+                    strokeWidth={1.5}
+                  />
                 ) : (
                   <Check className="w-3.5 h-3.5" strokeWidth={1.5} />
                 )}

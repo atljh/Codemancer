@@ -62,7 +62,7 @@ export function IntelFeedPanel() {
         // ignore
       }
     },
-    [api, fetchLogs]
+    [api, fetchLogs],
   );
 
   return (
@@ -89,7 +89,10 @@ export function IntelFeedPanel() {
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-theme-accent/10">
               <div className="flex items-center gap-2">
-                <BrainCircuit className="w-4 h-4 text-theme-accent" strokeWidth={1.5} />
+                <BrainCircuit
+                  className="w-4 h-4 text-theme-accent"
+                  strokeWidth={1.5}
+                />
                 <span className="text-xs font-mono uppercase tracking-widest text-theme-accent">
                   {t("intel.title")}
                 </span>
@@ -117,10 +120,10 @@ export function IntelFeedPanel() {
                   {f === null
                     ? "All"
                     : f === "pending"
-                    ? t("intel.pending")
-                    : f === "active"
-                    ? t("intel.active")
-                    : t("intel.done")}
+                      ? t("intel.pending")
+                      : f === "active"
+                        ? t("intel.active")
+                        : t("intel.done")}
                 </button>
               ))}
             </div>
@@ -144,13 +147,16 @@ export function IntelFeedPanel() {
                   >
                     {/* Top line: source + timestamp */}
                     <div className="flex items-center gap-2 mb-1.5">
-                      <SourceIcon className="w-3 h-3 text-theme-accent/50" strokeWidth={1.5} />
+                      <SourceIcon
+                        className="w-3 h-3 text-theme-accent/50"
+                        strokeWidth={1.5}
+                      />
                       <span className="text-[8px] font-mono text-theme-text-dimmer uppercase tracking-wider">
                         {log.source === "voice"
                           ? t("intel.voiceTag")
                           : log.source === "proactive"
-                          ? t("intel.proactiveTag")
-                          : t("intel.textTag")}
+                            ? t("intel.proactiveTag")
+                            : t("intel.textTag")}
                       </span>
                       <span className="text-[8px] font-mono text-theme-text-dimmer ml-auto">
                         {log.timestamp.slice(11, 16)}
@@ -167,7 +173,9 @@ export function IntelFeedPanel() {
                       <div className="text-[9px] font-mono text-theme-text-dim mb-1.5">
                         {log.subtasks.slice(0, 3).map((s, i) => (
                           <div key={i} className="flex gap-1 truncate">
-                            <span className="text-theme-accent/40 shrink-0">{i + 1}.</span>
+                            <span className="text-theme-accent/40 shrink-0">
+                              {i + 1}.
+                            </span>
                             <span className="truncate">{s}</span>
                           </div>
                         ))}
@@ -186,8 +194,8 @@ export function IntelFeedPanel() {
                           log.status === "done"
                             ? "text-green-400/60"
                             : log.status === "active"
-                            ? "text-theme-accent/60"
-                            : "text-theme-text-dimmer"
+                              ? "text-theme-accent/60"
+                              : "text-theme-text-dimmer"
                         }`}
                         strokeWidth={1.5}
                       />
@@ -220,7 +228,9 @@ export function IntelFeedPanel() {
                         )}
                         {log.status !== "archived" && (
                           <button
-                            onClick={() => handleStatusChange(log.id, "archived")}
+                            onClick={() =>
+                              handleStatusChange(log.id, "archived")
+                            }
                             className="text-[8px] font-mono text-theme-text-dimmer hover:text-theme-text-dim px-1"
                           >
                             ARCH

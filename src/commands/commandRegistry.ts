@@ -55,7 +55,9 @@ export function getCommands(): Command[] {
           s.setFileTree(tree);
           const player = await api.getStatus();
           s.setPlayer(player);
-        } catch { /* not in Tauri or cancelled */ }
+        } catch {
+          /* not in Tauri or cancelled */
+        }
       },
     },
     {
@@ -90,7 +92,9 @@ export function getCommands(): Command[] {
       execute: () => {
         const s = useGameStore.getState();
         const name = `untitled-${Date.now()}.txt`;
-        const path = s.fileTreeRoot ? `${s.fileTreeRoot}/${name}` : `/tmp/${name}`;
+        const path = s.fileTreeRoot
+          ? `${s.fileTreeRoot}/${name}`
+          : `/tmp/${name}`;
         s.openFile({ path, content: "", language: "plaintext", isDirty: true });
         s.setActiveTab(path);
       },
@@ -144,21 +148,30 @@ export function getCommands(): Command[] {
       labelKey: "cmd.zoomIn",
       shortcut: "⌘+",
       category: "View",
-      execute: () => window.dispatchEvent(new CustomEvent("codemancer:zoom", { detail: "in" })),
+      execute: () =>
+        window.dispatchEvent(
+          new CustomEvent("codemancer:zoom", { detail: "in" }),
+        ),
     },
     {
       id: "view.zoomOut",
       labelKey: "cmd.zoomOut",
       shortcut: "⌘-",
       category: "View",
-      execute: () => window.dispatchEvent(new CustomEvent("codemancer:zoom", { detail: "out" })),
+      execute: () =>
+        window.dispatchEvent(
+          new CustomEvent("codemancer:zoom", { detail: "out" }),
+        ),
     },
     {
       id: "view.zoomReset",
       labelKey: "cmd.zoomReset",
       shortcut: "⌘0",
       category: "View",
-      execute: () => window.dispatchEvent(new CustomEvent("codemancer:zoom", { detail: "reset" })),
+      execute: () =>
+        window.dispatchEvent(
+          new CustomEvent("codemancer:zoom", { detail: "reset" }),
+        ),
     },
 
     // --- Navigate ---
@@ -195,14 +208,16 @@ export function getCommands(): Command[] {
       labelKey: "cmd.findInFile",
       shortcut: "⌘F",
       category: "Editor",
-      execute: () => window.dispatchEvent(new CustomEvent("codemancer:editor-find")),
+      execute: () =>
+        window.dispatchEvent(new CustomEvent("codemancer:editor-find")),
     },
     {
       id: "editor.replace",
       labelKey: "cmd.replaceInFile",
       shortcut: "⌘H",
       category: "Editor",
-      execute: () => window.dispatchEvent(new CustomEvent("codemancer:editor-replace")),
+      execute: () =>
+        window.dispatchEvent(new CustomEvent("codemancer:editor-replace")),
     },
     {
       id: "editor.searchFiles",

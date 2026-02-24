@@ -76,7 +76,9 @@ export function GitPanel() {
   };
 
   const handleDiscard = async (path: string) => {
-    const confirmed = window.confirm(t("git.discardConfirm").replace("{path}", path));
+    const confirmed = window.confirm(
+      t("git.discardConfirm").replace("{path}", path),
+    );
     if (!confirmed) return;
     await api.gitDiscard([path]);
     await refresh();
@@ -140,7 +142,10 @@ export function GitPanel() {
       <div className="w-80 h-full flex flex-col glass-panel">
         {/* Header */}
         <div className="flex items-center gap-2 px-3 py-2 border-b border-[var(--theme-glass-border)]">
-          <GitBranch className="w-3.5 h-3.5 text-theme-accent" strokeWidth={1.5} />
+          <GitBranch
+            className="w-3.5 h-3.5 text-theme-accent"
+            strokeWidth={1.5}
+          />
           <span className="text-xs font-bold text-theme-text tracking-wide uppercase flex-1 truncate">
             {gitStatus?.branch ?? "—"}
           </span>
@@ -191,7 +196,9 @@ export function GitPanel() {
                 bgColor="bg-green-500/8"
                 headerAction={
                   <button
-                    onClick={() => handleUnstage(gitStatus.staged.map((f) => f.path))}
+                    onClick={() =>
+                      handleUnstage(gitStatus.staged.map((f) => f.path))
+                    }
                     className="text-[9px] font-mono text-theme-text-dimmer hover:text-theme-accent transition-colors"
                   >
                     {t("git.unstageAll")}
@@ -222,7 +229,9 @@ export function GitPanel() {
                 bgColor="bg-yellow-500/8"
                 headerAction={
                   <button
-                    onClick={() => handleStage(gitStatus.unstaged.map((f) => f.path))}
+                    onClick={() =>
+                      handleStage(gitStatus.unstaged.map((f) => f.path))
+                    }
                     className="text-[9px] font-mono text-theme-text-dimmer hover:text-theme-accent transition-colors"
                   >
                     {t("git.stageAll")}
@@ -254,7 +263,9 @@ export function GitPanel() {
                 bgColor="bg-white/3"
                 headerAction={
                   <button
-                    onClick={() => handleStage(gitStatus.untracked.map((f) => f.path))}
+                    onClick={() =>
+                      handleStage(gitStatus.untracked.map((f) => f.path))
+                    }
                     className="text-[9px] font-mono text-theme-text-dimmer hover:text-theme-accent transition-colors"
                   >
                     {t("git.stageAll")}
@@ -294,13 +305,18 @@ export function GitPanel() {
                 className="flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-mono bg-theme-accent/10 text-theme-accent/70 hover:bg-theme-accent/20 hover:text-theme-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 title={t("git.generateMessage")}
               >
-                <Sparkles className={`w-3.5 h-3.5 ${aiLoading ? "animate-pulse" : ""}`} strokeWidth={1.5} />
+                <Sparkles
+                  className={`w-3.5 h-3.5 ${aiLoading ? "animate-pulse" : ""}`}
+                  strokeWidth={1.5}
+                />
                 {aiLoading ? t("git.generating") : t("git.generateMessage")}
               </button>
             </div>
             <button
               onClick={handleCommit}
-              disabled={loading || !commitMsg.trim() || !gitStatus.staged.length}
+              disabled={
+                loading || !commitMsg.trim() || !gitStatus.staged.length
+              }
               className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded text-xs font-bold tracking-wide uppercase bg-theme-accent/15 text-theme-accent border border-theme-accent/25 hover:bg-theme-accent/25 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <Check className="w-3 h-3" strokeWidth={2} />
@@ -350,10 +366,14 @@ function FileSection({
         ) : (
           <ChevronUp className={`w-3 h-3 ${accentColor}`} strokeWidth={1.5} />
         )}
-        <span className={`text-[10px] font-bold uppercase tracking-wider ${accentColor}`}>
+        <span
+          className={`text-[10px] font-bold uppercase tracking-wider ${accentColor}`}
+        >
           {title}
         </span>
-        <span className="text-[9px] font-mono text-theme-text-dimmer">{count}</span>
+        <span className="text-[9px] font-mono text-theme-text-dimmer">
+          {count}
+        </span>
         <span className="flex-1" />
         {open && (
           <span onClick={(e) => e.stopPropagation()}>{headerAction}</span>
@@ -380,12 +400,19 @@ function FileRow({
   onDiscard?: () => void;
 }) {
   const filename = file.path.split("/").pop() || file.path;
-  const dir = file.path.includes("/") ? file.path.substring(0, file.path.lastIndexOf("/")) : "";
+  const dir = file.path.includes("/")
+    ? file.path.substring(0, file.path.lastIndexOf("/"))
+    : "";
 
   return (
     <div className="group flex items-center gap-1 px-3 py-1 hover:bg-white/3 transition-colors text-xs">
-      <FileText className="w-3 h-3 text-theme-text-dimmer shrink-0" strokeWidth={1.5} />
-      <span className={`w-4 text-center text-[9px] font-mono font-bold ${STATUS_COLORS[file.status] ?? "text-theme-text-dim"}`}>
+      <FileText
+        className="w-3 h-3 text-theme-text-dimmer shrink-0"
+        strokeWidth={1.5}
+      />
+      <span
+        className={`w-4 text-center text-[9px] font-mono font-bold ${STATUS_COLORS[file.status] ?? "text-theme-text-dim"}`}
+      >
         {file.status}
       </span>
       <span className="text-theme-text truncate flex-1" title={file.path}>
@@ -395,7 +422,10 @@ function FileRow({
         )}
       </span>
       <button
-        onClick={(e) => { e.stopPropagation(); onClick(); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick();
+        }}
         className={`p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-white/8 ${iconColor} transition-all`}
         title={iconTitle}
       >
@@ -403,7 +433,10 @@ function FileRow({
       </button>
       {onDiscard && (
         <button
-          onClick={(e) => { e.stopPropagation(); onDiscard(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDiscard();
+          }}
           className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-red-500/15 text-red-400/60 transition-all"
           title="Discard"
         >

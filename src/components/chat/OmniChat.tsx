@@ -47,7 +47,9 @@ export function OmniChat() {
   const addBytesProcessed = useGameStore((s) => s.addBytesProcessed);
   const showDiffViewer = useGameStore((s) => s.showDiffViewer);
   const currentConversationId = useGameStore((s) => s.currentConversationId);
-  const setCurrentConversationId = useGameStore((s) => s.setCurrentConversationId);
+  const setCurrentConversationId = useGameStore(
+    (s) => s.setCurrentConversationId,
+  );
   const setConversations = useGameStore((s) => s.setConversations);
   const setMessages = useGameStore((s) => s.setMessages);
   const clearMessages = useGameStore((s) => s.clearMessages);
@@ -69,22 +71,33 @@ export function OmniChat() {
     async (convId?: string | null) => {
       const id = convId ?? currentConversationId;
       if (!id) return;
-      const msgs = useGameStore.getState().messages.filter(
-        (m) => m.type !== "action_log" && !["health_alert", "recall", "blast_radius", "command_result", "proactive_log", "intel_entry"].includes(m.type!)
-      );
+      const msgs = useGameStore
+        .getState()
+        .messages.filter(
+          (m) =>
+            m.type !== "action_log" &&
+            ![
+              "health_alert",
+              "recall",
+              "blast_radius",
+              "command_result",
+              "proactive_log",
+              "intel_entry",
+            ].includes(m.type!),
+        );
       try {
         const meta = await api.saveMessages(id, msgs);
         // Update conversation in list
         setConversations(
-          useGameStore.getState().conversations.map((c) =>
-            c.id === meta.id ? meta : c
-          )
+          useGameStore
+            .getState()
+            .conversations.map((c) => (c.id === meta.id ? meta : c)),
         );
       } catch {
         // save failed silently
       }
     },
-    [api, currentConversationId, setConversations]
+    [api, currentConversationId, setConversations],
   );
 
   // Ensure conversation exists, create if needed. Returns conversation id.
@@ -114,7 +127,7 @@ export function OmniChat() {
         // load failed
       }
     },
-    [api, saveCurrentMessages, setMessages, setCurrentConversationId]
+    [api, saveCurrentMessages, setMessages, setCurrentConversationId],
   );
 
   const handleDeleteConversation = useCallback(
@@ -139,12 +152,22 @@ export function OmniChat() {
         // delete failed
       }
     },
-    [api, currentConversationId, setConversations, setMessages, setCurrentConversationId, clearMessages]
+    [
+      api,
+      currentConversationId,
+      setConversations,
+      setMessages,
+      setCurrentConversationId,
+      clearMessages,
+    ],
   );
 
   const handleGitCommand = useCallback(
     async (cmd: string, args: string[] = []) => {
-      addActionLog({ action: `[EXECUTING]: ${cmd} ${args.join(" ")}`.trim(), status: "pending" });
+      addActionLog({
+        action: `[EXECUTING]: ${cmd} ${args.join(" ")}`.trim(),
+        status: "pending",
+      });
       try {
         const result = await api.execCommand(cmd, args);
         addActionLog({
@@ -152,10 +175,13 @@ export function OmniChat() {
           status: result.status === "success" ? "done" : "error",
         });
       } catch {
-        addActionLog({ action: "[FAULT]: Command execution failed", status: "error" });
+        addActionLog({
+          action: "[FAULT]: Command execution failed",
+          status: "error",
+        });
       }
     },
-    [api, addActionLog]
+    [api, addActionLog],
   );
 
   const handleSlashCommand = useCallback(
@@ -179,9 +205,10 @@ export function OmniChat() {
           addMessage({ role: "system", content: t("slash.noProject") });
           return true;
         }
-        const keys = projectScan.key_files.length > 0
-          ? projectScan.key_files.map((f) => `- ${f}`).join("\n")
-          : "No key files found";
+        const keys =
+          projectScan.key_files.length > 0
+            ? projectScan.key_files.map((f) => `- ${f}`).join("\n")
+            : "No key files found";
         const topTypes = Object.entries(projectScan.file_types)
           .slice(0, 8)
           .map(([ext, count]) => `${ext}: ${count}`)
@@ -225,7 +252,7 @@ export function OmniChat() {
       addMessage({ role: "system", content: t("slash.unknown") });
       return true;
     },
-    [addMessage, player, projectScan, t, handleGitCommand]
+    [addMessage, player, projectScan, t, handleGitCommand],
   );
 
   const handleSend = useCallback(
@@ -267,7 +294,11 @@ export function OmniChat() {
           if (projectScan) {
             projectCtx = `Project: ${projectScan.path}\nFiles: ${projectScan.total_files}`;
           }
-          const intelResult = await api.processIntelligence(actualText, "voice", projectCtx);
+          const intelResult = await api.processIntelligence(
+            actualText,
+            "voice",
+            projectCtx,
+          );
 
           // Play appropriate sound
           if (intelResult.clarifying_question) {
@@ -356,7 +387,10 @@ export function OmniChat() {
           const dateStr = match.session_date;
           let recallContent = `**${t("chronicle.recallPrefix", { date: dateStr })}**`;
           if (match.files.length > 0) {
-            recallContent += `\n\n**${t("chronicle.recallFiles")}:** ${match.files.slice(0, 5).map(f => `\`${f}\``).join(", ")}`;
+            recallContent += `\n\n**${t("chronicle.recallFiles")}:** ${match.files
+              .slice(0, 5)
+              .map((f) => `\`${f}\``)
+              .join(", ")}`;
           }
           if (match.actions.length > 0) {
             recallContent += `\n\n**${t("chronicle.recallActions")}:**`;
@@ -364,17 +398,26 @@ export function OmniChat() {
               recallContent += `\n- ${action}`;
             }
           }
-          addMessage({ role: "system", content: recallContent, type: "recall" });
+          addMessage({
+            role: "system",
+            content: recallContent,
+            type: "recall",
+          });
         }
       } catch {
         // recall failed silently — not critical
       }
 
-      const conversationMessages = useGameStore.getState().messages
-        .filter((m) => m.role === "user" || m.role === "assistant")
+      const conversationMessages = useGameStore
+        .getState()
+        .messages.filter((m) => m.role === "user" || m.role === "assistant")
         .slice(-20)
         .map((m) => {
-          const payload: { role: string; content: string; images?: ImageAttachment[] } = { role: m.role, content: m.content };
+          const payload: {
+            role: string;
+            content: string;
+            images?: ImageAttachment[];
+          } = { role: m.role, content: m.content };
           if (m.images && m.images.length > 0) payload.images = m.images;
           return payload;
         });
@@ -394,11 +437,18 @@ export function OmniChat() {
         const assistantMsgId = crypto.randomUUID();
         addMessage({ role: "assistant", content: "", id: assistantMsgId });
 
-        const response = await api.chatStream(conversationMessages, projectContext);
+        const response = await api.chatStream(
+          conversationMessages,
+          projectContext,
+        );
 
         if (!response.ok) {
           const err = await response.text();
-          console.error("[OmniChat] Stream response not ok:", response.status, err);
+          console.error(
+            "[OmniChat] Stream response not ok:",
+            response.status,
+            err,
+          );
           updateMessageById(assistantMsgId, t("ai.streamError") + `: ${err}`);
           setAiResponding(false);
           if (convId) saveCurrentMessages(convId);
@@ -449,7 +499,10 @@ export function OmniChat() {
               // Error event from backend
               if (data.type === "error") {
                 console.error("[OmniChat] Backend error event:", data.error);
-                updateMessageById(assistantMsgId, data.error || t("ai.streamError"));
+                updateMessageById(
+                  assistantMsgId,
+                  data.error || t("ai.streamError"),
+                );
                 break;
               }
 
@@ -474,7 +527,9 @@ export function OmniChat() {
 
               // Tool result event
               if (data.type === "tool_result") {
-                playSound(data.status === "success" ? "mission_complete" : "tool_error");
+                playSound(
+                  data.status === "success" ? "mission_complete" : "tool_error",
+                );
                 const displayName = getToolDisplayName(data.tool_name);
                 addActionLog({
                   action: `[DATA_ACQUIRED]: ${displayName} — ${data.summary}`,
@@ -512,15 +567,20 @@ export function OmniChat() {
                   try {
                     const p = await api.getStatus();
                     setPlayer(p);
-                  } catch { /* ignore */ }
+                  } catch {
+                    /* ignore */
+                  }
                 }
 
                 const statusLine = isFail
                   ? t("tool.cmdFailed", { hp: String(hpDamage) })
                   : t("tool.cmdSuccess");
-                const outputPreview = cmdOutput.length > 1500
-                  ? cmdOutput.slice(0, 750) + "\n...\n" + cmdOutput.slice(-500)
-                  : cmdOutput;
+                const outputPreview =
+                  cmdOutput.length > 1500
+                    ? cmdOutput.slice(0, 750) +
+                      "\n...\n" +
+                      cmdOutput.slice(-500)
+                    : cmdOutput;
 
                 let content = `**${statusLine}**\n\n\`\`\`\n$ ${command}\n${outputPreview}\n\`\`\``;
                 if (isFail) {
@@ -560,7 +620,9 @@ export function OmniChat() {
         }
       } catch (e) {
         console.error("[OmniChat] Stream error:", e);
-        updateLastMessage(t("ai.streamError") + (e instanceof Error ? `: ${e.message}` : ""));
+        updateLastMessage(
+          t("ai.streamError") + (e instanceof Error ? `: ${e.message}` : ""),
+        );
       }
 
       setAiResponding(false);
@@ -568,19 +630,39 @@ export function OmniChat() {
       // Auto-save after AI response completes
       if (convId) saveCurrentMessages(convId);
     },
-    [addMessage, api, setPlayer, triggerLevelUp, player.mp, settings.ai_provider, settings.anthropic_api_key, settings.auth_method, settings.oauth_access_token, settings.openai_api_key, settings.gemini_api_key, settings.custom_base_url, projectScan, handleSlashCommand, setAiResponding, updateLastMessage, addActionLog, addActionCard, addBytesProcessed, t, ensureConversation, saveCurrentMessages, playSound, sayText]
+    [
+      addMessage,
+      api,
+      setPlayer,
+      triggerLevelUp,
+      player.mp,
+      settings.ai_provider,
+      settings.anthropic_api_key,
+      settings.auth_method,
+      settings.oauth_access_token,
+      settings.openai_api_key,
+      settings.gemini_api_key,
+      settings.custom_base_url,
+      projectScan,
+      handleSlashCommand,
+      setAiResponding,
+      updateLastMessage,
+      addActionLog,
+      addActionCard,
+      addBytesProcessed,
+      t,
+      ensureConversation,
+      saveCurrentMessages,
+      playSound,
+      sayText,
+    ],
   );
 
   const handleApplyCode = useCallback(
     (code: string) => {
-      showDiffViewer(
-        "untitled",
-        t("diff.codeBlock"),
-        "",
-        code
-      );
+      showDiffViewer("untitled", t("diff.codeBlock"), "", code);
     },
-    [showDiffViewer, t]
+    [showDiffViewer, t],
   );
 
   return (
@@ -645,9 +727,18 @@ export function OmniChat() {
         {isAiResponding && (
           <div className="flex items-center gap-2 px-3 py-2">
             <div className="flex gap-1">
-              <span className="w-1 h-3 bg-theme-accent/60 rounded-sm animate-bounce" style={{ animationDelay: "0ms" }} />
-              <span className="w-1 h-3 bg-theme-accent/60 rounded-sm animate-bounce" style={{ animationDelay: "150ms" }} />
-              <span className="w-1 h-3 bg-theme-accent/60 rounded-sm animate-bounce" style={{ animationDelay: "300ms" }} />
+              <span
+                className="w-1 h-3 bg-theme-accent/60 rounded-sm animate-bounce"
+                style={{ animationDelay: "0ms" }}
+              />
+              <span
+                className="w-1 h-3 bg-theme-accent/60 rounded-sm animate-bounce"
+                style={{ animationDelay: "150ms" }}
+              />
+              <span
+                className="w-1 h-3 bg-theme-accent/60 rounded-sm animate-bounce"
+                style={{ animationDelay: "300ms" }}
+              />
             </div>
             <span className="text-[10px] text-theme-text-dim font-mono tracking-wider uppercase">
               {t("ai.thinking")}

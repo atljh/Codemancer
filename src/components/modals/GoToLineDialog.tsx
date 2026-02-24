@@ -43,7 +43,7 @@ export function GoToLineDialog() {
         setShow(false);
       }
     },
-    [goToLine, setShow]
+    [goToLine, setShow],
   );
 
   if (!isFile) return null;

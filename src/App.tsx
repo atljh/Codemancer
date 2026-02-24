@@ -13,7 +13,9 @@ function App() {
   const setProjectScan = useGameStore((s) => s.setProjectScan);
   const setAppReady = useGameStore((s) => s.setAppReady);
   const setConversations = useGameStore((s) => s.setConversations);
-  const setCurrentConversationId = useGameStore((s) => s.setCurrentConversationId);
+  const setCurrentConversationId = useGameStore(
+    (s) => s.setCurrentConversationId,
+  );
   const setMessages = useGameStore((s) => s.setMessages);
   const setFocusStatus = useGameStore((s) => s.setFocusStatus);
   const sessionStartTime = useGameStore((s) => s.sessionStartTime);
@@ -21,7 +23,10 @@ function App() {
   const api = useApi();
 
   useThemeEffect(theme);
-  const timersRef = useRef<{ hp?: ReturnType<typeof setInterval>; mp?: ReturnType<typeof setInterval> }>({});
+  const timersRef = useRef<{
+    hp?: ReturnType<typeof setInterval>;
+    mp?: ReturnType<typeof setInterval>;
+  }>({});
   const initRef = useRef(false);
 
   // Initialize
@@ -35,7 +40,7 @@ function App() {
       try {
         const settings = await api.getSettings();
         setSettings(settings);
-        locale = settings.locale as "en" | "ru" || "en";
+        locale = (settings.locale as "en" | "ru") || "en";
         if (settings.workspace_root) {
           setFileTreeRoot(settings.workspace_root);
 

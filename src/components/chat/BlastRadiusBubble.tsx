@@ -11,10 +11,16 @@ interface BlastRadiusBubbleProps {
 
 function formatTimestamp(ts: number): string {
   const d = new Date(ts);
-  return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return d.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 }
 
-export const BlastRadiusBubble = memo(function BlastRadiusBubble({ message }: BlastRadiusBubbleProps) {
+export const BlastRadiusBubble = memo(function BlastRadiusBubble({
+  message,
+}: BlastRadiusBubbleProps) {
   const { t } = useTranslation();
   const setActiveTab = useGameStore((s) => s.setActiveTab);
   const timestamp = formatTimestamp(message.timestamp);
@@ -31,7 +37,9 @@ export const BlastRadiusBubble = memo(function BlastRadiusBubble({ message }: Bl
       dependents = meta.dependents || [];
       high = meta.high || false;
       sourceFile = meta.file || "";
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   const borderColor = high ? "border-orange-500/25" : "border-theme-accent/15";
@@ -58,32 +66,44 @@ export const BlastRadiusBubble = memo(function BlastRadiusBubble({ message }: Bl
       className="flex gap-2.5"
     >
       {/* Icon */}
-      <div className={`w-7 h-7 rounded flex-shrink-0 flex items-center justify-center ${bgColor} border ${borderColor}`}>
+      <div
+        className={`w-7 h-7 rounded flex-shrink-0 flex items-center justify-center ${bgColor} border ${borderColor}`}
+      >
         <Crosshair className={`w-3.5 h-3.5 ${textColor}`} strokeWidth={1.5} />
       </div>
 
       {/* Body */}
-      <div className={`max-w-[95%] rounded-lg overflow-hidden border ${borderColor} ${bgColor} flex-1`}>
+      <div
+        className={`max-w-[95%] rounded-lg overflow-hidden border ${borderColor} ${bgColor} flex-1`}
+      >
         {/* Header */}
         <div className="flex items-center gap-2 px-3 py-2">
-          <span className={`text-[10px] font-bold tracking-wider ${headerColor}`}>
+          <span
+            className={`text-[10px] font-bold tracking-wider ${headerColor}`}
+          >
             [{timestamp}] [PRE_COMMIT_SCAN]
           </span>
-          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase border ${badgeColor}`}>
+          <span
+            className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase border ${badgeColor}`}
+          >
             {high ? "HIGH BLAST" : "SCAN"}
           </span>
         </div>
 
         {/* Message */}
         <div className="px-3 pb-2">
-          <p className={`text-[13px] font-mono leading-relaxed ${textColor}/90`}>
+          <p
+            className={`text-[13px] font-mono leading-relaxed ${textColor}/90`}
+          >
             {text}
           </p>
 
           {/* Dependent files list */}
           {dependents.length > 0 && (
             <div className="mt-2">
-              <span className={`text-[10px] font-bold tracking-wider uppercase ${headerColor}`}>
+              <span
+                className={`text-[10px] font-bold tracking-wider uppercase ${headerColor}`}
+              >
                 {t("blast.dependents")}:
               </span>
               <div className="mt-1 flex flex-wrap gap-1">

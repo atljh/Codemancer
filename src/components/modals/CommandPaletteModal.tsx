@@ -33,7 +33,7 @@ export function CommandPaletteModal() {
       (cmd) =>
         fuzzyMatch(query, t(cmd.labelKey as any)) ||
         fuzzyMatch(query, cmd.category) ||
-        fuzzyMatch(query, cmd.id)
+        fuzzyMatch(query, cmd.id),
     );
   }, [query, commands, t]);
 
@@ -61,7 +61,7 @@ export function CommandPaletteModal() {
       setShow(false);
       cmd.execute();
     },
-    [setShow]
+    [setShow],
   );
 
   const handleKeyDown = useCallback(
@@ -80,7 +80,7 @@ export function CommandPaletteModal() {
         setShow(false);
       }
     },
-    [filtered, selectedIndex, executeCommand, setShow]
+    [filtered, selectedIndex, executeCommand, setShow],
   );
 
   return (
@@ -104,7 +104,9 @@ export function CommandPaletteModal() {
           >
             {/* Input */}
             <div className="flex items-center gap-2 px-4 py-3 border-b border-theme-accent/10">
-              <span className="text-theme-accent text-sm font-mono font-bold">&gt;</span>
+              <span className="text-theme-accent text-sm font-mono font-bold">
+                &gt;
+              </span>
               <input
                 ref={inputRef}
                 value={query}
@@ -119,7 +121,10 @@ export function CommandPaletteModal() {
             </div>
 
             {/* Results */}
-            <div ref={listRef} className="overflow-y-auto max-h-[calc(60vh-52px)] scrollbar-thin">
+            <div
+              ref={listRef}
+              className="overflow-y-auto max-h-[calc(60vh-52px)] scrollbar-thin"
+            >
               {filtered.length === 0 ? (
                 <div className="px-4 py-6 text-center text-xs text-theme-text-dim font-mono">
                   {t("cmd.palette.noResults" as any)}
@@ -136,10 +141,15 @@ export function CommandPaletteModal() {
                         : "text-theme-text-dim hover:bg-theme-accent/5"
                     }`}
                   >
-                    <Terminal className="w-3.5 h-3.5 shrink-0 opacity-50" strokeWidth={1.5} />
+                    <Terminal
+                      className="w-3.5 h-3.5 shrink-0 opacity-50"
+                      strokeWidth={1.5}
+                    />
                     <div className="min-w-0 flex-1">
                       <span className="text-sm font-mono truncate block">
-                        <span className="text-theme-text-dim/60 text-xs">{cmd.category}: </span>
+                        <span className="text-theme-text-dim/60 text-xs">
+                          {cmd.category}:{" "}
+                        </span>
                         {t(cmd.labelKey as any)}
                       </span>
                     </div>

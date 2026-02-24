@@ -6,7 +6,11 @@ import type { Locale } from "../types/game";
 
 const PULSE_INTERVAL_MS = 5 * 60_000; // 5 minutes
 
-function t(locale: Locale, key: TranslationKey, params?: Record<string, string | number>): string {
+function t(
+  locale: Locale,
+  key: TranslationKey,
+  params?: Record<string, string | number>,
+): string {
   let text: string = translations[locale]?.[key] ?? translations.en[key] ?? key;
   if (params) {
     for (const [k, v] of Object.entries(params)) {
@@ -37,7 +41,8 @@ export function useProactivePulse() {
 
   useEffect(() => {
     const pulse = async () => {
-      const { settings, locale, isAiResponding, addMessage } = useGameStore.getState();
+      const { settings, locale, isAiResponding, addMessage } =
+        useGameStore.getState();
 
       // Skip if no workspace, AI is responding, or no workspace set
       if (!settings.workspace_root || isAiResponding) return;
@@ -47,7 +52,10 @@ export function useProactivePulse() {
         if (!result.has_findings || result.findings.length === 0) return;
 
         // Deduplicate: hash findings to avoid repeating same alert
-        const hash = result.findings.map((f) => `${f.type}:${f.message}`).sort().join("|");
+        const hash = result.findings
+          .map((f) => `${f.type}:${f.message}`)
+          .sort()
+          .join("|");
         if (hash === lastDiffHashRef.current) return;
         lastDiffHashRef.current = hash;
 
@@ -56,7 +64,11 @@ export function useProactivePulse() {
         lines.push("");
 
         if (result.changed_files > 0) {
-          lines.push(t(locale, "proactive.changedFiles", { count: result.changed_files }));
+          lines.push(
+            t(locale, "proactive.changedFiles", {
+              count: result.changed_files,
+            }),
+          );
           lines.push("");
         }
 

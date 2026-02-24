@@ -11,10 +11,16 @@ interface RecallBubbleProps {
 
 function formatTimestamp(ts: number): string {
   const d = new Date(ts);
-  return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return d.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 }
 
-export const RecallBubble = memo(function RecallBubble({ message }: RecallBubbleProps) {
+export const RecallBubble = memo(function RecallBubble({
+  message,
+}: RecallBubbleProps) {
   const timestamp = formatTimestamp(message.timestamp);
 
   return (
@@ -26,7 +32,10 @@ export const RecallBubble = memo(function RecallBubble({ message }: RecallBubble
     >
       {/* Icon */}
       <div className="w-7 h-7 rounded flex-shrink-0 flex items-center justify-center bg-theme-purple/15 border border-theme-purple/25">
-        <BrainCircuit className="w-3.5 h-3.5 text-theme-purple" strokeWidth={1.5} />
+        <BrainCircuit
+          className="w-3.5 h-3.5 text-theme-purple"
+          strokeWidth={1.5}
+        />
       </div>
 
       {/* Body */}
@@ -39,13 +48,25 @@ export const RecallBubble = memo(function RecallBubble({ message }: RecallBubble
             remarkPlugins={[remarkGfm]}
             components={{
               p({ children }) {
-                return <p className="whitespace-pre-wrap leading-relaxed text-[13px] mb-1.5 last:mb-0">{children}</p>;
+                return (
+                  <p className="whitespace-pre-wrap leading-relaxed text-[13px] mb-1.5 last:mb-0">
+                    {children}
+                  </p>
+                );
               },
               strong({ children }) {
-                return <strong className="font-bold text-theme-purple">{children}</strong>;
+                return (
+                  <strong className="font-bold text-theme-purple">
+                    {children}
+                  </strong>
+                );
               },
               ul({ children }) {
-                return <ul className="list-disc list-inside text-[13px] leading-relaxed mb-1.5 space-y-0.5">{children}</ul>;
+                return (
+                  <ul className="list-disc list-inside text-[13px] leading-relaxed mb-1.5 space-y-0.5">
+                    {children}
+                  </ul>
+                );
               },
               code({ children }) {
                 return (

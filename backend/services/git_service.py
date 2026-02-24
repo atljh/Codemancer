@@ -1,5 +1,4 @@
 import subprocess
-from pathlib import Path
 
 from models.git import (
     GitFileEntry,

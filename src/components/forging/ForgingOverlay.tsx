@@ -33,7 +33,10 @@ export function ForgingOverlay() {
               }}
               transition={{ duration: 1.5, repeat: Infinity }}
               className="w-24 h-24 rounded-full flex items-center justify-center"
-              style={{ background: "linear-gradient(to bottom right, var(--theme-accent), var(--theme-accent-dim))" }}
+              style={{
+                background:
+                  "linear-gradient(to bottom right, var(--theme-accent), var(--theme-accent-dim))",
+              }}
             >
               <Cpu className="w-12 h-12 text-theme-text-bright" />
             </motion.div>

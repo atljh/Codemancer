@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, FileText, Loader2, ChevronRight, Replace } from "lucide-react";
+import {
+  Search,
+  X,
+  FileText,
+  Loader2,
+  ChevronRight,
+  Replace,
+} from "lucide-react";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -25,7 +32,9 @@ export function SearchPanel() {
   const openFile = useGameStore((s) => s.openFile);
   const setActiveTab = useGameStore((s) => s.setActiveTab);
   const searchReplaceExpanded = useGameStore((s) => s.searchReplaceExpanded);
-  const setSearchReplaceExpanded = useGameStore((s) => s.setSearchReplaceExpanded);
+  const setSearchReplaceExpanded = useGameStore(
+    (s) => s.setSearchReplaceExpanded,
+  );
   const api = useApi();
   const { t } = useTranslation();
 
@@ -75,7 +84,7 @@ export function SearchPanel() {
         setLoading(false);
       }
     },
-    [api, fileTreeRoot]
+    [api, fileTreeRoot],
   );
 
   const handleChange = useCallback(
@@ -84,7 +93,7 @@ export function SearchPanel() {
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => doSearch(value), 300);
     },
-    [doSearch]
+    [doSearch],
   );
 
   const handleReplaceAll = useCallback(async () => {
@@ -112,7 +121,7 @@ export function SearchPanel() {
         // ignore
       }
     },
-    [api, openFile, setActiveTab]
+    [api, openFile, setActiveTab],
   );
 
   const handleKeyDown = useCallback(
@@ -125,7 +134,7 @@ export function SearchPanel() {
         doSearch(query);
       }
     },
-    [toggle, doSearch, query]
+    [toggle, doSearch, query],
   );
 
   // Group results by file
@@ -172,7 +181,10 @@ export function SearchPanel() {
                   strokeWidth={1.5}
                 />
               </button>
-              <Search className="w-3.5 h-3.5 text-theme-text-dim shrink-0" strokeWidth={1.5} />
+              <Search
+                className="w-3.5 h-3.5 text-theme-text-dim shrink-0"
+                strokeWidth={1.5}
+              />
               <input
                 ref={inputRef}
                 value={query}
@@ -182,7 +194,10 @@ export function SearchPanel() {
                 className="flex-1 bg-transparent text-xs font-mono text-theme-text placeholder:text-theme-text-dim/50 outline-none"
               />
               {loading && (
-                <Loader2 className="w-3.5 h-3.5 text-theme-accent animate-spin shrink-0" strokeWidth={1.5} />
+                <Loader2
+                  className="w-3.5 h-3.5 text-theme-accent animate-spin shrink-0"
+                  strokeWidth={1.5}
+                />
               )}
             </div>
 
@@ -197,7 +212,10 @@ export function SearchPanel() {
                   className="overflow-hidden border-b border-theme-accent/10"
                 >
                   <div className="flex items-center gap-2 px-3 py-2">
-                    <Replace className="w-3.5 h-3.5 text-theme-text-dim shrink-0 ml-[22px]" strokeWidth={1.5} />
+                    <Replace
+                      className="w-3.5 h-3.5 text-theme-text-dim shrink-0 ml-[22px]"
+                      strokeWidth={1.5}
+                    />
                     <input
                       value={replaceQuery}
                       onChange={(e) => setReplaceQuery(e.target.value)}
@@ -209,7 +227,9 @@ export function SearchPanel() {
                       disabled={replacing || !query.trim() || !replaceQuery}
                       className="text-[9px] font-mono px-2 py-0.5 rounded bg-theme-accent/20 text-theme-accent hover:bg-theme-accent/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shrink-0"
                     >
-                      {replacing ? t("search.replacing" as any) : t("search.replaceAll" as any)}
+                      {replacing
+                        ? t("search.replacing" as any)
+                        : t("search.replaceAll" as any)}
                     </button>
                   </div>
                 </motion.div>
@@ -229,9 +249,15 @@ export function SearchPanel() {
               ) : (
                 <>
                   {Object.entries(grouped).map(([filePath, matches]) => (
-                    <div key={filePath} className="border-b border-theme-accent/5">
+                    <div
+                      key={filePath}
+                      className="border-b border-theme-accent/5"
+                    >
                       <div className="flex items-center gap-1.5 px-3 py-1.5 bg-theme-bg-deep/30">
-                        <FileText className="w-3 h-3 text-theme-accent/60 shrink-0" strokeWidth={1.5} />
+                        <FileText
+                          className="w-3 h-3 text-theme-accent/60 shrink-0"
+                          strokeWidth={1.5}
+                        />
                         <span className="text-[10px] font-mono text-theme-accent/80 truncate">
                           {relativePath(filePath, fileTreeRoot)}
                         </span>

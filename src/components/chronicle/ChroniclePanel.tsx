@@ -79,7 +79,10 @@ export function ChroniclePanel() {
           className="fixed inset-0 z-50 flex items-center justify-center"
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={toggle} />
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={toggle}
+          />
 
           {/* Panel */}
           <motion.div
@@ -93,7 +96,10 @@ export function ChroniclePanel() {
               <h2 className="text-sm font-bold text-theme-accent tracking-widest uppercase font-display">
                 {t("chronicle.title")}
               </h2>
-              <button onClick={toggle} className="p-1 rounded hover:bg-white/8 text-theme-text-dim hover:text-theme-text">
+              <button
+                onClick={toggle}
+                className="p-1 rounded hover:bg-white/8 text-theme-text-dim hover:text-theme-text"
+              >
                 <X className="w-4 h-4" strokeWidth={1.5} />
               </button>
             </div>
@@ -101,51 +107,76 @@ export function ChroniclePanel() {
             {/* Timeline */}
             <div className="flex-1 overflow-y-auto scrollbar-thin px-4 py-3 min-h-0">
               {loading ? (
-                <div className="text-center text-theme-text-dim text-xs py-8">{t("health.scanning")}</div>
+                <div className="text-center text-theme-text-dim text-xs py-8">
+                  {t("health.scanning")}
+                </div>
               ) : events.length === 0 ? (
-                <div className="text-center text-theme-text-dim text-xs py-8">{t("chronicle.noEvents")}</div>
+                <div className="text-center text-theme-text-dim text-xs py-8">
+                  {t("chronicle.noEvents")}
+                </div>
               ) : (
                 <div className="relative pl-6">
                   {/* Timeline line */}
                   <div className="absolute left-2 top-0 bottom-0 w-px bg-[var(--theme-glass-border)]" />
 
                   {events.map((ev) => {
-                    const color = ACTION_COLORS[ev.action_type] || "var(--theme-text-dim)";
+                    const color =
+                      ACTION_COLORS[ev.action_type] || "var(--theme-text-dim)";
                     return (
                       <div key={ev.id} className="relative mb-3 group">
                         {/* Dot */}
                         <div
                           className="absolute -left-[16px] top-1 w-2.5 h-2.5 rounded-full border-2"
-                          style={{ borderColor: color, backgroundColor: `color-mix(in srgb, ${color} 30%, transparent)` }}
+                          style={{
+                            borderColor: color,
+                            backgroundColor: `color-mix(in srgb, ${color} 30%, transparent)`,
+                          }}
                         />
                         {/* Content */}
                         <div className="glass-panel rounded px-3 py-2">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-[9px] font-mono text-theme-text-dimmer flex items-center gap-1">
-                              <Clock className="w-2.5 h-2.5" strokeWidth={1.5} />
+                              <Clock
+                                className="w-2.5 h-2.5"
+                                strokeWidth={1.5}
+                              />
                               {formatTime(ev.timestamp)}
                             </span>
                             <span
                               className="text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
-                              style={{ color, backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)` }}
+                              style={{
+                                color,
+                                backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)`,
+                              }}
                             >
                               {ev.action_type}
                             </span>
                             {ev.exp_gained > 0 && (
                               <span className="text-[9px] font-mono text-theme-accent flex items-center gap-0.5 ml-auto">
-                                <Zap className="w-2.5 h-2.5" strokeWidth={1.5} />
+                                <Zap
+                                  className="w-2.5 h-2.5"
+                                  strokeWidth={1.5}
+                                />
                                 +{ev.exp_gained}
                               </span>
                             )}
                           </div>
                           {ev.description && (
-                            <p className="text-[11px] text-theme-text-dim">{ev.description}</p>
+                            <p className="text-[11px] text-theme-text-dim">
+                              {ev.description}
+                            </p>
                           )}
                           {ev.files_affected.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-1">
                               {ev.files_affected.map((f) => (
-                                <span key={f} className="text-[9px] font-mono text-theme-text-dimmer flex items-center gap-0.5">
-                                  <FileText className="w-2 h-2" strokeWidth={1.5} />
+                                <span
+                                  key={f}
+                                  className="text-[9px] font-mono text-theme-text-dimmer flex items-center gap-0.5"
+                                >
+                                  <FileText
+                                    className="w-2 h-2"
+                                    strokeWidth={1.5}
+                                  />
                                   {f.split("/").pop()}
                                 </span>
                               ))}
@@ -183,7 +214,9 @@ export function ChroniclePanel() {
                   disabled={generating || events.length === 0}
                   className="ml-auto text-[10px] font-bold font-mono px-3 py-1 rounded bg-theme-accent/15 text-theme-accent hover:bg-theme-accent/25 transition-colors disabled:opacity-40 tracking-wider"
                 >
-                  {generating ? t("chronicle.generating") : t("chronicle.generateReport")}
+                  {generating
+                    ? t("chronicle.generating")
+                    : t("chronicle.generateReport")}
                 </button>
               </div>
 
@@ -199,7 +232,11 @@ export function ChroniclePanel() {
                     className="absolute top-2 right-2 p-1 rounded bg-theme-accent/10 hover:bg-theme-accent/20 text-theme-accent transition-colors"
                     title={t("chronicle.copy")}
                   >
-                    {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                    {copied ? (
+                      <Check className="w-3 h-3" />
+                    ) : (
+                      <Copy className="w-3 h-3" />
+                    )}
                   </button>
                 </div>
               )}

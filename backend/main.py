@@ -14,6 +14,7 @@ from routes import health as health_route
 from routes import dependency as dependency_route
 from routes import proactive as proactive_route
 from routes import telegram as telegram_route
+from routes import repair as repair_route
 from services.file_service import FileService
 
 STATE_FILE = Path(__file__).parent / "state.json"
@@ -89,6 +90,7 @@ app.include_router(health_route.router)
 app.include_router(dependency_route.router)
 app.include_router(proactive_route.router)
 app.include_router(telegram_route.router)
+app.include_router(repair_route.router)
 
 @app.get("/health")
 async def health():

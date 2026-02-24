@@ -15,8 +15,26 @@ import { useTranslation } from "../../hooks/useTranslation";
 import type { FileTreeNode } from "../../types/game";
 
 const CODE_EXTENSIONS = new Set([
-  "ts", "tsx", "js", "jsx", "py", "rs", "go", "java", "c", "cpp", "h",
-  "css", "scss", "html", "json", "yaml", "yml", "toml", "md", "sh",
+  "ts",
+  "tsx",
+  "js",
+  "jsx",
+  "py",
+  "rs",
+  "go",
+  "java",
+  "c",
+  "cpp",
+  "h",
+  "css",
+  "scss",
+  "html",
+  "json",
+  "yaml",
+  "yml",
+  "toml",
+  "md",
+  "sh",
 ]);
 
 function getFileIcon(name: string) {
@@ -84,7 +102,10 @@ export function FileExplorer() {
             className="p-1 rounded hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent transition-colors"
             title={t("explorer.refresh")}
           >
-            <RefreshCw className={`w-3 h-3 ${loading ? "animate-spin" : ""}`} strokeWidth={1.5} />
+            <RefreshCw
+              className={`w-3 h-3 ${loading ? "animate-spin" : ""}`}
+              strokeWidth={1.5}
+            />
           </button>
         </div>
 
@@ -101,7 +122,12 @@ export function FileExplorer() {
             </div>
           )}
           {fileTree.map((node) => (
-            <TreeNode key={node.path} node={node} depth={0} onFileClick={handleFileClick} />
+            <TreeNode
+              key={node.path}
+              node={node}
+              depth={0}
+              onFileClick={handleFileClick}
+            />
           ))}
         </div>
       </div>
@@ -132,16 +158,31 @@ function TreeNode({
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
         >
           {expanded ? (
-            <ChevronDown className="w-3 h-3 text-theme-text-dimmer shrink-0" strokeWidth={1.5} />
+            <ChevronDown
+              className="w-3 h-3 text-theme-text-dimmer shrink-0"
+              strokeWidth={1.5}
+            />
           ) : (
-            <ChevronRight className="w-3 h-3 text-theme-text-dimmer shrink-0" strokeWidth={1.5} />
+            <ChevronRight
+              className="w-3 h-3 text-theme-text-dimmer shrink-0"
+              strokeWidth={1.5}
+            />
           )}
-          <FolderIcon className="w-3.5 h-3.5 text-theme-accent/70 shrink-0" strokeWidth={1.5} />
+          <FolderIcon
+            className="w-3.5 h-3.5 text-theme-accent/70 shrink-0"
+            strokeWidth={1.5}
+          />
           <span className="text-theme-text-dim truncate">{node.name}</span>
         </button>
-        {expanded && node.children.map((child) => (
-          <TreeNode key={child.path} node={child} depth={depth + 1} onFileClick={onFileClick} />
-        ))}
+        {expanded &&
+          node.children.map((child) => (
+            <TreeNode
+              key={child.path}
+              node={child}
+              depth={depth + 1}
+              onFileClick={onFileClick}
+            />
+          ))}
       </div>
     );
   }

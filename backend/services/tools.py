@@ -1,7 +1,7 @@
 import os
 import re
 import subprocess
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 from services.file_service import FileService, SKIP_DIRS
@@ -269,7 +269,7 @@ class ToolExecutor:
                 tool_name="search_text",
                 status="error",
                 content=f"Invalid regex: {e}",
-                summary=f"Invalid regex pattern",
+                summary="Invalid regex pattern",
             )
 
         import fnmatch
@@ -330,7 +330,7 @@ class ToolExecutor:
                     tool_id=tool_id, tool_name="run_command",
                     status="error",
                     content=f"Blocked: command contains '{blocked}'",
-                    summary=f"Command blocked for safety",
+                    summary="Command blocked for safety",
                 )
 
         # Security: must match an allowed prefix

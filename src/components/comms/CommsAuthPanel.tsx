@@ -7,7 +7,14 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 export function CommsAuthPanel() {
   const { t } = useTranslation();
-  const { authState, qrUrl, startPhoneAuth, submitPhoneCode, submitPassword, startQrAuth } = useTelegram();
+  const {
+    authState,
+    qrUrl,
+    startPhoneAuth,
+    submitPhoneCode,
+    submitPassword,
+    startQrAuth,
+  } = useTelegram();
   const [mode, setMode] = useState<"qr" | "phone">("qr");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
@@ -57,7 +64,10 @@ export function CommsAuthPanel() {
           </p>
           <div className="flex gap-2">
             <div className="relative flex-1">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-theme-text-dimmer" strokeWidth={1.5} />
+              <Lock
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-theme-text-dimmer"
+                strokeWidth={1.5}
+              />
               <input
                 type="password"
                 value={password}
@@ -124,13 +134,23 @@ export function CommsAuthPanel() {
             {authState === "qr_pending" ? (
               <>
                 {qrUrl ? (
-                  <canvas ref={canvasRef} width={200} height={200} className="rounded border border-[var(--theme-glass-border)]" />
+                  <canvas
+                    ref={canvasRef}
+                    width={200}
+                    height={200}
+                    className="rounded border border-[var(--theme-glass-border)]"
+                  />
                 ) : (
                   <div className="w-[200px] h-[200px] rounded border border-[var(--theme-glass-border)] flex items-center justify-center bg-theme-bg-base">
-                    <Loader2 className="w-6 h-6 text-theme-accent animate-spin" strokeWidth={1.5} />
+                    <Loader2
+                      className="w-6 h-6 text-theme-accent animate-spin"
+                      strokeWidth={1.5}
+                    />
                   </div>
                 )}
-                <p className="text-[10px] text-theme-text-dim font-mono">{t("comms.qrScan")}</p>
+                <p className="text-[10px] text-theme-text-dim font-mono">
+                  {t("comms.qrScan")}
+                </p>
               </>
             ) : (
               <motion.button

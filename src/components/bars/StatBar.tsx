@@ -37,7 +37,13 @@ const colorMap = {
   },
 };
 
-export function StatBar({ label, current, max, color, className = "" }: StatBarProps) {
+export function StatBar({
+  label,
+  current,
+  max,
+  color,
+  className = "",
+}: StatBarProps) {
   const pct = max > 0 ? current / max : 0;
   const filledSegments = Math.round(pct * SEGMENTS);
   const c = colorMap[color];
@@ -46,7 +52,9 @@ export function StatBar({ label, current, max, color, className = "" }: StatBarP
   return (
     <div className={`space-y-0.5 ${className}`}>
       <div className="flex justify-between items-center">
-        <span className={`text-[10px] font-bold tracking-widest uppercase ${c.text}`}>
+        <span
+          className={`text-[10px] font-bold tracking-widest uppercase ${c.text}`}
+        >
           {label}
         </span>
         <span className="text-[10px] text-theme-text-dim font-mono tabular-nums">
@@ -68,9 +76,13 @@ export function StatBar({ label, current, max, color, className = "" }: StatBarP
                 ? `${c.filled} ${isLow ? "animate-bar-pulse" : ""}`
                 : "bg-theme-bg-empty"
             }`}
-            style={i < filledSegments ? {
-              boxShadow: `0 0 3px color-mix(in srgb, ${c.shadowColor} 40%, transparent)`,
-            } : undefined}
+            style={
+              i < filledSegments
+                ? {
+                    boxShadow: `0 0 3px color-mix(in srgb, ${c.shadowColor} 40%, transparent)`,
+                  }
+                : undefined
+            }
           />
         ))}
       </div>

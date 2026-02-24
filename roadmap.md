@@ -5,11 +5,12 @@ Codemancer = visual companion для CLI-инструментов вроде Cla
 
 ---
 
-## v0.2 — Visual Git *(current)*
+## v0.2 — Visual Git _(current)_
 
 Цель: полноценный visual git клиент внутри Codemancer.
 
 ### Phase 1: Git Status Panel
+
 - [ ] Новый компонент `GitPanel` — боковая панель (или tab) с git-информацией
 - [ ] Backend: `GET /api/git/status` — parsed git status (staged, unstaged, untracked файлы со статусами)
 - [ ] Backend: `GET /api/git/branch` — текущая ветка, список локальных/remote веток
@@ -18,12 +19,14 @@ Codemancer = visual companion для CLI-инструментов вроде Cla
 - [ ] Quick commit: inline поле для commit message + кнопка Commit
 
 ### Phase 2: Visual Diff
+
 - [ ] Backend: `POST /api/git/diff` — diff для конкретного файла (staged/unstaged)
 - [ ] Интеграция с существующим `DiffViewerModal` — показ git diff в side-by-side виде
 - [ ] Клик по файлу в GitPanel → открывает diff
 - [ ] Hunk-level staging: stage отдельные куски изменений
 
 ### Phase 3: Branch Management
+
 - [ ] UI: dropdown/drawer со списком веток
 - [ ] Создание новой ветки (от текущей или от выбранного коммита)
 - [ ] Переключение между ветками (checkout)
@@ -31,18 +34,21 @@ Codemancer = visual companion для CLI-инструментов вроде Cla
 - [ ] Визуальное предупреждение при uncommitted changes перед checkout
 
 ### Phase 4: Commit History
+
 - [ ] Backend: `GET /api/git/log` — parsed commit log (hash, author, date, message, refs)
 - [ ] UI: вертикальный timeline коммитов с branch graph (линии веток)
 - [ ] Клик по коммиту → просмотр diff этого коммита
 - [ ] Фильтр по ветке, автору, файлу
 
 ### Phase 5: Merge & Conflicts
+
 - [ ] UI для merge: выбрать ветку → preview → merge
 - [ ] Visual conflict resolver: three-way merge (ours / theirs / result)
 - [ ] Интеграция с AI: "Resolve this conflict" через чат
 - [ ] Cherry-pick отдельных коммитов
 
 ### Phase 6: Stash & Advanced
+
 - [ ] Stash list, stash apply/drop/pop
 - [ ] Interactive rebase UI (reorder, squash, edit)
 - [ ] Git blame — аннотации в просмотре файла

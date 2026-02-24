@@ -112,6 +112,94 @@
   --theme-exp-hue-start: 40;
 }
 
+/* ── Hacker — Matrix green monochrome ── */
+[data-theme="hacker"] {
+  --theme-bg-deep: #020a02;
+  --theme-bg-base: #061208;
+  --theme-bg-elevated: #0a1a0a;
+  --theme-bg-inset: #010601;
+  --theme-bg-empty: #0d240d;
+
+  --theme-accent: #00ff41;
+  --theme-accent-dim: #00b330;
+  --theme-accent-rgb: 0, 255, 65;
+  --theme-accent-hue: 135;
+
+  --theme-text: #33ff66;
+  --theme-text-dim: #1a8a2e;
+  --theme-text-dimmer: #0d5a1a;
+  --theme-text-bright: #80ffaa;
+
+  --theme-status-success: #00ff41;
+  --theme-status-warning: #66ff00;
+  --theme-status-error: #ff0040;
+
+  --theme-glass-bg: rgba(6, 18, 8, 0.9);
+  --theme-glass-bg-bright: rgba(10, 26, 10, 0.92);
+  --theme-glass-border: rgba(0, 255, 65, 0.12);
+  --theme-glass-border-bright: rgba(0, 255, 65, 0.2);
+
+  --theme-grid-color: rgba(0, 255, 65, 0.04);
+  --theme-grid-line: rgba(0, 255, 65, 0.025);
+  --theme-corner-color: rgba(0, 255, 65, 0.4);
+
+  --theme-purple: #00cc33;
+  --theme-purple-dim: #009926;
+  --theme-exp-hue-start: 135;
+}
+
+/* Matrix scanline + phosphor glow for hacker theme */
+[data-theme="hacker"] .tactical-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 65, 0.015) 2px,
+    rgba(0, 255, 65, 0.015) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-theme="hacker"] .tactical-grid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 255, 65, 0.03) 50%,
+    transparent 100%
+  );
+  background-size: 100% 8px;
+  animation: matrix-scanline 8s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes matrix-scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+[data-theme="hacker"] * {
+  text-shadow: 0 0 6px rgba(0, 255, 65, 0.15);
+}
+
+[data-theme="hacker"] .glass-panel,
+[data-theme="hacker"] .glass-panel-bright {
+  box-shadow:
+    inset 0 0 30px rgba(0, 255, 65, 0.02),
+    0 0 15px rgba(0, 255, 65, 0.03);
+}
+
 /* ── Arctic — Light cold steel ── */
 [data-theme="arctic"] {
   --theme-bg-deep: #f0f4f8;

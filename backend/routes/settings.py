@@ -30,6 +30,7 @@ DEFAULT_SETTINGS = {
     "custom_model": "",
     "telegram_api_id": "",
     "telegram_api_hash": "",
+    "sound_pack": "default",
 }
 
 
@@ -54,6 +55,7 @@ class AppSettings(BaseModel):
     custom_model: str = ""
     telegram_api_id: str = ""
     telegram_api_hash: str = ""
+    sound_pack: str = "default"
 
 
 def load_settings() -> dict:

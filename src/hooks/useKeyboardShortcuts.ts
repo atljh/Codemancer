@@ -14,7 +14,10 @@ function getZoom(): number {
 }
 
 function setZoom(level: number) {
-  const clamped = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(level * 100) / 100));
+  const clamped = Math.min(
+    ZOOM_MAX,
+    Math.max(ZOOM_MIN, Math.round(level * 100) / 100),
+  );
   localStorage.setItem(ZOOM_KEY, String(clamped));
   document.documentElement.style.zoom = String(clamped);
 }
@@ -46,14 +49,46 @@ export function useKeyboardShortcuts() {
       // --- Escape chain (no mod required) ---
       if (e.key === "Escape") {
         const s = useGameStore.getState();
-        if (s.showCommandPalette) { s.setShowCommandPalette(false); e.preventDefault(); return; }
-        if (s.showQuickOpen) { s.toggleQuickOpen(); e.preventDefault(); return; }
-        if (s.showGoToLine) { s.setShowGoToLine(false); e.preventDefault(); return; }
-        if (s.showSearchPanel) { s.toggleSearchPanel(); e.preventDefault(); return; }
-        if (s.showSettings) { s.toggleSettings(); e.preventDefault(); return; }
-        if (s.diffViewer.show) { s.closeDiffViewer(); e.preventDefault(); return; }
-        if (s.showChronicle) { s.toggleChronicle(); e.preventDefault(); return; }
-        if (s.showHealthPanel) { s.toggleHealthPanel(); e.preventDefault(); return; }
+        if (s.showCommandPalette) {
+          s.setShowCommandPalette(false);
+          e.preventDefault();
+          return;
+        }
+        if (s.showQuickOpen) {
+          s.toggleQuickOpen();
+          e.preventDefault();
+          return;
+        }
+        if (s.showGoToLine) {
+          s.setShowGoToLine(false);
+          e.preventDefault();
+          return;
+        }
+        if (s.showSearchPanel) {
+          s.toggleSearchPanel();
+          e.preventDefault();
+          return;
+        }
+        if (s.showSettings) {
+          s.toggleSettings();
+          e.preventDefault();
+          return;
+        }
+        if (s.diffViewer.show) {
+          s.closeDiffViewer();
+          e.preventDefault();
+          return;
+        }
+        if (s.showChronicle) {
+          s.toggleChronicle();
+          e.preventDefault();
+          return;
+        }
+        if (s.showHealthPanel) {
+          s.toggleHealthPanel();
+          e.preventDefault();
+          return;
+        }
         return;
       }
 
@@ -189,8 +224,15 @@ export function useKeyboardShortcuts() {
           e.preventDefault();
           const s = useGameStore.getState();
           const name = `untitled-${Date.now()}.txt`;
-          const path = s.fileTreeRoot ? `${s.fileTreeRoot}/${name}` : `/tmp/${name}`;
-          s.openFile({ path, content: "", language: "plaintext", isDirty: true });
+          const path = s.fileTreeRoot
+            ? `${s.fileTreeRoot}/${name}`
+            : `/tmp/${name}`;
+          s.openFile({
+            path,
+            content: "",
+            language: "plaintext",
+            isDirty: true,
+          });
           s.setActiveTab(path);
           break;
         }
@@ -289,7 +331,8 @@ export function useKeyboardShortcuts() {
         case "9": {
           e.preventDefault();
           const num = parseInt(e.key, 10);
-          const { openFiles, setActiveTab: switchTab } = useGameStore.getState();
+          const { openFiles, setActiveTab: switchTab } =
+            useGameStore.getState();
           if (num === 1) {
             switchTab("chat");
           } else if (num === 2) {
@@ -333,7 +376,9 @@ async function openProjectDialog() {
   const newSettings = { ...state.settings, workspace_root: path };
   try {
     await api.updateSettings(newSettings);
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   state.setSettings(newSettings);
   state.setFileTreeRoot(path);
 
@@ -341,17 +386,23 @@ async function openProjectDialog() {
   try {
     const scan = await api.scanProject(path);
     state.setProjectScan(scan);
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 
   // Load file tree
   try {
     const tree = await api.getFileTree(path);
     state.setFileTree(tree);
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 
   // Refresh player
   try {
     const player = await api.getStatus();
     state.setPlayer(player);
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }

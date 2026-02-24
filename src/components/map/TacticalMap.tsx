@@ -32,7 +32,10 @@ export function TacticalMap() {
   const bountyZoneFiles = useGameStore((s) => s.bountyZoneFiles);
   const bountyZoneSource = useGameStore((s) => s.bountyZoneSource);
   const clearBountyZone = useGameStore((s) => s.clearBountyZone);
-  const openFilePaths = useMemo(() => new Set(openFiles.map((f) => f.path)), [openFiles]);
+  const openFilePaths = useMemo(
+    () => new Set(openFiles.map((f) => f.path)),
+    [openFiles],
+  );
   const blastSet = useMemo(() => new Set(blastRadiusFiles), [blastRadiusFiles]);
   const bountySet = useMemo(() => new Set(bountyZoneFiles), [bountyZoneFiles]);
 
@@ -101,9 +104,14 @@ export function TacticalMap() {
     (e: React.MouseEvent<SVGSVGElement>) => {
       if (e.button !== 0) return;
       setIsPanning(true);
-      panStart.current = { x: e.clientX, y: e.clientY, vx: viewBox.x, vy: viewBox.y };
+      panStart.current = {
+        x: e.clientX,
+        y: e.clientY,
+        vx: viewBox.x,
+        vy: viewBox.y,
+      };
     },
-    [viewBox.x, viewBox.y]
+    [viewBox.x, viewBox.y],
   );
 
   const onMouseMove = useCallback(
@@ -112,9 +120,13 @@ export function TacticalMap() {
       const dx = e.clientX - panStart.current.x;
       const dy = e.clientY - panStart.current.y;
       const scale = viewBox.w / dimensions.width;
-      setViewBox((v) => ({ ...v, x: panStart.current.vx - dx * scale, y: panStart.current.vy - dy * scale }));
+      setViewBox((v) => ({
+        ...v,
+        x: panStart.current.vx - dx * scale,
+        y: panStart.current.vy - dy * scale,
+      }));
     },
-    [isPanning, viewBox.w, dimensions.width]
+    [isPanning, viewBox.w, dimensions.width],
   );
 
   const onMouseUp = useCallback(() => setIsPanning(false), []);
@@ -124,14 +136,20 @@ export function TacticalMap() {
       e.preventDefault();
       const factor = e.deltaY > 0 ? 1.1 : 0.9;
       setViewBox((v) => {
-        const nw = Math.max(dimensions.width * 0.3, Math.min(dimensions.width * 3, v.w * factor));
-        const nh = Math.max(dimensions.height * 0.3, Math.min(dimensions.height * 3, v.h * factor));
+        const nw = Math.max(
+          dimensions.width * 0.3,
+          Math.min(dimensions.width * 3, v.w * factor),
+        );
+        const nh = Math.max(
+          dimensions.height * 0.3,
+          Math.min(dimensions.height * 3, v.h * factor),
+        );
         const cx = v.x + v.w / 2;
         const cy = v.y + v.h / 2;
         return { x: cx - nw / 2, y: cy - nh / 2, w: nw, h: nh };
       });
     },
-    [dimensions]
+    [dimensions],
   );
 
   const handleNodeClick = async (nodeId: string) => {
@@ -139,10 +157,17 @@ export function TacticalMap() {
       // Second click: open file
       const node = nodes.find((n) => n.id === nodeId);
       if (node) {
-        const fullPath = workspaceRoot ? `${workspaceRoot}/${node.path}` : node.path;
+        const fullPath = workspaceRoot
+          ? `${workspaceRoot}/${node.path}`
+          : node.path;
         try {
           const result = await api.readFile(fullPath);
-          openFile({ path: fullPath, content: result.content, language: result.language, isDirty: false });
+          openFile({
+            path: fullPath,
+            content: result.content,
+            language: result.language,
+            isDirty: false,
+          });
           setActiveTab(fullPath);
         } catch {
           // ignore
@@ -159,13 +184,16 @@ export function TacticalMap() {
     setSelectedNode(null);
   };
 
-  const nodeRadius = (lines: number) => Math.max(6, Math.min(24, Math.sqrt(lines) * 0.8));
+  const nodeRadius = (lines: number) =>
+    Math.max(6, Math.min(24, Math.sqrt(lines) * 0.8));
 
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="w-6 h-6 border border-theme-accent/40 border-t-theme-accent rounded-full animate-spin" />
-        <span className="ml-3 text-xs text-theme-text-dim font-mono">{t("map.loading")}</span>
+        <span className="ml-3 text-xs text-theme-text-dim font-mono">
+          {t("map.loading")}
+        </span>
       </div>
     );
   }
@@ -187,13 +215,18 @@ export function TacticalMap() {
   }
 
   return (
-    <div ref={containerRef} className="flex-1 relative overflow-hidden bg-theme-bg-deep">
+    <div
+      ref={containerRef}
+      className="flex-1 relative overflow-hidden bg-theme-bg-deep"
+    >
       {/* Controls */}
       <div className="absolute top-2 right-2 z-10 flex gap-1">
         <button
           onClick={() => setFogOfWar(!fogOfWar)}
           className={`text-[9px] font-mono px-2 py-1 rounded transition-colors ${
-            fogOfWar ? "bg-theme-accent/15 text-theme-accent" : "bg-white/5 text-theme-text-dim"
+            fogOfWar
+              ? "bg-theme-accent/15 text-theme-accent"
+              : "bg-white/5 text-theme-text-dim"
           }`}
         >
           {t("map.fogOfWar")}
@@ -223,21 +256,25 @@ export function TacticalMap() {
       </div>
 
       {/* Tooltip */}
-      {activeId && (() => {
-        const ln = nodeMap.get(activeId);
-        const nd = nodes.find((n) => n.id === activeId);
-        if (!ln || !nd) return null;
-        const deps = edges.filter((e) => e.source === activeId).length;
-        const depBy = edges.filter((e) => e.target === activeId).length;
-        return (
-          <div className="absolute bottom-3 left-3 z-10 glass-panel rounded px-3 py-2 max-w-[320px]">
-            <div className="text-[10px] font-mono text-theme-accent font-bold truncate">{nd.path}</div>
-            <div className="text-[9px] font-mono text-theme-text-dim mt-0.5">
-              {nd.lines} {t("map.lines")} | {deps} {t("map.dependents")} | {depBy} {t("map.dependencies")}
+      {activeId &&
+        (() => {
+          const ln = nodeMap.get(activeId);
+          const nd = nodes.find((n) => n.id === activeId);
+          if (!ln || !nd) return null;
+          const deps = edges.filter((e) => e.source === activeId).length;
+          const depBy = edges.filter((e) => e.target === activeId).length;
+          return (
+            <div className="absolute bottom-3 left-3 z-10 glass-panel rounded px-3 py-2 max-w-[320px]">
+              <div className="text-[10px] font-mono text-theme-accent font-bold truncate">
+                {nd.path}
+              </div>
+              <div className="text-[9px] font-mono text-theme-text-dim mt-0.5">
+                {nd.lines} {t("map.lines")} | {deps} {t("map.dependents")} |{" "}
+                {depBy} {t("map.dependencies")}
+              </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
       <svg
         width="100%"
@@ -259,8 +296,20 @@ export function TacticalMap() {
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-          <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-            <path d="M0,0 L10,5 L0,10" fill="var(--theme-accent)" opacity="0.3" />
+          <marker
+            id="arrow"
+            viewBox="0 0 10 10"
+            refX="10"
+            refY="5"
+            markerWidth="5"
+            markerHeight="5"
+            orient="auto"
+          >
+            <path
+              d="M0,0 L10,5 L0,10"
+              fill="var(--theme-accent)"
+              opacity="0.3"
+            />
           </marker>
         </defs>
 
@@ -270,7 +319,8 @@ export function TacticalMap() {
           const tgt = nodeMap.get(e.target);
           if (!s || !tgt) return null;
 
-          const isHighlighted = activeId && (e.source === activeId || e.target === activeId);
+          const isHighlighted =
+            activeId && (e.source === activeId || e.target === activeId);
           let opacity = 0.06;
           let stroke = "var(--theme-text-dim)";
           if (isHighlighted) {
@@ -301,7 +351,9 @@ export function TacticalMap() {
         {/* Nodes */}
         {layoutNodes.map((ln) => {
           const r = nodeRadius(ln.node.lines);
-          const fullNodePath = workspaceRoot ? `${workspaceRoot}/${ln.node.path}` : ln.node.path;
+          const fullNodePath = workspaceRoot
+            ? `${workspaceRoot}/${ln.node.path}`
+            : ln.node.path;
           const isOpen = openFilePaths.has(fullNodePath);
           const isActive = ln.id === activeId;
           const isDependent = dependentsOf.has(ln.id);
@@ -310,7 +362,14 @@ export function TacticalMap() {
           const isBlastTarget = blastSet.has(ln.id);
           const isBountySource = ln.id === bountyZoneSource;
           const isBountyTarget = bountySet.has(ln.id);
-          const showLabel = isActive || isDependent || isDependency || isBlastSource || isBlastTarget || isBountySource || isBountyTarget;
+          const showLabel =
+            isActive ||
+            isDependent ||
+            isDependency ||
+            isBlastSource ||
+            isBlastTarget ||
+            isBountySource ||
+            isBountyTarget;
 
           let fill = "var(--theme-accent)";
           // If fog of war is on but no files are open, show all nodes normally
@@ -361,7 +420,11 @@ export function TacticalMap() {
                 stroke={fill}
                 strokeWidth={isActive ? 2 : 1}
                 filter={isActive ? "url(#map-glow)" : undefined}
-                className={(isBountySource || isBountyTarget) ? "animate-bounty-pulse" : undefined}
+                className={
+                  isBountySource || isBountyTarget
+                    ? "animate-bounty-pulse"
+                    : undefined
+                }
               />
               {showLabel && (
                 <text

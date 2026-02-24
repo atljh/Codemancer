@@ -22,8 +22,13 @@ export function CommsPanel() {
           animate={{ opacity: 1, y: 0 }}
           className="glass-panel rounded-lg p-6 text-center tactical-corners"
         >
-          <WifiOff className="w-8 h-8 text-theme-text-dimmer mx-auto mb-3" strokeWidth={1} />
-          <p className="text-xs text-theme-text-dim font-mono mb-4">{t("comms.noApiCredentials")}</p>
+          <WifiOff
+            className="w-8 h-8 text-theme-text-dimmer mx-auto mb-3"
+            strokeWidth={1}
+          />
+          <p className="text-xs text-theme-text-dim font-mono mb-4">
+            {t("comms.noApiCredentials")}
+          </p>
           <button
             onClick={toggleSettings}
             className="flex items-center gap-2 mx-auto px-4 py-2 rounded glass-panel-bright text-theme-accent text-xs font-mono font-bold tracking-[0.1em] uppercase hover:bg-theme-accent/8 transition-colors"

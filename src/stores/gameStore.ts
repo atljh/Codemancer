@@ -106,10 +106,15 @@ interface GameState {
   bountyZoneFiles: string[];
   bountyZoneSource: string | null;
 
+  // Self-repair
+  selfRepairActive: boolean;
+
   // Actions
   setPlayer: (player: Player) => void;
   setQuests: (quests: Quest[]) => void;
-  addMessage: (msg: Omit<ChatMessage, "id" | "timestamp"> & { id?: string }) => void;
+  addMessage: (
+    msg: Omit<ChatMessage, "id" | "timestamp"> & { id?: string },
+  ) => void;
   triggerLevelUp: (level: number) => void;
   dismissLevelUp: () => void;
   setForging: (v: boolean) => void;
@@ -125,7 +130,12 @@ interface GameState {
   resetLinesWritten: () => void;
 
   // Diff viewer actions
-  showDiffViewer: (filePath: string, fileName: string, oldContent: string, newContent: string) => void;
+  showDiffViewer: (
+    filePath: string,
+    fileName: string,
+    oldContent: string,
+    newContent: string,
+  ) => void;
   closeDiffViewer: () => void;
 
   // Message helpers
@@ -205,6 +215,9 @@ interface GameState {
   setCommsMessages: (msgs: TelegramMessage[]) => void;
   setBountyZone: (source: string, files: string[]) => void;
   clearBountyZone: () => void;
+
+  // Self-repair actions
+  setSelfRepairActive: (v: boolean) => void;
 }
 
 const defaultPlayer: Player = {
@@ -240,6 +253,7 @@ const defaultSettings: AppSettings = {
   custom_model: "",
   telegram_api_id: "",
   telegram_api_hash: "",
+  sound_pack: "default",
 };
 
 export const useGameStore = create<GameState>((set) => ({
@@ -258,7 +272,13 @@ export const useGameStore = create<GameState>((set) => ({
   lastSaveTime: null,
   sessionStartTime: Date.now(),
 
-  diffViewer: { show: false, filePath: "", fileName: "", oldContent: "", newContent: "" },
+  diffViewer: {
+    show: false,
+    filePath: "",
+    fileName: "",
+    oldContent: "",
+    newContent: "",
+  },
 
   locale: "en",
   settings: defaultSettings,
@@ -295,6 +315,7 @@ export const useGameStore = create<GameState>((set) => ({
   commsMessages: [],
   bountyZoneFiles: [],
   bountyZoneSource: null,
+  selfRepairActive: false,
 
   setPlayer: (player) => set({ player }),
   setQuests: (quests) => set({ quests }),
@@ -329,19 +350,21 @@ export const useGameStore = create<GameState>((set) => ({
       const filtered = s.openFiles.filter((f) => f.path !== path);
       const newCurrent =
         s.currentFile?.path === path
-          ? filtered[filtered.length - 1] ?? null
+          ? (filtered[filtered.length - 1] ?? null)
           : s.currentFile;
       const newActiveTab =
-        s.activeTab === path
-          ? (newCurrent?.path ?? "chat")
-          : s.activeTab;
-      return { openFiles: filtered, currentFile: newCurrent, activeTab: newActiveTab };
+        s.activeTab === path ? (newCurrent?.path ?? "chat") : s.activeTab;
+      return {
+        openFiles: filtered,
+        currentFile: newCurrent,
+        activeTab: newActiveTab,
+      };
     }),
 
   updateFileContent: (path, content) =>
     set((s) => {
       const openFiles = s.openFiles.map((f) =>
-        f.path === path ? { ...f, content, isDirty: true } : f
+        f.path === path ? { ...f, content, isDirty: true } : f,
       );
       const currentFile =
         s.currentFile?.path === path
@@ -353,7 +376,7 @@ export const useGameStore = create<GameState>((set) => ({
   markFileSaved: (path) =>
     set((s) => {
       const openFiles = s.openFiles.map((f) =>
-        f.path === path ? { ...f, isDirty: false } : f
+        f.path === path ? { ...f, isDirty: false } : f,
       );
       const currentFile =
         s.currentFile?.path === path
@@ -371,7 +394,9 @@ export const useGameStore = create<GameState>((set) => ({
   resetLinesWritten: () => set({ linesWritten: 0 }),
 
   showDiffViewer: (filePath, fileName, oldContent, newContent) =>
-    set({ diffViewer: { show: true, filePath, fileName, oldContent, newContent } }),
+    set({
+      diffViewer: { show: true, filePath, fileName, oldContent, newContent },
+    }),
 
   closeDiffViewer: () =>
     set((s) => ({ diffViewer: { ...s.diffViewer, show: false } })),
@@ -418,16 +443,13 @@ export const useGameStore = create<GameState>((set) => ({
 
   updateMessageById: (id, content) =>
     set((s) => ({
-      messages: s.messages.map((m) =>
-        m.id === id ? { ...m, content } : m
-      ),
+      messages: s.messages.map((m) => (m.id === id ? { ...m, content } : m)),
     })),
 
   setLocale: (locale) =>
     set((s) => ({ locale, settings: { ...s.settings, locale } })),
 
-  setSettings: (settings) =>
-    set({ settings, locale: settings.locale }),
+  setSettings: (settings) => set({ settings, locale: settings.locale }),
 
   toggleSettings: () => set((s) => ({ showSettings: !s.showSettings })),
 
@@ -441,7 +463,8 @@ export const useGameStore = create<GameState>((set) => ({
   setAppReady: (v) => set({ appReady: v }),
 
   // File explorer actions
-  toggleFileExplorer: () => set((s) => ({ showFileExplorer: !s.showFileExplorer })),
+  toggleFileExplorer: () =>
+    set((s) => ({ showFileExplorer: !s.showFileExplorer })),
   setActiveTab: (tab) => set({ activeTab: tab }),
 
   // Git panel actions
@@ -458,19 +481,24 @@ export const useGameStore = create<GameState>((set) => ({
   toggleChronicle: () => set((s) => ({ showChronicle: !s.showChronicle })),
 
   // Health panel
-  toggleHealthPanel: () => set((s) => ({ showHealthPanel: !s.showHealthPanel })),
+  toggleHealthPanel: () =>
+    set((s) => ({ showHealthPanel: !s.showHealthPanel })),
   setLastHealthAlertHash: (hash) => set({ lastHealthAlertHash: hash }),
 
   // Blast radius
-  setBlastRadius: (source, files) => set({ blastRadiusSource: source, blastRadiusFiles: files }),
-  clearBlastRadius: () => set({ blastRadiusSource: null, blastRadiusFiles: [] }),
+  setBlastRadius: (source, files) =>
+    set({ blastRadiusSource: source, blastRadiusFiles: files }),
+  clearBlastRadius: () =>
+    set({ blastRadiusSource: null, blastRadiusFiles: [] }),
 
   // Quick open & search
   toggleQuickOpen: () => set((s) => ({ showQuickOpen: !s.showQuickOpen })),
-  toggleSearchPanel: () => set((s) => ({ showSearchPanel: !s.showSearchPanel })),
+  toggleSearchPanel: () =>
+    set((s) => ({ showSearchPanel: !s.showSearchPanel })),
 
   // Command palette & go to line
-  toggleCommandPalette: () => set((s) => ({ showCommandPalette: !s.showCommandPalette })),
+  toggleCommandPalette: () =>
+    set((s) => ({ showCommandPalette: !s.showCommandPalette })),
   setShowCommandPalette: (v) => set({ showCommandPalette: v }),
   toggleGoToLine: () => set((s) => ({ showGoToLine: !s.showGoToLine })),
   setShowGoToLine: (v) => set({ showGoToLine: v }),
@@ -492,6 +520,10 @@ export const useGameStore = create<GameState>((set) => ({
   setCommsDialogs: (dialogs) => set({ commsDialogs: dialogs }),
   setCommsActiveDialogId: (id) => set({ commsActiveDialogId: id }),
   setCommsMessages: (msgs) => set({ commsMessages: msgs }),
-  setBountyZone: (source, files) => set({ bountyZoneSource: source, bountyZoneFiles: files }),
+  setBountyZone: (source, files) =>
+    set({ bountyZoneSource: source, bountyZoneFiles: files }),
   clearBountyZone: () => set({ bountyZoneSource: null, bountyZoneFiles: [] }),
+
+  // Self-repair
+  setSelfRepairActive: (v) => set({ selfRepairActive: v }),
 }));

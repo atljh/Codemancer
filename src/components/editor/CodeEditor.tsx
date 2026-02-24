@@ -4,7 +4,10 @@ import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useEditorRef } from "../../hooks/useEditorRef";
 import { useTranslation } from "../../hooks/useTranslation";
-import { registerMonacoThemes, getMonacoThemeName } from "../../themes/monacoThemes";
+import {
+  registerMonacoThemes,
+  getMonacoThemeName,
+} from "../../themes/monacoThemes";
 import type { ThemeId } from "../../types/game";
 
 export function CodeEditor() {
@@ -57,7 +60,9 @@ export function CodeEditor() {
       editorRef.current?.getAction("actions.find")?.run();
     };
     const onReplace = () => {
-      editorRef.current?.getAction("editor.action.startFindReplaceAction")?.run();
+      editorRef.current
+        ?.getAction("editor.action.startFindReplaceAction")
+        ?.run();
     };
     window.addEventListener("codemancer:editor-find", onFind);
     window.addEventListener("codemancer:editor-replace", onReplace);

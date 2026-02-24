@@ -1,4 +1,9 @@
-import { createContext, useContext, useRef, type MutableRefObject } from "react";
+import {
+  createContext,
+  useContext,
+  useRef,
+  type MutableRefObject,
+} from "react";
 import type { editor } from "monaco-editor";
 
 type EditorRef = MutableRefObject<editor.IStandaloneCodeEditor | null>;
@@ -16,6 +21,7 @@ export function EditorRefProvider({ children }: { children: React.ReactNode }) {
 
 export function useEditorRef(): EditorRef {
   const ctx = useContext(EditorRefContext);
-  if (!ctx) throw new Error("useEditorRef must be used within EditorRefProvider");
+  if (!ctx)
+    throw new Error("useEditorRef must be used within EditorRefProvider");
   return ctx;
 }

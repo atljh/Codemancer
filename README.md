@@ -21,36 +21,46 @@ While your AI agent operates files and terminal, you see the big picture:
 ## Key Features
 
 ### The Tactical Map
+
 Interactive dependency graph with "fog of war" effect. See the **Blast Radius** of your changes before they break the system. Orange highlights show affected modules when the AI writes files.
 
 ### Agentic Tools (The Hands)
+
 The agent has full access to `list_files`, `read_file`, `write_file`, `search_text`, and `run_command`. It doesn't just advise — it executes. Failed commands deal HP damage; the agent proposes repair plans automatically.
 
 ### Health & Tech Debt Radar
+
 Radar diagram of anomalies. Turn refactoring into clearing "red zones" of complexity and tech debt. Background health watch alerts you when critical anomalies are detected: `[CRITICAL_ANOMALY]: Instability detected in sector src/logic`.
 
 ### Session Chronicle
+
 Automatic knowledge base of all your actions. Generate PR reports and standups in one click. **Cross-session memory** — the agent recalls previous work on the same code: `[RECALLING_DATA]: We previously worked on this module...`
 
 ### Proactive Assistant (Ambient Thinking)
+
 Background pulse every 5 minutes analyzes `git diff` and error patterns. If something important is found, the agent initiates dialogue: `[PROACTIVE_LOG]: Background analysis complete. Redundancy detected. Operator, shall we stabilize?`
 
 ### Neural Voice Link
+
 Voice input via microphone button in the command line. Web Speech API TTS voices AI responses. Procedural audio engine: scanning tones on tool use, glitch noise on errors, success chimes on completion.
 
 ### Deep Dive Mode
+
 RPG focus timer with experience multiplier (x2 EXP). Working in flow restores your mental "Mana".
 
 ### Visual Presence Effects
+
 Animated waveform in the header pulses when the AI is thinking. When HP drops below 20%, the entire UI gets a glitch distortion effect with a red vignette — your systems are failing, Operator.
 
 ### RPG Progression System
+
 - **EXP & Levels** — earn experience for coding actions (messages, commits, bug fixes, file saves)
 - **HP / MP** — HP drains from failed commands, MP spent on tool use
 - **Focus Mode** — Pomodoro-style timer with x2 EXP multiplier
 - **Level-up notifications** with visual effects
 
 ### AI Chat Assistant
+
 - **Multi-provider support** — Anthropic Claude, OpenAI GPT, Google Gemini, Custom (Ollama, local LLMs)
 - **Streaming responses** with tool use integration
 - **Persistent conversations** — auto-saved, restorable across sessions
@@ -58,6 +68,7 @@ Animated waveform in the header pulses when the AI is thinking. When HP drops be
 - **Tactical personality** — the agent addresses you as "Operator" and reports in analytical style with confidence percentages
 
 ### Built-in Code Editor
+
 - **Monaco Editor** with 4 sci-fi themes
 - **Tab-based multi-file editing**
 - **Syntax validation** (Python, JavaScript, TypeScript)
@@ -65,6 +76,7 @@ Animated waveform in the header pulses when the AI is thinking. When HP drops be
 - **File explorer** with tree navigation
 
 ### Visual Git Client
+
 - **Git status panel** — staged, unstaged, untracked files with status icons
 - **Stage/unstage** individual files
 - **Inline commit** with message input
@@ -72,6 +84,7 @@ Animated waveform in the header pulses when the AI is thinking. When HP drops be
 - **Discard changes** per file
 
 ### Productivity Tools
+
 - **Command Palette** (Cmd+K) — 20+ built-in commands
 - **Quick Open** (Cmd+P) — fuzzy file search
 - **Search in files** with result preview
@@ -79,6 +92,7 @@ Animated waveform in the header pulses when the AI is thinking. When HP drops be
 - **Quest system** — auto-scan TODOs/FIXMEs and turn them into quests
 
 ### Theming & Localization
+
 - **4 themes**: Dark Ops (cyan), Midnight (blue), Phantom (amber), Arctic (light blue)
 - **2 languages**: English, Russian
 - **Sci-fi / tactical aesthetic** with glass morphism effects
@@ -234,12 +248,12 @@ The built app will be in `src-tauri/target/release/bundle/`.
 
 On first launch, open **Settings** (gear icon) and configure your AI provider:
 
-| Provider | What you need |
-|----------|--------------|
-| **Anthropic** | API key or OAuth (sign in with Anthropic account) |
-| **OpenAI** | API key from platform.openai.com |
-| **Gemini** | API key from ai.google.dev |
-| **Custom** | Any OpenAI-compatible endpoint URL (Ollama, LM Studio, etc.) |
+| Provider      | What you need                                                |
+| ------------- | ------------------------------------------------------------ |
+| **Anthropic** | API key or OAuth (sign in with Anthropic account)            |
+| **OpenAI**    | API key from platform.openai.com                             |
+| **Gemini**    | API key from ai.google.dev                                   |
+| **Custom**    | Any OpenAI-compatible endpoint URL (Ollama, LM Studio, etc.) |
 
 ### Workspace
 
@@ -247,32 +261,32 @@ Select your project directory via the folder icon in the top bar. Codemancer wil
 
 ## EXP System
 
-| Action | EXP |
-|--------|-----|
-| Send message | +10 |
-| Save file | +5 |
-| Apply code | +50 |
-| Fix bug | +100 |
-| Git commit | variable |
-| Tool execution | +15-25 |
-| Focus mode | x2 multiplier |
+| Action         | EXP           |
+| -------------- | ------------- |
+| Send message   | +10           |
+| Save file      | +5            |
+| Apply code     | +50           |
+| Fix bug        | +100          |
+| Git commit     | variable      |
+| Tool execution | +15-25        |
+| Focus mode     | x2 multiplier |
 
 **Level formula**: `level = floor(sqrt(total_exp / 100))`
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Desktop Shell | Tauri 2.0 (Rust) |
-| Frontend | React 19, TypeScript, Vite 7 |
-| Styling | Tailwind CSS 4.2, Framer Motion 12 |
-| State | Zustand 5 |
-| Editor | Monaco Editor |
-| Audio | Web Audio API (procedural), Web Speech API (TTS/STT) |
-| Icons | Lucide React |
-| Backend | Python 3.12+, FastAPI, Uvicorn |
-| AI SDKs | anthropic, openai, google-genai |
-| Package Managers | pnpm (frontend), uv (backend), cargo (Rust) |
+| Layer            | Technology                                           |
+| ---------------- | ---------------------------------------------------- |
+| Desktop Shell    | Tauri 2.0 (Rust)                                     |
+| Frontend         | React 19, TypeScript, Vite 7                         |
+| Styling          | Tailwind CSS 4.2, Framer Motion 12                   |
+| State            | Zustand 5                                            |
+| Editor           | Monaco Editor                                        |
+| Audio            | Web Audio API (procedural), Web Speech API (TTS/STT) |
+| Icons            | Lucide React                                         |
+| Backend          | Python 3.12+, FastAPI, Uvicorn                       |
+| AI SDKs          | anthropic, openai, google-genai                      |
+| Package Managers | pnpm (frontend), uv (backend), cargo (Rust)          |
 
 ## What's Next
 

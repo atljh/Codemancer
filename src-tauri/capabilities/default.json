@@ -9,9 +9,7 @@
     "shell:default",
     {
       "identifier": "shell:allow-execute",
-      "allow": [
-        { "name": "python-backend" }
-      ]
+      "allow": [{ "name": "python-backend" }]
     },
     "shell:allow-spawn",
     "shell:allow-kill",

@@ -66,7 +66,9 @@ export function AppLayout() {
 
   return (
     <EditorRefProvider>
-      <div className={`h-screen w-screen flex flex-col bg-theme-bg-deep text-theme-text overflow-hidden ${isLowHp ? "low-hp-glitch" : ""}`}>
+      <div
+        className={`h-screen w-screen flex flex-col bg-theme-bg-deep text-theme-text overflow-hidden ${isLowHp ? "low-hp-glitch" : ""}`}
+      >
         {/* Tactical grid background */}
         <div className="tactical-grid" />
         {/* Scanline overlay */}
@@ -86,11 +88,17 @@ export function AppLayout() {
             </AnimatePresence>
             <div className="flex-1 flex flex-col min-w-0">
               <EditorTabs />
-              {activeTab === "chat" ? <OmniChat /> : activeTab === "map" ? <TacticalMap /> : activeTab === "comms" ? <CommsPanel /> : <CodeEditor />}
+              {activeTab === "chat" ? (
+                <OmniChat />
+              ) : activeTab === "map" ? (
+                <TacticalMap />
+              ) : activeTab === "comms" ? (
+                <CommsPanel />
+              ) : (
+                <CodeEditor />
+              )}
             </div>
-            <AnimatePresence>
-              {showGitPanel && <GitPanel />}
-            </AnimatePresence>
+            <AnimatePresence>{showGitPanel && <GitPanel />}</AnimatePresence>
           </main>
         </div>
       </div>

@@ -33,10 +33,14 @@ export function ExpBar() {
               animate={{ opacity: 1, scaleY: 1 }}
               transition={{ duration: 0.3, delay: i * 0.015 }}
               className={`flex-1 rounded-[1px] ${!isFilled ? "bg-theme-bg-empty" : ""}`}
-              style={isFilled ? {
-                backgroundColor: `hsl(${hue}, 80%, 55%)`,
-                boxShadow: `0 0 4px hsla(${hue}, 80%, 55%, 0.5)`,
-              } : undefined}
+              style={
+                isFilled
+                  ? {
+                      backgroundColor: `hsl(${hue}, 80%, 55%)`,
+                      boxShadow: `0 0 4px hsla(${hue}, 80%, 55%, 0.5)`,
+                    }
+                  : undefined
+              }
             />
           );
         })}

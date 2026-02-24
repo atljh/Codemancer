@@ -58,7 +58,9 @@ export function QuickOpenModal() {
 
   const filtered = useMemo(() => {
     if (!query.trim()) return allFiles.slice(0, 50);
-    return allFiles.filter((f) => fuzzyMatch(query, f.name) || fuzzyMatch(query, f.path)).slice(0, 50);
+    return allFiles
+      .filter((f) => fuzzyMatch(query, f.name) || fuzzyMatch(query, f.path))
+      .slice(0, 50);
   }, [query, allFiles]);
 
   useEffect(() => {
@@ -69,7 +71,10 @@ export function QuickOpenModal() {
 
       // Load file tree if not yet loaded
       if (fileTree.length === 0 && workspaceRoot) {
-        api.getFileTree(workspaceRoot).then((tree) => setFileTree(tree)).catch(() => {});
+        api
+          .getFileTree(workspaceRoot)
+          .then((tree) => setFileTree(tree))
+          .catch(() => {});
       }
     }
   }, [show, fileTree.length, workspaceRoot, api, setFileTree]);
@@ -97,7 +102,7 @@ export function QuickOpenModal() {
         // ignore
       }
     },
-    [api, openFile, setActiveTab, toggle]
+    [api, openFile, setActiveTab, toggle],
   );
 
   const handleKeyDown = useCallback(
@@ -116,7 +121,7 @@ export function QuickOpenModal() {
         toggle();
       }
     },
-    [filtered, selectedIndex, handleOpen, toggle]
+    [filtered, selectedIndex, handleOpen, toggle],
   );
 
   return (
@@ -140,7 +145,10 @@ export function QuickOpenModal() {
           >
             {/* Search input */}
             <div className="flex items-center gap-2 px-4 py-3 border-b border-theme-accent/10">
-              <Search className="w-4 h-4 text-theme-text-dim shrink-0" strokeWidth={1.5} />
+              <Search
+                className="w-4 h-4 text-theme-text-dim shrink-0"
+                strokeWidth={1.5}
+              />
               <input
                 ref={inputRef}
                 value={query}
@@ -155,7 +163,10 @@ export function QuickOpenModal() {
             </div>
 
             {/* Results */}
-            <div ref={listRef} className="overflow-y-auto max-h-[calc(60vh-52px)] scrollbar-thin">
+            <div
+              ref={listRef}
+              className="overflow-y-auto max-h-[calc(60vh-52px)] scrollbar-thin"
+            >
               {filtered.length === 0 ? (
                 <div className="px-4 py-6 text-center text-xs text-theme-text-dim font-mono">
                   {t("quickOpen.noResults")}
@@ -172,9 +183,14 @@ export function QuickOpenModal() {
                         : "text-theme-text-dim hover:bg-theme-accent/5"
                     }`}
                   >
-                    <File className="w-3.5 h-3.5 shrink-0 opacity-50" strokeWidth={1.5} />
+                    <File
+                      className="w-3.5 h-3.5 shrink-0 opacity-50"
+                      strokeWidth={1.5}
+                    />
                     <div className="min-w-0 flex-1">
-                      <span className="text-sm font-mono truncate block">{node.name}</span>
+                      <span className="text-sm font-mono truncate block">
+                        {node.name}
+                      </span>
                       <span className="text-[10px] text-theme-text-dim/60 font-mono truncate block">
                         {relativePath(node.path, fileTreeRoot)}
                       </span>

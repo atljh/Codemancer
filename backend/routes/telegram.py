@@ -48,7 +48,7 @@ async def analyze_message(req: TelegramAnalyzeRequest):
 
     user_msg = f"Message from {req.sender_name}: {req.message_text}"
     if req.project_files:
-        user_msg += f"\n\nProject files:\n" + "\n".join(req.project_files)
+        user_msg += "\n\nProject files:\n" + "\n".join(req.project_files)
     if req.project_context:
         user_msg += f"\n\nProject context:\n{req.project_context}"
 

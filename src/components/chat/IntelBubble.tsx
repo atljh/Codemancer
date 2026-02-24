@@ -29,8 +29,10 @@ export function IntelBubble({ message }: IntelBubbleProps) {
     intent = message.content;
   }
 
-  const sourceTag = source === "voice" ? t("intel.voiceTag") : t("intel.textTag");
-  const sourceColor = source === "voice" ? "text-theme-status-error" : "text-theme-accent";
+  const sourceTag =
+    source === "voice" ? t("intel.voiceTag") : t("intel.textTag");
+  const sourceColor =
+    source === "voice" ? "text-theme-status-error" : "text-theme-accent";
 
   return (
     <motion.div
@@ -42,11 +44,16 @@ export function IntelBubble({ message }: IntelBubbleProps) {
       <div className="glass-panel rounded-lg p-3 border border-theme-accent/15">
         {/* Header */}
         <div className="flex items-center gap-2 mb-2">
-          <BrainCircuit className="w-3.5 h-3.5 text-theme-accent shrink-0" strokeWidth={1.5} />
+          <BrainCircuit
+            className="w-3.5 h-3.5 text-theme-accent shrink-0"
+            strokeWidth={1.5}
+          />
           <span className="text-[9px] font-mono uppercase tracking-widest text-theme-accent/70">
             {t("intel.processed")}
           </span>
-          <span className={`text-[8px] font-mono uppercase tracking-wider ${sourceColor} ml-auto px-1.5 py-0.5 rounded bg-current/10`}>
+          <span
+            className={`text-[8px] font-mono uppercase tracking-wider ${sourceColor} ml-auto px-1.5 py-0.5 rounded bg-current/10`}
+          >
             {sourceTag}
           </span>
         </div>
@@ -67,15 +74,23 @@ export function IntelBubble({ message }: IntelBubbleProps) {
         {subtasks.length > 0 && (
           <div className="mb-2">
             <div className="flex items-center gap-1 mb-1">
-              <ListChecks className="w-3 h-3 text-theme-accent/50" strokeWidth={1.5} />
+              <ListChecks
+                className="w-3 h-3 text-theme-accent/50"
+                strokeWidth={1.5}
+              />
               <span className="text-[8px] font-mono uppercase tracking-wider text-theme-text-dimmer">
                 {t("intel.subtasks")}
               </span>
             </div>
             <ul className="space-y-0.5 pl-4">
               {subtasks.map((task, i) => (
-                <li key={i} className="text-[10px] font-mono text-theme-text/80 flex items-start gap-1.5">
-                  <span className="text-theme-accent/40 shrink-0">{i + 1}.</span>
+                <li
+                  key={i}
+                  className="text-[10px] font-mono text-theme-text/80 flex items-start gap-1.5"
+                >
+                  <span className="text-theme-accent/40 shrink-0">
+                    {i + 1}.
+                  </span>
                   {task}
                 </li>
               ))}
@@ -87,7 +102,10 @@ export function IntelBubble({ message }: IntelBubbleProps) {
         {question && (
           <div className="mt-2 pt-2 border-t border-theme-accent/10">
             <div className="flex items-center gap-1.5">
-              <HelpCircle className="w-3 h-3 text-theme-status-warning shrink-0" strokeWidth={1.5} />
+              <HelpCircle
+                className="w-3 h-3 text-theme-status-warning shrink-0"
+                strokeWidth={1.5}
+              />
               <span className="text-[8px] font-mono uppercase tracking-wider text-theme-status-warning/70">
                 {t("intel.question")}
               </span>

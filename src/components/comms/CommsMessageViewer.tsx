@@ -19,7 +19,9 @@ export function CommsMessageViewer() {
   const { playSound, sayText } = useAudio();
 
   const [analyzingId, setAnalyzingId] = useState<number | null>(null);
-  const [analyses, setAnalyses] = useState<Record<number, TelegramAnalysis>>({});
+  const [analyses, setAnalyses] = useState<Record<number, TelegramAnalysis>>(
+    {},
+  );
   const [extractingId, setExtractingId] = useState<number | null>(null);
   const [glowActive, setGlowActive] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -45,14 +47,15 @@ export function CommsMessageViewer() {
         msg.text,
         msg.senderName,
         "",
-        projectFiles
+        projectFiles,
       );
       setAnalyses((prev) => ({ ...prev, [msg.id]: result }));
       playSound("data_burst");
 
       if (result.has_references && result.linked_files.length > 0) {
         setBountyZone(result.linked_files[0], result.linked_files);
-        const sector = result.linked_files[0].split("/").pop() ?? result.linked_files[0];
+        const sector =
+          result.linked_files[0].split("/").pop() ?? result.linked_files[0];
         sayText(t("comms.signalReceived").replace("{sector}", sector));
       }
     } catch {
@@ -71,7 +74,7 @@ export function CommsMessageViewer() {
         msg.text,
         msg.senderName,
         analysis.linked_files,
-        analysis.quest_suggestion
+        analysis.quest_suggestion,
       );
       setQuests([...quests, quest]);
       playSound("mission_complete");
@@ -84,7 +87,11 @@ export function CommsMessageViewer() {
 
   const formatTime = (ts: number) => {
     const d = new Date(ts * 1000);
-    return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    return d.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
   };
 
   if (!activeDialogId) {
@@ -109,16 +116,26 @@ export function CommsMessageViewer() {
         ref={scrollRef}
         className="flex-1 overflow-y-auto scrollbar-thin p-3 space-y-1 transition-shadow duration-800"
         style={{
-          boxShadow: glowActive ? "inset 0 0 20px rgba(var(--theme-accent-rgb), 0.2)" : "none",
+          boxShadow: glowActive
+            ? "inset 0 0 20px rgba(var(--theme-accent-rgb), 0.2)"
+            : "none",
         }}
       >
         {messages.map((msg) => {
           const analysis = analyses[msg.id];
           return (
             <div key={msg.id} className="group">
-              <div className={`font-mono text-[11px] leading-relaxed ${msg.out ? "text-theme-text-dim" : "text-theme-text"}`}>
-                <span className="text-theme-text-dimmer">[{formatTime(msg.date)}]</span>{" "}
-                <span className={msg.out ? "text-theme-accent-dim" : "text-theme-accent"}>
+              <div
+                className={`font-mono text-[11px] leading-relaxed ${msg.out ? "text-theme-text-dim" : "text-theme-text"}`}
+              >
+                <span className="text-theme-text-dimmer">
+                  [{formatTime(msg.date)}]
+                </span>{" "}
+                <span
+                  className={
+                    msg.out ? "text-theme-accent-dim" : "text-theme-accent"
+                  }
+                >
                   [{msg.out ? "OUT" : msg.senderName || "SRC"}]
                 </span>
                 : {msg.text}
@@ -133,9 +150,18 @@ export function CommsMessageViewer() {
                     className="flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-mono tracking-wider border border-theme-accent/15 text-theme-accent/70 hover:bg-theme-accent/8 hover:text-theme-accent transition-all disabled:opacity-50"
                   >
                     {analyzingId === msg.id ? (
-                      <><Loader2 className="w-2.5 h-2.5 animate-spin" strokeWidth={1.5} />{t("comms.analyzing")}</>
+                      <>
+                        <Loader2
+                          className="w-2.5 h-2.5 animate-spin"
+                          strokeWidth={1.5}
+                        />
+                        {t("comms.analyzing")}
+                      </>
                     ) : (
-                      <><SearchIcon className="w-2.5 h-2.5" strokeWidth={1.5} />{t("comms.analyze")}</>
+                      <>
+                        <SearchIcon className="w-2.5 h-2.5" strokeWidth={1.5} />
+                        {t("comms.analyze")}
+                      </>
                     )}
                   </button>
 
@@ -161,7 +187,10 @@ export function CommsMessageViewer() {
                     exit={{ opacity: 0, height: 0 }}
                     className="mt-1 mb-1 flex items-center gap-1.5 px-2 py-1 rounded bg-theme-status-warning/5 border border-theme-status-warning/15"
                   >
-                    <Link className="w-3 h-3 text-theme-status-warning shrink-0" strokeWidth={1.5} />
+                    <Link
+                      className="w-3 h-3 text-theme-status-warning shrink-0"
+                      strokeWidth={1.5}
+                    />
                     <span className="text-[9px] font-mono text-theme-status-warning tracking-wider font-bold">
                       {t("comms.linkedSector")}:
                     </span>

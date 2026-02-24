@@ -8,7 +8,8 @@ export function useTranslation() {
 
   const t = useCallback(
     (key: TranslationKey, params?: Record<string, string | number>) => {
-      let text: string = translations[locale]?.[key] ?? translations.en[key] ?? key;
+      let text: string =
+        translations[locale]?.[key] ?? translations.en[key] ?? key;
       if (params) {
         for (const [k, v] of Object.entries(params)) {
           text = text.replace(`{${k}}`, String(v));
@@ -16,7 +17,7 @@ export function useTranslation() {
       }
       return text;
     },
-    [locale]
+    [locale],
   );
 
   return { t, locale, setLocale };

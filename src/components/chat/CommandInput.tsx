@@ -1,4 +1,11 @@
-import { useState, useRef, useEffect, useCallback, type KeyboardEvent, type ClipboardEvent } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  type KeyboardEvent,
+  type ClipboardEvent,
+} from "react";
 import { Send, Mic, MicOff, Paperclip, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -100,17 +107,22 @@ export function CommandInput({ onSend, disabled }: CommandInputProps) {
     setAttachedImages((prev) => [...prev, ...newImages].slice(0, 5)); // max 5 images
   }, []);
 
-  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
+  const handleFileSelect = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (!files) return;
 
-    const imageFiles = Array.from(files).filter((f) => f.type.startsWith("image/"));
-    const newImages = await Promise.all(imageFiles.map(fileToBase64));
-    setAttachedImages((prev) => [...prev, ...newImages].slice(0, 5));
+      const imageFiles = Array.from(files).filter((f) =>
+        f.type.startsWith("image/"),
+      );
+      const newImages = await Promise.all(imageFiles.map(fileToBase64));
+      setAttachedImages((prev) => [...prev, ...newImages].slice(0, 5));
 
-    // Reset input so same file can be selected again
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  }, []);
+      // Reset input so same file can be selected again
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    },
+    [],
+  );
 
   const removeImage = useCallback((index: number) => {
     setAttachedImages((prev) => prev.filter((_, i) => i !== index));
@@ -145,7 +157,9 @@ export function CommandInput({ onSend, disabled }: CommandInputProps) {
     dragCounterRef.current = 0;
     setIsDragging(false);
 
-    const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"));
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      f.type.startsWith("image/"),
+    );
     if (files.length === 0) return;
 
     const newImages = await Promise.all(files.map(fileToBase64));
@@ -154,7 +168,8 @@ export function CommandInput({ onSend, disabled }: CommandInputProps) {
 
   const toggleListening = useCallback(() => {
     const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) return;
 
@@ -204,7 +219,10 @@ export function CommandInput({ onSend, disabled }: CommandInputProps) {
 
   const hasSpeechApi =
     typeof window !== "undefined" &&
-    !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+    !!(
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition
+    );
 
   return (
     <div
@@ -284,7 +302,9 @@ export function CommandInput({ onSend, disabled }: CommandInputProps) {
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
-            placeholder={isListening ? t("voice.listening") : t("command.placeholder")}
+            placeholder={
+              isListening ? t("voice.listening") : t("command.placeholder")
+            }
             rows={1}
             disabled={disabled}
             className="flex-1 resize-none bg-transparent text-sm text-theme-text placeholder-theme-text-dimmer outline-none min-h-[36px] max-h-[120px] py-1 font-mono"
@@ -328,11 +348,21 @@ export function CommandInput({ onSend, disabled }: CommandInputProps) {
             >
               <AnimatePresence mode="wait">
                 {isListening ? (
-                  <motion.div key="mic-off" initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8 }}>
+                  <motion.div
+                    key="mic-off"
+                    initial={{ scale: 0.8 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0.8 }}
+                  >
                     <MicOff className="w-4 h-4" strokeWidth={1.5} />
                   </motion.div>
                 ) : (
-                  <motion.div key="mic" initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8 }}>
+                  <motion.div
+                    key="mic"
+                    initial={{ scale: 0.8 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0.8 }}
+                  >
                     <Mic className="w-4 h-4" strokeWidth={1.5} />
                   </motion.div>
                 )}

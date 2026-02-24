@@ -60,7 +60,10 @@ body,
     radial-gradient(circle, var(--theme-grid-color) 1px, transparent 1px),
     linear-gradient(var(--theme-grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--theme-grid-line) 1px, transparent 1px);
-  background-size: 20px 20px, 80px 80px, 80px 80px;
+  background-size:
+    20px 20px,
+    80px 80px,
+    80px 80px;
 }
 
 /* ═══════════════════════════════════════════════
@@ -149,7 +152,9 @@ body,
 
 /* Digital glitch effect */
 @keyframes glitch {
-  0%, 88%, 100% {
+  0%,
+  88%,
+  100% {
     transform: translate(0);
     opacity: 1;
   }
@@ -262,7 +267,8 @@ body,
 
 /* Bar pulse for active stats */
 @keyframes bar-pulse {
-  0%, 100% {
+  0%,
+  100% {
     filter: brightness(1);
   }
   50% {
@@ -344,7 +350,9 @@ body,
    LOW HP GLITCH OVERLAY
    ═══════════════════════════════════════════════ */
 @keyframes critical-glitch {
-  0%, 92%, 100% {
+  0%,
+  92%,
+  100% {
     transform: translate(0);
     filter: none;
   }
@@ -372,13 +380,22 @@ body,
   inset: 0;
   pointer-events: none;
   z-index: 50;
-  background: radial-gradient(ellipse at center, transparent 50%, rgba(200, 0, 0, 0.08) 100%);
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(200, 0, 0, 0.08) 100%
+  );
   animation: vignette-pulse 2s ease-in-out infinite;
 }
 
 @keyframes vignette-pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -404,8 +421,13 @@ body,
    BOUNTY ZONE PULSE (COMMS)
    ═══════════════════════════════════════════════ */
 @keyframes bounty-pulse {
-  0%, 100% { opacity: 0.9; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .animate-bounty-pulse {

@@ -6,7 +6,6 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 
 from models.conversation import (
-    ChatMessageOut,
     ConversationMeta,
     SaveMessagesRequest,
     RenameRequest,

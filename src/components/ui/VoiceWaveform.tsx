@@ -34,11 +34,16 @@ export function VoiceWaveform({ isActive }: VoiceWaveformProps) {
 
       // Get accent color from CSS
       const style = getComputedStyle(document.documentElement);
-      const rgb = style.getPropertyValue("--theme-accent-rgb").trim() || "0,255,200";
+      const rgb =
+        style.getPropertyValue("--theme-accent-rgb").trim() || "0,255,200";
 
       for (let i = 0; i < bars; i++) {
         const x = i * (barW + 2) + 1;
-        const amp = 0.3 + 0.7 * Math.abs(Math.sin(phase + i * 0.3)) * Math.abs(Math.cos(phase * 0.5 + i * 0.15));
+        const amp =
+          0.3 +
+          0.7 *
+            Math.abs(Math.sin(phase + i * 0.3)) *
+            Math.abs(Math.cos(phase * 0.5 + i * 0.15));
         const barH = amp * h * 0.8;
         const y = (h - barH) / 2;
 

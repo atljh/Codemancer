@@ -18,6 +18,7 @@ import {
   Link,
   Pencil,
   Radio,
+  Volume2,
 } from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
@@ -25,23 +26,55 @@ import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
 import { themes, themeIds } from "../../themes/themeConfig";
-import type { AppSettings, AIProvider, AIModel, AuthMethod, Locale, ThemeId } from "../../types/game";
+import type {
+  AppSettings,
+  AIProvider,
+  AIModel,
+  AuthMethod,
+  Locale,
+  ThemeId,
+  SoundPackId,
+} from "../../types/game";
 import type { TranslationKey } from "../../i18n/translations";
 
 const FALLBACK_MODELS: Record<string, AIModel[]> = {
   anthropic: [
-    { id: "claude-sonnet-4-20250514", name: "Claude Sonnet 4", description: "Fast & capable" },
-    { id: "claude-opus-4-20250514", name: "Claude Opus 4", description: "Most powerful" },
-    { id: "claude-haiku-4-5-20251001", name: "Claude Haiku 4.5", description: "Fast & affordable" },
+    {
+      id: "claude-sonnet-4-20250514",
+      name: "Claude Sonnet 4",
+      description: "Fast & capable",
+    },
+    {
+      id: "claude-opus-4-20250514",
+      name: "Claude Opus 4",
+      description: "Most powerful",
+    },
+    {
+      id: "claude-haiku-4-5-20251001",
+      name: "Claude Haiku 4.5",
+      description: "Fast & affordable",
+    },
   ],
   openai: [
     { id: "gpt-4o", name: "GPT-4o", description: "Fast & capable" },
-    { id: "gpt-4o-mini", name: "GPT-4o Mini", description: "Fast & affordable" },
+    {
+      id: "gpt-4o-mini",
+      name: "GPT-4o Mini",
+      description: "Fast & affordable",
+    },
     { id: "o3-mini", name: "o3-mini", description: "Reasoning model" },
   ],
   gemini: [
-    { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash", description: "Fast & capable" },
-    { id: "gemini-2.5-pro", name: "Gemini 2.5 Pro", description: "Most powerful" },
+    {
+      id: "gemini-2.0-flash",
+      name: "Gemini 2.0 Flash",
+      description: "Fast & capable",
+    },
+    {
+      id: "gemini-2.5-pro",
+      name: "Gemini 2.5 Pro",
+      description: "Most powerful",
+    },
   ],
   custom: [],
 };
@@ -59,7 +92,8 @@ export function SettingsModal() {
   const { t } = useTranslation();
 
   const [draft, setDraft] = useState<AppSettings>(settings);
-  const [allModels, setAllModels] = useState<Record<string, AIModel[]>>(FALLBACK_MODELS);
+  const [allModels, setAllModels] =
+    useState<Record<string, AIModel[]>>(FALLBACK_MODELS);
   const [activeTab, setActiveTab] = useState<SettingsTab>("general");
   const [showApiKey, setShowApiKey] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -68,7 +102,10 @@ export function SettingsModal() {
     if (showSettings) {
       setDraft(settings);
       setSaved(false);
-      api.getAllChatModels().then(setAllModels).catch(() => setAllModels(FALLBACK_MODELS));
+      api
+        .getAllChatModels()
+        .then(setAllModels)
+        .catch(() => setAllModels(FALLBACK_MODELS));
     }
   }, [showSettings, settings, api]);
 
@@ -90,20 +127,36 @@ export function SettingsModal() {
       if (selected) {
         setDraft({ ...draft, workspace_root: selected as string });
       }
-    } catch { /* cancelled */ }
+    } catch {
+      /* cancelled */
+    }
   };
 
   const handleResetPlayer = async () => {
     try {
       const p = await api.resetPlayer();
       useGameStore.getState().setPlayer(p);
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   };
 
   const tabs: { id: SettingsTab; label: string; icon: React.ReactNode }[] = [
-    { id: "general", label: t("settings.tabGeneral"), icon: <Settings className="w-3.5 h-3.5" strokeWidth={1.5} /> },
-    { id: "ai", label: t("settings.tabAi"), icon: <Brain className="w-3.5 h-3.5" strokeWidth={1.5} /> },
-    { id: "appearance", label: t("settings.tabAppearance"), icon: <Palette className="w-3.5 h-3.5" strokeWidth={1.5} /> },
+    {
+      id: "general",
+      label: t("settings.tabGeneral"),
+      icon: <Settings className="w-3.5 h-3.5" strokeWidth={1.5} />,
+    },
+    {
+      id: "ai",
+      label: t("settings.tabAi"),
+      icon: <Brain className="w-3.5 h-3.5" strokeWidth={1.5} />,
+    },
+    {
+      id: "appearance",
+      label: t("settings.tabAppearance"),
+      icon: <Palette className="w-3.5 h-3.5" strokeWidth={1.5} />,
+    },
   ];
 
   return (
@@ -127,8 +180,13 @@ export function SettingsModal() {
             {/* Sidebar */}
             <div className="w-40 bg-theme-bg-deep/60 border-r border-[var(--theme-glass-border)] py-4 px-2 flex flex-col shrink-0">
               <div className="flex items-center gap-2 px-3 mb-5">
-                <Settings className="w-4 h-4 text-theme-accent" strokeWidth={1.5} />
-                <span className="text-xs font-mono font-bold text-theme-text tracking-wider uppercase">{t("panel.settings")}</span>
+                <Settings
+                  className="w-4 h-4 text-theme-accent"
+                  strokeWidth={1.5}
+                />
+                <span className="text-xs font-mono font-bold text-theme-text tracking-wider uppercase">
+                  {t("panel.settings")}
+                </span>
               </div>
 
               <nav className="space-y-0.5 flex-1">
@@ -142,7 +200,13 @@ export function SettingsModal() {
                         : "text-theme-text-dim hover:text-theme-text hover:bg-theme-accent/3"
                     }`}
                   >
-                    <span className={activeTab === tab.id ? "text-theme-accent" : ""}>{tab.icon}</span>
+                    <span
+                      className={
+                        activeTab === tab.id ? "text-theme-accent" : ""
+                      }
+                    >
+                      {tab.icon}
+                    </span>
                     {tab.label}
                   </button>
                 ))}
@@ -252,10 +316,15 @@ function GeneralTab({
 }) {
   return (
     <>
-      <SettingsField label={t("settings.language")} icon={<Globe className="w-3.5 h-3.5" strokeWidth={1.5} />}>
+      <SettingsField
+        label={t("settings.language")}
+        icon={<Globe className="w-3.5 h-3.5" strokeWidth={1.5} />}
+      >
         <select
           value={draft.locale}
-          onChange={(e) => setDraft({ ...draft, locale: e.target.value as Locale })}
+          onChange={(e) =>
+            setDraft({ ...draft, locale: e.target.value as Locale })
+          }
           className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm font-mono text-theme-text outline-none focus:border-theme-accent/30 transition-colors"
         >
           <option value="en">English</option>
@@ -263,12 +332,17 @@ function GeneralTab({
         </select>
       </SettingsField>
 
-      <SettingsField label={t("settings.workspaceRoot")} icon={<FolderOpen className="w-3.5 h-3.5" strokeWidth={1.5} />}>
+      <SettingsField
+        label={t("settings.workspaceRoot")}
+        icon={<FolderOpen className="w-3.5 h-3.5" strokeWidth={1.5} />}
+      >
         <div className="flex gap-2">
           <input
             type="text"
             value={draft.workspace_root}
-            onChange={(e) => setDraft({ ...draft, workspace_root: e.target.value })}
+            onChange={(e) =>
+              setDraft({ ...draft, workspace_root: e.target.value })
+            }
             placeholder="/path/to/project"
             className="flex-1 bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
           />
@@ -281,39 +355,56 @@ function GeneralTab({
             {t("settings.browse")}
           </motion.button>
         </div>
-        <p className="text-[11px] text-theme-text-dimmer mt-1.5 font-mono">{t("settings.workspaceHint")}</p>
+        <p className="text-[11px] text-theme-text-dimmer mt-1.5 font-mono">
+          {t("settings.workspaceHint")}
+        </p>
       </SettingsField>
 
       {/* Telegram */}
       <div className="mt-5 pt-4 border-t border-[var(--theme-glass-border)]">
         <div className="flex items-center gap-2 mb-3">
-          <Radio className="w-3.5 h-3.5 text-theme-accent/40" strokeWidth={1.5} />
+          <Radio
+            className="w-3.5 h-3.5 text-theme-accent/40"
+            strokeWidth={1.5}
+          />
           <h3 className="text-xs font-mono font-bold text-theme-text-dim uppercase tracking-[0.15em]">
             {t("settings.telegramSection")}
           </h3>
         </div>
         <div className="space-y-3">
           <div>
-            <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">{t("settings.telegramApiId")}</label>
+            <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">
+              {t("settings.telegramApiId")}
+            </label>
             <input
               type="text"
               value={draft.telegram_api_id}
-              onChange={(e) => setDraft({ ...draft, telegram_api_id: e.target.value })}
+              onChange={(e) =>
+                setDraft({ ...draft, telegram_api_id: e.target.value })
+              }
               placeholder="12345678"
               className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
             />
-            <p className="text-[11px] text-theme-text-dimmer mt-1 font-mono">{t("settings.telegramApiIdHint")}</p>
+            <p className="text-[11px] text-theme-text-dimmer mt-1 font-mono">
+              {t("settings.telegramApiIdHint")}
+            </p>
           </div>
           <div>
-            <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">{t("settings.telegramApiHash")}</label>
+            <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">
+              {t("settings.telegramApiHash")}
+            </label>
             <input
               type="password"
               value={draft.telegram_api_hash}
-              onChange={(e) => setDraft({ ...draft, telegram_api_hash: e.target.value })}
+              onChange={(e) =>
+                setDraft({ ...draft, telegram_api_hash: e.target.value })
+              }
               placeholder="abc123..."
               className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
             />
-            <p className="text-[11px] text-theme-text-dimmer mt-1 font-mono">{t("settings.telegramApiHashHint")}</p>
+            <p className="text-[11px] text-theme-text-dimmer mt-1 font-mono">
+              {t("settings.telegramApiHashHint")}
+            </p>
           </div>
         </div>
       </div>
@@ -329,7 +420,9 @@ function GeneralTab({
           <RotateCcw className="w-4 h-4" strokeWidth={1.5} />
           {t("settings.resetProgress")}
         </button>
-        <p className="text-[11px] text-theme-text-dimmer mt-1.5 font-mono">{t("settings.resetHint")}</p>
+        <p className="text-[11px] text-theme-text-dimmer mt-1.5 font-mono">
+          {t("settings.resetHint")}
+        </p>
       </div>
     </>
   );
@@ -337,11 +430,31 @@ function GeneralTab({
 
 /* ───── AI Tab ───── */
 
-const PROVIDER_OPTIONS: { id: AIProvider; labelKey: TranslationKey; icon: React.ReactNode }[] = [
-  { id: "anthropic", labelKey: "settings.providerAnthropic", icon: <Brain className="w-3.5 h-3.5" strokeWidth={1.5} /> },
-  { id: "openai", labelKey: "settings.providerOpenAI", icon: <Brain className="w-3.5 h-3.5" strokeWidth={1.5} /> },
-  { id: "gemini", labelKey: "settings.providerGemini", icon: <Brain className="w-3.5 h-3.5" strokeWidth={1.5} /> },
-  { id: "custom", labelKey: "settings.providerCustom", icon: <Link className="w-3.5 h-3.5" strokeWidth={1.5} /> },
+const PROVIDER_OPTIONS: {
+  id: AIProvider;
+  labelKey: TranslationKey;
+  icon: React.ReactNode;
+}[] = [
+  {
+    id: "anthropic",
+    labelKey: "settings.providerAnthropic",
+    icon: <Brain className="w-3.5 h-3.5" strokeWidth={1.5} />,
+  },
+  {
+    id: "openai",
+    labelKey: "settings.providerOpenAI",
+    icon: <Brain className="w-3.5 h-3.5" strokeWidth={1.5} />,
+  },
+  {
+    id: "gemini",
+    labelKey: "settings.providerGemini",
+    icon: <Brain className="w-3.5 h-3.5" strokeWidth={1.5} />,
+  },
+  {
+    id: "custom",
+    labelKey: "settings.providerCustom",
+    icon: <Link className="w-3.5 h-3.5" strokeWidth={1.5} />,
+  },
 ];
 
 // Which settings key holds the model for each provider
@@ -395,7 +508,10 @@ function AiTab({
       window.open(authUrl, "_blank");
       const code = prompt("Paste the authorization code:");
       if (code) {
-        const tokens = await invoke<{ access_token: string; refresh_token: string }>("complete_oauth", { code });
+        const tokens = await invoke<{
+          access_token: string;
+          refresh_token: string;
+        }>("complete_oauth", { code });
         setDraft({
           ...draft,
           oauth_access_token: tokens.access_token,
@@ -420,19 +536,28 @@ function AiTab({
   return (
     <>
       {/* Status indicator */}
-      <div className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded text-sm font-mono tracking-wider ${
-        hasAuth
-          ? "bg-theme-status-success/5 border border-theme-status-success/15 text-theme-status-success"
-          : "bg-theme-status-warning/5 border border-theme-status-warning/12 text-theme-status-warning"
-      }`}>
-        <div className={`w-2 h-2 rounded-full ${hasAuth ? "bg-theme-status-success animate-glow-pulse" : "bg-theme-status-warning"}`} />
+      <div
+        className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded text-sm font-mono tracking-wider ${
+          hasAuth
+            ? "bg-theme-status-success/5 border border-theme-status-success/15 text-theme-status-success"
+            : "bg-theme-status-warning/5 border border-theme-status-warning/12 text-theme-status-warning"
+        }`}
+      >
+        <div
+          className={`w-2 h-2 rounded-full ${hasAuth ? "bg-theme-status-success animate-glow-pulse" : "bg-theme-status-warning"}`}
+        />
         {hasAuth
-          ? (provider === "anthropic" && draft.auth_method === "oauth" ? t("settings.oauthConnected") : t("settings.aiConnected"))
+          ? provider === "anthropic" && draft.auth_method === "oauth"
+            ? t("settings.oauthConnected")
+            : t("settings.aiConnected")
           : t("settings.aiNotConfigured")}
       </div>
 
       {/* Provider Selector */}
-      <SettingsField label={t("settings.aiProvider")} icon={<Brain className="w-3.5 h-3.5" strokeWidth={1.5} />}>
+      <SettingsField
+        label={t("settings.aiProvider")}
+        icon={<Brain className="w-3.5 h-3.5" strokeWidth={1.5} />}
+      >
         <div className="grid grid-cols-4 gap-1.5">
           {PROVIDER_OPTIONS.map((opt) => (
             <button
@@ -455,12 +580,23 @@ function AiTab({
       {provider === "anthropic" && (
         <>
           {/* Auth Method Toggle */}
-          <SettingsField label={t("settings.authMethod")} icon={<Shield className="w-3.5 h-3.5" strokeWidth={1.5} />}>
+          <SettingsField
+            label={t("settings.authMethod")}
+            icon={<Shield className="w-3.5 h-3.5" strokeWidth={1.5} />}
+          >
             <div className="flex gap-2">
-              {([
-                { id: "api_key" as AuthMethod, label: t("settings.authApiKey"), icon: <KeyRound className="w-3.5 h-3.5" strokeWidth={1.5} /> },
-                { id: "oauth" as AuthMethod, label: t("settings.authOAuth"), icon: <LogIn className="w-3.5 h-3.5" strokeWidth={1.5} /> },
-              ]).map((method) => (
+              {[
+                {
+                  id: "api_key" as AuthMethod,
+                  label: t("settings.authApiKey"),
+                  icon: <KeyRound className="w-3.5 h-3.5" strokeWidth={1.5} />,
+                },
+                {
+                  id: "oauth" as AuthMethod,
+                  label: t("settings.authOAuth"),
+                  icon: <LogIn className="w-3.5 h-3.5" strokeWidth={1.5} />,
+                },
+              ].map((method) => (
                 <button
                   key={method.id}
                   onClick={() => setDraft({ ...draft, auth_method: method.id })}
@@ -492,7 +628,10 @@ function AiTab({
 
           {/* OAuth */}
           {draft.auth_method === "oauth" && (
-            <SettingsField label={t("settings.authOAuth")} icon={<LogIn className="w-3.5 h-3.5" strokeWidth={1.5} />}>
+            <SettingsField
+              label={t("settings.authOAuth")}
+              icon={<LogIn className="w-3.5 h-3.5" strokeWidth={1.5} />}
+            >
               {draft.oauth_access_token ? (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 px-3 py-2.5 rounded bg-theme-status-success/5 border border-theme-status-success/15 text-theme-status-success text-sm font-mono">
@@ -556,15 +695,22 @@ function AiTab({
 
       {provider === "custom" && (
         <>
-          <SettingsField label={t("settings.customBaseUrl")} icon={<Link className="w-4 h-4" strokeWidth={1.5} />}>
+          <SettingsField
+            label={t("settings.customBaseUrl")}
+            icon={<Link className="w-4 h-4" strokeWidth={1.5} />}
+          >
             <input
               type="text"
               value={draft.custom_base_url ?? ""}
-              onChange={(e) => setDraft({ ...draft, custom_base_url: e.target.value })}
+              onChange={(e) =>
+                setDraft({ ...draft, custom_base_url: e.target.value })
+              }
               placeholder="http://localhost:11434/v1"
               className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
             />
-            <p className="text-[11px] text-theme-text-dimmer mt-1.5 font-mono">{t("settings.customBaseUrlHint")}</p>
+            <p className="text-[11px] text-theme-text-dimmer mt-1.5 font-mono">
+              {t("settings.customBaseUrlHint")}
+            </p>
           </SettingsField>
 
           <ApiKeyField
@@ -577,22 +723,32 @@ function AiTab({
             setShowApiKey={setShowApiKey}
           />
 
-          <SettingsField label={t("settings.customModel")} icon={<Pencil className="w-4 h-4" strokeWidth={1.5} />}>
+          <SettingsField
+            label={t("settings.customModel")}
+            icon={<Pencil className="w-4 h-4" strokeWidth={1.5} />}
+          >
             <input
               type="text"
               value={draft.custom_model ?? ""}
-              onChange={(e) => setDraft({ ...draft, custom_model: e.target.value })}
+              onChange={(e) =>
+                setDraft({ ...draft, custom_model: e.target.value })
+              }
               placeholder={t("settings.customModelPlaceholder")}
               className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
             />
-            <p className="text-[11px] text-theme-text-dimmer mt-1.5 font-mono">{t("settings.customModelHint")}</p>
+            <p className="text-[11px] text-theme-text-dimmer mt-1.5 font-mono">
+              {t("settings.customModelHint")}
+            </p>
           </SettingsField>
         </>
       )}
 
       {/* Model Selector (for providers with predefined models) */}
       {provider !== "custom" && models.length > 0 && (
-        <SettingsField label={t("settings.model")} icon={<Brain className="w-3.5 h-3.5" strokeWidth={1.5} />}>
+        <SettingsField
+          label={t("settings.model")}
+          icon={<Brain className="w-3.5 h-3.5" strokeWidth={1.5} />}
+        >
           <div className="space-y-1.5">
             {models.map((m) => (
               <label
@@ -611,16 +767,24 @@ function AiTab({
                   onChange={() => setDraft({ ...draft, [modelKey]: m.id })}
                   className="sr-only"
                 />
-                <div className={`w-3 h-3 rounded-full border flex items-center justify-center shrink-0 ${
-                  currentModel === m.id ? "border-theme-accent" : "border-theme-text-dimmer"
-                }`}>
+                <div
+                  className={`w-3 h-3 rounded-full border flex items-center justify-center shrink-0 ${
+                    currentModel === m.id
+                      ? "border-theme-accent"
+                      : "border-theme-text-dimmer"
+                  }`}
+                >
                   {currentModel === m.id && (
                     <div className="w-1.5 h-1.5 rounded-full bg-theme-accent" />
                   )}
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-mono text-theme-text font-medium">{m.name}</div>
-                  <div className="text-xs font-mono text-theme-text-dim">{m.description}</div>
+                  <div className="text-sm font-mono text-theme-text font-medium">
+                    {m.name}
+                  </div>
+                  <div className="text-xs font-mono text-theme-text-dim">
+                    {m.description}
+                  </div>
                 </div>
               </label>
             ))}
@@ -650,7 +814,10 @@ function ApiKeyField({
   setShowApiKey: (v: boolean) => void;
 }) {
   return (
-    <SettingsField label={label} icon={<KeyRound className="w-4 h-4" strokeWidth={1.5} />}>
+    <SettingsField
+      label={label}
+      icon={<KeyRound className="w-4 h-4" strokeWidth={1.5} />}
+    >
       <div className="relative">
         <input
           type={showApiKey ? "text" : "password"}
@@ -664,10 +831,16 @@ function ApiKeyField({
           onClick={() => setShowApiKey(!showApiKey)}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-theme-text-dim hover:text-theme-text transition-colors"
         >
-          {showApiKey ? <EyeOff className="w-4 h-4" strokeWidth={1.5} /> : <Eye className="w-4 h-4" strokeWidth={1.5} />}
+          {showApiKey ? (
+            <EyeOff className="w-4 h-4" strokeWidth={1.5} />
+          ) : (
+            <Eye className="w-4 h-4" strokeWidth={1.5} />
+          )}
         </button>
       </div>
-      <p className="text-[11px] text-theme-text-dimmer mt-1.5 font-mono">{hint}</p>
+      <p className="text-[11px] text-theme-text-dimmer mt-1.5 font-mono">
+        {hint}
+      </p>
     </SettingsField>
   );
 }
@@ -684,7 +857,10 @@ function AppearanceTab({
 }) {
   return (
     <>
-      <SettingsField label={`${t("settings.fontSize")}: ${draft.font_size}px`} icon={<Palette className="w-3.5 h-3.5" strokeWidth={1.5} />}>
+      <SettingsField
+        label={`${t("settings.fontSize")}: ${draft.font_size}px`}
+        icon={<Palette className="w-3.5 h-3.5" strokeWidth={1.5} />}
+      >
         <div className="flex items-center gap-4">
           <span className="text-xs text-theme-text-dim font-mono w-6">12</span>
           <input
@@ -692,7 +868,9 @@ function AppearanceTab({
             min={12}
             max={24}
             value={draft.font_size}
-            onChange={(e) => setDraft({ ...draft, font_size: parseInt(e.target.value) })}
+            onChange={(e) =>
+              setDraft({ ...draft, font_size: parseInt(e.target.value) })
+            }
             className="flex-1 accent-[var(--theme-accent)]"
           />
           <span className="text-xs text-theme-text-dim font-mono w-6">24</span>
@@ -705,7 +883,10 @@ function AppearanceTab({
         </div>
       </SettingsField>
 
-      <SettingsField label={t("settings.theme")} icon={<Palette className="w-3.5 h-3.5" strokeWidth={1.5} />}>
+      <SettingsField
+        label={t("settings.theme")}
+        icon={<Palette className="w-3.5 h-3.5" strokeWidth={1.5} />}
+      >
         <div className="grid grid-cols-2 gap-2">
           {themeIds.map((id) => {
             const cfg = themes[id];
@@ -720,14 +901,67 @@ function AppearanceTab({
                 }`}
               >
                 <div className="flex gap-1 mb-2">
-                  <div className="w-5 h-5 rounded-sm border border-[var(--theme-glass-border)]" style={{ backgroundColor: cfg.previewBg }} />
-                  <div className="w-5 h-5 rounded-sm border border-[var(--theme-glass-border)]" style={{ backgroundColor: cfg.previewSurface }} />
-                  <div className="w-5 h-5 rounded-sm border border-[var(--theme-glass-border)]" style={{ backgroundColor: cfg.previewAccent }} />
+                  <div
+                    className="w-5 h-5 rounded-sm border border-[var(--theme-glass-border)]"
+                    style={{ backgroundColor: cfg.previewBg }}
+                  />
+                  <div
+                    className="w-5 h-5 rounded-sm border border-[var(--theme-glass-border)]"
+                    style={{ backgroundColor: cfg.previewSurface }}
+                  />
+                  <div
+                    className="w-5 h-5 rounded-sm border border-[var(--theme-glass-border)]"
+                    style={{ backgroundColor: cfg.previewAccent }}
+                  />
                 </div>
-                <div className="text-xs font-mono text-theme-text-dim tracking-wider">{cfg.label}</div>
+                <div className="text-xs font-mono text-theme-text-dim tracking-wider">
+                  {cfg.label}
+                </div>
               </button>
             );
           })}
+        </div>
+      </SettingsField>
+
+      <SettingsField
+        label={t("settings.soundPack")}
+        icon={<Volume2 className="w-3.5 h-3.5" strokeWidth={1.5} />}
+      >
+        <div className="grid grid-cols-2 gap-2">
+          {(["default", "jarvis", "pipboy", "retro"] as SoundPackId[]).map(
+            (packId) => {
+              const labels: Record<SoundPackId, string> = {
+                default: t("settings.soundDefault"),
+                jarvis: t("settings.soundJarvis"),
+                pipboy: t("settings.soundPipboy"),
+                retro: t("settings.soundRetro"),
+              };
+              const icons: Record<SoundPackId, string> = {
+                default: "//",
+                jarvis: "AI",
+                pipboy: "PB",
+                retro: ">_",
+              };
+              return (
+                <button
+                  key={packId}
+                  onClick={() => setDraft({ ...draft, sound_pack: packId })}
+                  className={`rounded border p-3 transition-all flex items-center gap-2.5 ${
+                    draft.sound_pack === packId
+                      ? "border-theme-accent/25 bg-theme-accent/4"
+                      : "border-[var(--theme-glass-border)] hover:border-theme-accent/12"
+                  }`}
+                >
+                  <span className="text-xs font-mono font-bold text-theme-accent/60 w-6">
+                    {icons[packId]}
+                  </span>
+                  <span className="text-xs font-mono text-theme-text-dim tracking-wider">
+                    {labels[packId]}
+                  </span>
+                </button>
+              );
+            },
+          )}
         </div>
       </SettingsField>
     </>

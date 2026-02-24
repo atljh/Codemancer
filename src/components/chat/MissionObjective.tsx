@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crosshair, ChevronDown, ChevronUp, Check, RefreshCw } from "lucide-react";
+import {
+  Crosshair,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  RefreshCw,
+} from "lucide-react";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -57,7 +63,7 @@ export function MissionObjective() {
         // ignore
       }
     },
-    [api, setPlayer, setQuests]
+    [api, setPlayer, setQuests],
   );
 
   const activeQuests = quests.filter((q) => q.status === "active");
@@ -108,9 +114,15 @@ export function MissionObjective() {
           </span>
         )}
         {expanded ? (
-          <ChevronUp className="w-3 h-3 text-theme-text-dimmer shrink-0" strokeWidth={1.5} />
+          <ChevronUp
+            className="w-3 h-3 text-theme-text-dimmer shrink-0"
+            strokeWidth={1.5}
+          />
         ) : (
-          <ChevronDown className="w-3 h-3 text-theme-text-dimmer shrink-0" strokeWidth={1.5} />
+          <ChevronDown
+            className="w-3 h-3 text-theme-text-dimmer shrink-0"
+            strokeWidth={1.5}
+          />
         )}
       </button>
 
@@ -181,7 +193,10 @@ function QuestRow({
         className="mt-0.5 w-3.5 h-3.5 rounded-sm border border-theme-accent/25 hover:border-theme-accent/60 hover:bg-theme-accent/10 flex items-center justify-center transition-all shrink-0 group"
         title={t("mission.complete")}
       >
-        <Check className="w-2 h-2 text-theme-accent opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
+        <Check
+          className="w-2 h-2 text-theme-accent opacity-0 group-hover:opacity-100 transition-opacity"
+          strokeWidth={2}
+        />
       </button>
       <div className="flex-1 min-w-0">
         <div className="text-[11px] font-mono text-theme-text leading-tight truncate">

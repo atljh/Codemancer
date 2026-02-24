@@ -42,7 +42,11 @@ function scoreColor(score: number): string {
   return `hsl(${hue}, 70%, 50%)`;
 }
 
-export function RadarChart({ scores, size = 280, onAxisClick }: RadarChartProps) {
+export function RadarChart({
+  scores,
+  size = 280,
+  onAxisClick,
+}: RadarChartProps) {
   const { t } = useTranslation();
   const pad = 50; // padding for labels
   const full = size + pad * 2;
@@ -53,7 +57,12 @@ export function RadarChart({ scores, size = 280, onAxisClick }: RadarChartProps)
   const values = AXES.map((a) => scores[a]);
 
   return (
-    <svg width={full} height={full} viewBox={`0 0 ${full} ${full}`} className="block mx-auto">
+    <svg
+      width={full}
+      height={full}
+      viewBox={`0 0 ${full} ${full}`}
+      className="block mx-auto"
+    >
       <defs>
         <filter id="radar-glow">
           <feGaussianBlur stdDeviation="3" result="blur" />

@@ -15,7 +15,12 @@ interface UseForceLayoutOptions {
   height: number;
 }
 
-export function useForceLayout({ nodes, edges, width, height }: UseForceLayoutOptions) {
+export function useForceLayout({
+  nodes,
+  edges,
+  width,
+  height,
+}: UseForceLayoutOptions) {
   const [layoutNodes, setLayoutNodes] = useState<LayoutNode[]>([]);
 
   useEffect(() => {
@@ -35,7 +40,8 @@ function computeLayout(
 ): LayoutNode[] {
   const N = nodes.length;
   if (N === 0) return [];
-  if (N === 1) return [{ id: nodes[0].id, x: width / 2, y: height / 2, node: nodes[0] }];
+  if (N === 1)
+    return [{ id: nodes[0].id, x: width / 2, y: height / 2, node: nodes[0] }];
 
   const cx = width / 2;
   const cy = height / 2;
@@ -50,7 +56,14 @@ function computeLayout(
   const pos = nodes.map((n, i) => {
     const angle = i * 2.399963;
     const r = Math.sqrt((i + 1) / N) * spread;
-    return { id: n.id, x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle), vx: 0, vy: 0, node: n };
+    return {
+      id: n.id,
+      x: cx + r * Math.cos(angle),
+      y: cy + r * Math.sin(angle),
+      vx: 0,
+      vy: 0,
+      node: n,
+    };
   });
 
   const posMap = new Map<string, (typeof pos)[0]>();
@@ -63,7 +76,10 @@ function computeLayout(
     const t = 1 - iter / ITERS;
     const maxMove = idealDist * 0.4 * t;
 
-    for (const p of pos) { p.vx = 0; p.vy = 0; }
+    for (const p of pos) {
+      p.vx = 0;
+      p.vy = 0;
+    }
 
     // Repulsion
     for (let i = 0; i < N; i++) {
@@ -76,8 +92,10 @@ function computeLayout(
         const f = (idealDist * idealDist) / dist;
         dx = (dx / dist) * f;
         dy = (dy / dist) * f;
-        a.vx += dx; a.vy += dy;
-        b.vx -= dx; b.vy -= dy;
+        a.vx += dx;
+        a.vy += dy;
+        b.vx -= dx;
+        b.vy -= dy;
       }
     }
 
@@ -92,8 +110,10 @@ function computeLayout(
       const f = (dist * dist) / idealDist;
       const fx = (dx / dist) * f;
       const fy = (dy / dist) * f;
-      a.vx += fx; a.vy += fy;
-      b.vx -= fx; b.vy -= fy;
+      a.vx += fx;
+      a.vy += fy;
+      b.vx -= fx;
+      b.vy -= fy;
     }
 
     // Gravity toward center — stronger for nodes far from center
@@ -117,7 +137,10 @@ function computeLayout(
   }
 
   // Rescale to fit viewport instead of clamping
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  let minX = Infinity,
+    maxX = -Infinity,
+    minY = Infinity,
+    maxY = -Infinity;
   for (const p of pos) {
     if (p.x < minX) minX = p.x;
     if (p.x > maxX) maxX = p.x;

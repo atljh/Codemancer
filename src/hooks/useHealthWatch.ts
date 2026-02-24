@@ -7,7 +7,11 @@ import type { Locale } from "../types/game";
 
 const WATCH_INTERVAL_MS = 300_000; // 5 minutes
 
-function t(locale: Locale, key: TranslationKey, params?: Record<string, string | number>): string {
+function t(
+  locale: Locale,
+  key: TranslationKey,
+  params?: Record<string, string | number>,
+): string {
   let text: string = translations[locale]?.[key] ?? translations.en[key] ?? key;
   if (params) {
     for (const [k, v] of Object.entries(params)) {
@@ -33,16 +37,26 @@ function computeHash(result: HealthWatchResult): string {
 
 function getAnomalyText(locale: Locale, anomaly: CriticalAnomaly): string {
   if (anomaly.category === "file_size") {
-    return t(locale, "health.alertFileSize", { count: anomaly.details.length || 1 });
+    return t(locale, "health.alertFileSize", {
+      count: anomaly.details.length || 1,
+    });
   }
   if (anomaly.category === "complexity") {
-    return t(locale, "health.alertComplexity", { count: anomaly.details.length || 1 });
+    return t(locale, "health.alertComplexity", {
+      count: anomaly.details.length || 1,
+    });
   }
   // Score-based anomalies (message contains the value)
   const scoreMatch = anomaly.message.match(/:\s*(\d+)\/100/);
   if (scoreMatch) {
-    const catLabel = t(locale, CATEGORY_KEYS[anomaly.category] ?? "health.catComplexity");
-    return t(locale, "health.alertScoreLow", { category: catLabel, value: scoreMatch[1] });
+    const catLabel = t(
+      locale,
+      CATEGORY_KEYS[anomaly.category] ?? "health.catComplexity",
+    );
+    return t(locale, "health.alertScoreLow", {
+      category: catLabel,
+      value: scoreMatch[1],
+    });
   }
   // BUG/FIXME markers
   const markerMatch = anomaly.message.match(/:\s*(\d+)$/);
@@ -60,11 +74,16 @@ function buildAlertMessage(locale: Locale, result: HealthWatchResult): string {
   const sectorLabel = sectors.join(", ");
 
   const lines: string[] = [];
-  lines.push(`**${t(locale, "health.alertCritical", { sector: sectorLabel })}**`);
+  lines.push(
+    `**${t(locale, "health.alertCritical", { sector: sectorLabel })}**`,
+  );
   lines.push("");
 
   for (const anomaly of critical) {
-    const catLabel = t(locale, CATEGORY_KEYS[anomaly.category] ?? "health.catComplexity");
+    const catLabel = t(
+      locale,
+      CATEGORY_KEYS[anomaly.category] ?? "health.catComplexity",
+    );
     const text = getAnomalyText(locale, anomaly);
     lines.push(`- **${catLabel}**: ${text}`);
     for (const detail of anomaly.details.slice(0, 3)) {
@@ -84,8 +103,14 @@ export function useHealthWatch() {
 
   useEffect(() => {
     const check = async () => {
-      const { settings, locale, lastHealthAlertHash, addMessage, setLastHealthAlertHash, isAiResponding } =
-        useGameStore.getState();
+      const {
+        settings,
+        locale,
+        lastHealthAlertHash,
+        addMessage,
+        setLastHealthAlertHash,
+        isAiResponding,
+      } = useGameStore.getState();
 
       // Skip if no workspace or AI is responding
       if (!settings.workspace_root || isAiResponding) return;

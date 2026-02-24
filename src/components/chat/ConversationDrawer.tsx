@@ -9,7 +9,8 @@ function timeAgo(ts: number, locale: string): string {
   const seconds = Math.floor((Date.now() - ts * 1000) / 1000);
   if (seconds < 60) return locale === "ru" ? "только что" : "just now";
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return locale === "ru" ? `${minutes} мин назад` : `${minutes}m ago`;
+  if (minutes < 60)
+    return locale === "ru" ? `${minutes} мин назад` : `${minutes}m ago`;
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return locale === "ru" ? `${hours} ч назад` : `${hours}h ago`;
   const days = Math.floor(hours / 24);
@@ -38,7 +39,10 @@ export function ConversationDrawer({
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     };

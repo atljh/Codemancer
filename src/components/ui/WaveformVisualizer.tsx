@@ -29,8 +29,14 @@ export function WaveformVisualizer({ className = "" }: Props) {
     ctx.scale(dpr, dpr);
 
     let phase = 0;
-    const speeds = Array.from({ length: BAR_COUNT }, () => 0.8 + Math.random() * 1.2);
-    const offsets = Array.from({ length: BAR_COUNT }, () => Math.random() * Math.PI * 2);
+    const speeds = Array.from(
+      { length: BAR_COUNT },
+      () => 0.8 + Math.random() * 1.2,
+    );
+    const offsets = Array.from(
+      { length: BAR_COUNT },
+      () => Math.random() * Math.PI * 2,
+    );
 
     const draw = () => {
       ctx.clearRect(0, 0, width, HEIGHT);
@@ -46,7 +52,8 @@ export function WaveformVisualizer({ className = "" }: Props) {
         let amplitude: number;
         if (isAiResponding) {
           // Active: sine wave animation
-          amplitude = 0.3 + 0.7 * Math.abs(Math.sin(phase * speeds[i] + offsets[i]));
+          amplitude =
+            0.3 + 0.7 * Math.abs(Math.sin(phase * speeds[i] + offsets[i]));
         } else {
           // Idle: subtle breathing
           amplitude = 0.1 + 0.15 * Math.abs(Math.sin(phase * 0.3 + offsets[i]));
@@ -54,7 +61,9 @@ export function WaveformVisualizer({ className = "" }: Props) {
 
         const barH = Math.max(1, amplitude * HEIGHT);
         const y = (HEIGHT - barH) / 2;
-        const opacity = isAiResponding ? 0.4 + amplitude * 0.5 : 0.15 + amplitude * 0.2;
+        const opacity = isAiResponding
+          ? 0.4 + amplitude * 0.5
+          : 0.15 + amplitude * 0.2;
 
         ctx.fillStyle = accentRgb
           ? `rgba(${accentRgb}, ${opacity})`

@@ -1,5 +1,9 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import type { TelegramDialog, TelegramMessage, CommsAuthState } from "../types/game";
+import type {
+  TelegramDialog,
+  TelegramMessage,
+  CommsAuthState,
+} from "../types/game";
 import { useGameStore } from "../stores/gameStore";
 
 // GramJS types — loaded dynamically to avoid top-level Buffer crash
@@ -28,7 +32,9 @@ export function useTelegram() {
   const codeResolveRef = useRef<((v: string) => void) | null>(null);
   const passwordResolveRef = useRef<((v: string) => void) | null>(null);
 
-  const hasCredentials = !!(settings.telegram_api_id && settings.telegram_api_hash);
+  const hasCredentials = !!(
+    settings.telegram_api_id && settings.telegram_api_hash
+  );
 
   const getClient = useCallback(async () => {
     if (client) return client;
@@ -80,7 +86,9 @@ export function useTelegram() {
       }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasCredentials]);
 
@@ -93,33 +101,38 @@ export function useTelegram() {
     }
   }, [hasCredentials, getClient, markConnected]);
 
-  const startPhoneAuth = useCallback(async (phone: string) => {
-    if (!hasCredentials) return;
-    const c = await getClient();
-    if (!c.connected) await c.connect();
+  const startPhoneAuth = useCallback(
+    async (phone: string) => {
+      if (!hasCredentials) return;
+      const c = await getClient();
+      if (!c.connected) await c.connect();
 
-    setAuthState("code_pending");
+      setAuthState("code_pending");
 
-    try {
-      await c.start({
-        phoneNumber: () => Promise.resolve(phone),
-        phoneCode: () =>
-          new Promise<string>((resolve) => {
-            codeResolveRef.current = resolve;
-          }),
-        password: () => {
-          setAuthState("password_pending");
-          return new Promise<string>((resolve) => {
-            passwordResolveRef.current = resolve;
-          });
-        },
-        onError: ((_err: Error) => true) as unknown as (err: Error) => Promise<boolean>,
-      });
-      markConnected();
-    } catch {
-      setAuthState("disconnected");
-    }
-  }, [hasCredentials, getClient, markConnected]);
+      try {
+        await c.start({
+          phoneNumber: () => Promise.resolve(phone),
+          phoneCode: () =>
+            new Promise<string>((resolve) => {
+              codeResolveRef.current = resolve;
+            }),
+          password: () => {
+            setAuthState("password_pending");
+            return new Promise<string>((resolve) => {
+              passwordResolveRef.current = resolve;
+            });
+          },
+          onError: ((_err: Error) => true) as unknown as (
+            err: Error,
+          ) => Promise<boolean>,
+        });
+        markConnected();
+      } catch {
+        setAuthState("disconnected");
+      }
+    },
+    [hasCredentials, getClient, markConnected],
+  );
 
   const submitPhoneCode = useCallback((code: string) => {
     codeResolveRef.current?.(code);
@@ -139,11 +152,17 @@ export function useTelegram() {
 
     try {
       await c.signInUserWithQrCode(
-        { apiId: parseInt(settings.telegram_api_id, 10), apiHash: settings.telegram_api_hash },
+        {
+          apiId: parseInt(settings.telegram_api_id, 10),
+          apiHash: settings.telegram_api_hash,
+        },
         {
           qrCode: async (code) => {
-            const token = Buffer.from(code.token).toString("base64")
-              .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+            const token = Buffer.from(code.token)
+              .toString("base64")
+              .replace(/\+/g, "-")
+              .replace(/\//g, "_")
+              .replace(/=+$/, "");
             setQrUrl(`tg://login?token=${token}`);
           },
           password: async () => {
@@ -157,15 +176,21 @@ export function useTelegram() {
             // Return true to let GramJS retry with a new QR code
             return true;
           },
-        }
+        },
       );
       markConnected();
     } catch (err) {
       console.error("[COMMS] QR auth failed:", err);
       // Only reset if we're still in qr_pending (not password flow)
-      setAuthState((prev) => prev === "qr_pending" ? "disconnected" : prev);
+      setAuthState((prev) => (prev === "qr_pending" ? "disconnected" : prev));
     }
-  }, [hasCredentials, getClient, settings.telegram_api_id, settings.telegram_api_hash, markConnected]);
+  }, [
+    hasCredentials,
+    getClient,
+    settings.telegram_api_id,
+    settings.telegram_api_hash,
+    markConnected,
+  ]);
 
   const fetchDialogs = useCallback(async () => {
     if (!client || authState !== "connected") return;
@@ -187,30 +212,41 @@ export function useTelegram() {
     }
   }, [authState, setCommsDialogs]);
 
-  const fetchMessages = useCallback(async (dialogId: string) => {
-    if (!client || authState !== "connected") return;
-    try {
-      const entity = await client.getEntity(dialogId);
-      const msgs = await client.getMessages(entity, { limit: 50 });
-      const mapped: TelegramMessage[] = msgs.map((m) => ({
-        id: m.id,
-        senderId: String(m.senderId ?? ""),
-        senderName: (m.sender && "firstName" in m.sender ? String((m.sender as unknown as Record<string, unknown>).firstName ?? "") : ""),
-        text: m.message || "",
-        date: m.date ?? 0,
-        out: m.out ?? false,
-      }));
-      setCommsMessages(mapped);
-    } catch {
-      // error fetching messages
-    }
-  }, [authState, setCommsMessages]);
+  const fetchMessages = useCallback(
+    async (dialogId: string) => {
+      if (!client || authState !== "connected") return;
+      try {
+        const entity = await client.getEntity(dialogId);
+        const msgs = await client.getMessages(entity, { limit: 50 });
+        const mapped: TelegramMessage[] = msgs.map((m) => ({
+          id: m.id,
+          senderId: String(m.senderId ?? ""),
+          senderName:
+            m.sender && "firstName" in m.sender
+              ? String(
+                  (m.sender as unknown as Record<string, unknown>).firstName ??
+                    "",
+                )
+              : "",
+          text: m.message || "",
+          date: m.date ?? 0,
+          out: m.out ?? false,
+        }));
+        setCommsMessages(mapped);
+      } catch {
+        // error fetching messages
+      }
+    },
+    [authState, setCommsMessages],
+  );
 
   const disconnect = useCallback(async () => {
     if (client) {
       try {
         await client.destroy();
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       client = null;
     }
     localStorage.removeItem(SESSION_KEY);

@@ -13,10 +13,16 @@ interface HealthAlertBubbleProps {
 
 function formatTimestamp(ts: number): string {
   const d = new Date(ts);
-  return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return d.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 }
 
-export const HealthAlertBubble = memo(function HealthAlertBubble({ message }: HealthAlertBubbleProps) {
+export const HealthAlertBubble = memo(function HealthAlertBubble({
+  message,
+}: HealthAlertBubbleProps) {
   const [expanded, setExpanded] = useState(true);
   const { t } = useTranslation();
   const toggleHealthPanel = useGameStore((s) => s.toggleHealthPanel);
@@ -70,13 +76,25 @@ export const HealthAlertBubble = memo(function HealthAlertBubble({ message }: He
                 remarkPlugins={[remarkGfm]}
                 components={{
                   p({ children }) {
-                    return <p className="whitespace-pre-wrap leading-relaxed text-[13px] mb-1.5 last:mb-0">{children}</p>;
+                    return (
+                      <p className="whitespace-pre-wrap leading-relaxed text-[13px] mb-1.5 last:mb-0">
+                        {children}
+                      </p>
+                    );
                   },
                   strong({ children }) {
-                    return <strong className="font-bold text-red-300">{children}</strong>;
+                    return (
+                      <strong className="font-bold text-red-300">
+                        {children}
+                      </strong>
+                    );
                   },
                   ul({ children }) {
-                    return <ul className="list-disc list-inside text-[13px] leading-relaxed mb-1.5 space-y-0.5">{children}</ul>;
+                    return (
+                      <ul className="list-disc list-inside text-[13px] leading-relaxed mb-1.5 space-y-0.5">
+                        {children}
+                      </ul>
+                    );
                   },
                   code({ children }) {
                     return (

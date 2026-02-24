@@ -95,7 +95,16 @@ export interface ChatMessage {
   role: "user" | "assistant" | "system";
   content: string;
   timestamp: number;
-  type?: "message" | "action_card" | "action_log" | "health_alert" | "recall" | "blast_radius" | "command_result" | "proactive_log" | "intel_entry";
+  type?:
+    | "message"
+    | "action_card"
+    | "action_log"
+    | "health_alert"
+    | "recall"
+    | "blast_radius"
+    | "command_result"
+    | "proactive_log"
+    | "intel_entry";
   actionCard?: ActionCardData;
   actionLog?: ActionLogData;
   images?: ImageAttachment[];
@@ -142,7 +151,9 @@ export type AuthMethod = "api_key" | "oauth";
 
 export type AIProvider = "anthropic" | "openai" | "gemini" | "custom";
 
-export type ThemeId = "dark-ops" | "midnight" | "phantom" | "arctic";
+export type ThemeId = "dark-ops" | "midnight" | "phantom" | "arctic" | "hacker";
+
+export type SoundPackId = "default" | "jarvis" | "pipboy" | "retro";
 
 export interface AIModel {
   id: string;
@@ -171,6 +182,7 @@ export interface AppSettings {
   custom_model: string;
   telegram_api_id: string;
   telegram_api_hash: string;
+  sound_pack: SoundPackId;
 }
 
 export interface ProjectScanResult {
@@ -349,7 +361,13 @@ export interface TelegramAnalysis {
   quest_suggestion: string | null;
 }
 
-export type CommsAuthState = "disconnected" | "qr_pending" | "phone_pending" | "code_pending" | "password_pending" | "connected";
+export type CommsAuthState =
+  | "disconnected"
+  | "qr_pending"
+  | "phone_pending"
+  | "code_pending"
+  | "password_pending"
+  | "connected";
 
 /** @deprecated Use AIModel instead */
 export type ClaudeModel = AIModel;

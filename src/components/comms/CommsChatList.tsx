@@ -18,7 +18,9 @@ export function CommsChatList() {
   }, [fetchDialogs]);
 
   const filtered = filter
-    ? dialogs.filter((d) => d.title.toLowerCase().includes(filter.toLowerCase()))
+    ? dialogs.filter((d) =>
+        d.title.toLowerCase().includes(filter.toLowerCase()),
+      )
     : dialogs;
 
   const handleSelect = (dialog: TelegramDialog) => {
@@ -27,8 +29,10 @@ export function CommsChatList() {
   };
 
   const getIcon = (d: TelegramDialog) => {
-    if (d.isChannel) return <Megaphone className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />;
-    if (d.isGroup) return <Users className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />;
+    if (d.isChannel)
+      return <Megaphone className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />;
+    if (d.isGroup)
+      return <Users className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />;
     return <MessageSquare className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />;
   };
 
@@ -40,7 +44,10 @@ export function CommsChatList() {
           {t("comms.activeSignals")}
         </h3>
         <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-theme-text-dimmer" strokeWidth={1.5} />
+          <Search
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-theme-text-dimmer"
+            strokeWidth={1.5}
+          />
           <input
             type="text"
             value={filter}
@@ -69,7 +76,13 @@ export function CommsChatList() {
               }`}
             >
               <div className="flex items-center gap-2">
-                <span className={activeDialogId === d.id ? "text-theme-accent" : "text-theme-text-dim"}>
+                <span
+                  className={
+                    activeDialogId === d.id
+                      ? "text-theme-accent"
+                      : "text-theme-text-dim"
+                  }
+                >
                   {getIcon(d)}
                 </span>
                 <span className="text-[11px] font-mono text-theme-text truncate flex-1">

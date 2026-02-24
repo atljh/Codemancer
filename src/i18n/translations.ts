@@ -55,7 +55,8 @@ const translations = {
     // Settings - Fields
     "settings.language": "Language",
     "settings.workspaceRoot": "Project Directory",
-    "settings.workspaceHint": "Root directory of your project. Used for file explorer and project scanning.",
+    "settings.workspaceHint":
+      "Root directory of your project. Used for file explorer and project scanning.",
     "settings.browse": "Browse",
     "settings.fontSize": "Font Size",
     "settings.theme": "Theme",
@@ -63,13 +64,15 @@ const translations = {
     "settings.saved": "Saved!",
     "settings.cancel": "Cancel",
     "settings.apiKey": "Anthropic API Key",
-    "settings.apiKeyHint": "Your API key from console.anthropic.com. Stored locally, never sent to third parties.",
+    "settings.apiKeyHint":
+      "Your API key from console.anthropic.com. Stored locally, never sent to third parties.",
     "settings.model": "AI Model",
     "settings.aiConnected": "AI connected and ready",
     "settings.aiNotConfigured": "API key not configured",
     "settings.dangerZone": "Danger Zone",
     "settings.resetProgress": "Reset Operative Progress",
-    "settings.resetHint": "Resets level, EXP, HP, and MP to starting values. This cannot be undone.",
+    "settings.resetHint":
+      "Resets level, EXP, HP, and MP to starting values. This cannot be undone.",
 
     // Settings - Auth
     "settings.authMethod": "Authentication Method",
@@ -86,13 +89,17 @@ const translations = {
     "welcome.exploreTitle": "Explore Codebase",
     "welcome.exploreDesc": "Scan project structure and discover files",
     "welcome.configureAiTitle": "Configure AI Assistant",
-    "welcome.configureAiDesc": "Set up your Anthropic API key and choose a model",
+    "welcome.configureAiDesc":
+      "Set up your Anthropic API key and choose a model",
     "welcome.questsTitle": "Scan Objectives",
-    "welcome.questsDesc": "Find TODOs in your code and turn them into objectives",
+    "welcome.questsDesc":
+      "Find TODOs in your code and turn them into objectives",
 
     // Welcome (legacy)
-    "welcome.back": "Operative {name} online. Clearance {level}. Operations resumed.",
-    "welcome.error": "Command server unresponsive. Initialize backend to begin operations.",
+    "welcome.back":
+      "Operative {name} online. Clearance {level}. Operations resumed.",
+    "welcome.error":
+      "Command server unresponsive. Initialize backend to begin operations.",
 
     // Quests / Objectives
     "quests.active": "Active Objectives",
@@ -128,8 +135,10 @@ const translations = {
     "project.scanFailed": "Project scan failed",
 
     // Slash commands
-    "slash.unknown": "Unknown command. Available: /status, /ls, /commit, /push, /git-status, /git-diff, /git-log",
-    "slash.noProject": "No project loaded. Use the folder button to select one.",
+    "slash.unknown":
+      "Unknown command. Available: /status, /ls, /commit, /push, /git-status, /git-diff, /git-log",
+    "slash.noProject":
+      "No project loaded. Use the folder button to select one.",
     "slash.commitNoMsg": "Usage: /commit <message>",
 
     // AI
@@ -159,15 +168,20 @@ const translations = {
     "settings.providerGemini": "Gemini",
     "settings.providerCustom": "Custom",
     "settings.openaiApiKey": "OpenAI API Key",
-    "settings.openaiApiKeyHint": "Your API key from platform.openai.com. Stored locally.",
+    "settings.openaiApiKeyHint":
+      "Your API key from platform.openai.com. Stored locally.",
     "settings.geminiApiKey": "Gemini API Key",
-    "settings.geminiApiKeyHint": "Your API key from aistudio.google.com. Stored locally.",
+    "settings.geminiApiKeyHint":
+      "Your API key from aistudio.google.com. Stored locally.",
     "settings.customBaseUrl": "Base URL",
-    "settings.customBaseUrlHint": "OpenAI-compatible endpoint (e.g. http://localhost:11434/v1 for Ollama).",
+    "settings.customBaseUrlHint":
+      "OpenAI-compatible endpoint (e.g. http://localhost:11434/v1 for Ollama).",
     "settings.customApiKey": "API Key (optional)",
-    "settings.customApiKeyHint": "API key for the custom endpoint, if required.",
+    "settings.customApiKeyHint":
+      "API key for the custom endpoint, if required.",
     "settings.customModel": "Model Name",
-    "settings.customModelHint": "Enter the model identifier (e.g. llama3, mixtral).",
+    "settings.customModelHint":
+      "Enter the model identifier (e.g. llama3, mixtral).",
     "settings.customModelPlaceholder": "model-name",
 
     // Git panel
@@ -199,7 +213,8 @@ const translations = {
     "chronicle.copied": "Copied to clipboard",
     "chronicle.copy": "Copy",
     "chronicle.error": "Report generation failed",
-    "chronicle.recallPrefix": "[RECALLING_DATA]: Previously we worked on this module (session from {date}). Current changes build on the previous patch.",
+    "chronicle.recallPrefix":
+      "[RECALLING_DATA]: Previously we worked on this module (session from {date}). Current changes build on the previous patch.",
     "chronicle.recallFiles": "Files affected",
     "chronicle.recallActions": "Past actions",
 
@@ -219,11 +234,14 @@ const translations = {
     "health.error": "Scan failed",
     "health.stabilize": "Initiate stabilization",
     "health.alertDismissed": "Alert acknowledged",
-    "health.alertCritical": "[CRITICAL_ANOMALY]: Instability detected in sector `{sector}`. Bug probability elevated.",
+    "health.alertCritical":
+      "[CRITICAL_ANOMALY]: Instability detected in sector `{sector}`. Bug probability elevated.",
     "health.alertFileSize": "Detected {count} file(s) exceeding 500 lines",
-    "health.alertComplexity": "Detected {count} function(s) exceeding 100 lines",
+    "health.alertComplexity":
+      "Detected {count} function(s) exceeding 100 lines",
     "health.alertScoreLow": "{category} score critically low: {value}/100",
-    "health.alertBugMarkers": "High concentration of BUG/FIXME markers: {count}",
+    "health.alertBugMarkers":
+      "High concentration of BUG/FIXME markers: {count}",
     "health.alertStabilize": "Initiate stabilization operation?",
     "health.catFileSize": "FILE SIZE",
     "health.catComplexity": "COMPLEXITY",
@@ -231,7 +249,8 @@ const translations = {
     "health.catCleanliness": "CLEANLINESS",
 
     // Blast Radius
-    "blast.warning": "[TACTICAL_WARNING]: High blast radius. Damaging this node will affect {count} dependent systems.",
+    "blast.warning":
+      "[TACTICAL_WARNING]: High blast radius. Damaging this node will affect {count} dependent systems.",
     "blast.low": "[PRE_COMMIT_SCAN]: Blast radius: {count} dependent file(s).",
     "blast.dependents": "Affected systems",
     "blast.openMap": "Show on tactical map",
@@ -314,7 +333,8 @@ const translations = {
     // Mission Objective
     "mission.label": "CURRENT OBJECTIVE",
     "mission.noObjective": "No active objective — scan TODOs or create one",
-    "mission.scanHint": "No objectives found. Scan your project for TODOs or create one manually.",
+    "mission.scanHint":
+      "No objectives found. Scan your project for TODOs or create one manually.",
     "mission.scanTodos": "Scan TODOs from code",
     "mission.complete": "Mark as complete",
 
@@ -329,9 +349,11 @@ const translations = {
     "audio.sounds": "Sound Effects",
 
     // Proactive analysis
-    "proactive.header": "[PROACTIVE_LOG]: Background process analysis complete.",
+    "proactive.header":
+      "[PROACTIVE_LOG]: Background process analysis complete.",
     "proactive.changedFiles": "Detected {count} modified file(s) in workspace.",
-    "proactive.suggestion": "Operator, shall we initiate stabilization protocol?",
+    "proactive.suggestion":
+      "Operator, shall we initiate stabilization protocol?",
 
     // Waveform
     "waveform.thinking": "Processing",
@@ -339,7 +361,8 @@ const translations = {
 
     // Intel Feed
     "intel.title": "INTEL FEED",
-    "intel.empty": "No intelligence entries yet. Use voice or text briefings to add operational data.",
+    "intel.empty":
+      "No intelligence entries yet. Use voice or text briefings to add operational data.",
     "intel.voiceTag": "VOICE",
     "intel.textTag": "TEXT",
     "intel.proactiveTag": "AUTO",
@@ -351,11 +374,28 @@ const translations = {
     "intel.done": "Complete",
     "intel.archived": "Archived",
     "intel.processing": "Processing intelligence...",
-    "intel.processed": "[INTEL_PROCESSED]: Briefing analyzed. Intent formulated. Subtasks generated.",
+    "intel.processed":
+      "[INTEL_PROCESSED]: Briefing analyzed. Intent formulated. Subtasks generated.",
     "intel.voiceCommand": "[VOICE_COMMAND]",
     "intel.expBonus": "x1.5 EXP (briefing bonus)",
     "intel.mpReward": "+5 MP (voice briefing)",
     "cmd.toggleIntelFeed": "Intel Feed",
+
+    // Sound packs
+    "settings.soundPack": "Sound Pack",
+    "settings.soundDefault": "Tactical",
+    "settings.soundJarvis": "Jarvis",
+    "settings.soundPipboy": "Pip-Boy",
+    "settings.soundRetro": "Retro Terminal",
+
+    // Self-Repair
+    "repair.title": "SELF-REPAIR",
+    "repair.running": "Repairing...",
+    "repair.toolStart": "Running {tool}...",
+    "repair.toolDone": "{tool} — fixed",
+    "repair.toolFailed": "{tool} — failed",
+    "repair.complete": "Self-repair complete: {ok}/{total} tools passed",
+    "repair.noTools": "No linting tools detected in project",
 
     // Images
     "image.attach": "Attach image",
@@ -450,7 +490,8 @@ const translations = {
     // Settings - Fields
     "settings.language": "Язык",
     "settings.workspaceRoot": "Директория проекта",
-    "settings.workspaceHint": "Корневая директория проекта. Используется для проводника и сканирования.",
+    "settings.workspaceHint":
+      "Корневая директория проекта. Используется для проводника и сканирования.",
     "settings.browse": "Обзор",
     "settings.fontSize": "Размер шрифта",
     "settings.theme": "Тема",
@@ -458,13 +499,15 @@ const translations = {
     "settings.saved": "Сохранено!",
     "settings.cancel": "Отмена",
     "settings.apiKey": "Ключ API Anthropic",
-    "settings.apiKeyHint": "Ваш API ключ с console.anthropic.com. Хранится локально, не отправляется третьим лицам.",
+    "settings.apiKeyHint":
+      "Ваш API ключ с console.anthropic.com. Хранится локально, не отправляется третьим лицам.",
     "settings.model": "Модель ИИ",
     "settings.aiConnected": "ИИ подключён и готов",
     "settings.aiNotConfigured": "API ключ не настроен",
     "settings.dangerZone": "Опасная зона",
     "settings.resetProgress": "Сбросить прогресс оператора",
-    "settings.resetHint": "Сбрасывает уровень, EXP, HP и MP до начальных значений. Отменить нельзя.",
+    "settings.resetHint":
+      "Сбрасывает уровень, EXP, HP и MP до начальных значений. Отменить нельзя.",
 
     // Settings - Auth
     "settings.authMethod": "Метод аутентификации",
@@ -486,8 +529,10 @@ const translations = {
     "welcome.questsDesc": "Найти TODO в коде и превратить их в задачи",
 
     // Welcome (legacy)
-    "welcome.back": "Оператор {name} на связи. Допуск {level}. Операции возобновлены.",
-    "welcome.error": "Командный сервер не отвечает. Запустите бэкенд для начала операций.",
+    "welcome.back":
+      "Оператор {name} на связи. Допуск {level}. Операции возобновлены.",
+    "welcome.error":
+      "Командный сервер не отвечает. Запустите бэкенд для начала операций.",
 
     // Quests / Objectives
     "quests.active": "Активные задачи",
@@ -523,8 +568,10 @@ const translations = {
     "project.scanFailed": "Ошибка сканирования проекта",
 
     // Slash commands
-    "slash.unknown": "Неизвестная команда. Доступны: /status, /ls, /commit, /push, /git-status, /git-diff, /git-log",
-    "slash.noProject": "Проект не загружен. Используйте кнопку папки для выбора.",
+    "slash.unknown":
+      "Неизвестная команда. Доступны: /status, /ls, /commit, /push, /git-status, /git-diff, /git-log",
+    "slash.noProject":
+      "Проект не загружен. Используйте кнопку папки для выбора.",
     "slash.commitNoMsg": "Использование: /commit <сообщение>",
 
     // AI
@@ -554,15 +601,20 @@ const translations = {
     "settings.providerGemini": "Gemini",
     "settings.providerCustom": "Другой",
     "settings.openaiApiKey": "Ключ API OpenAI",
-    "settings.openaiApiKeyHint": "Ваш API ключ с platform.openai.com. Хранится локально.",
+    "settings.openaiApiKeyHint":
+      "Ваш API ключ с platform.openai.com. Хранится локально.",
     "settings.geminiApiKey": "Ключ API Gemini",
-    "settings.geminiApiKeyHint": "Ваш API ключ с aistudio.google.com. Хранится локально.",
+    "settings.geminiApiKeyHint":
+      "Ваш API ключ с aistudio.google.com. Хранится локально.",
     "settings.customBaseUrl": "Базовый URL",
-    "settings.customBaseUrlHint": "OpenAI-совместимый эндпоинт (напр. http://localhost:11434/v1 для Ollama).",
+    "settings.customBaseUrlHint":
+      "OpenAI-совместимый эндпоинт (напр. http://localhost:11434/v1 для Ollama).",
     "settings.customApiKey": "API ключ (опционально)",
-    "settings.customApiKeyHint": "API ключ для кастомного эндпоинта, если требуется.",
+    "settings.customApiKeyHint":
+      "API ключ для кастомного эндпоинта, если требуется.",
     "settings.customModel": "Имя модели",
-    "settings.customModelHint": "Введите идентификатор модели (напр. llama3, mixtral).",
+    "settings.customModelHint":
+      "Введите идентификатор модели (напр. llama3, mixtral).",
     "settings.customModelPlaceholder": "имя-модели",
 
     // Git panel
@@ -594,7 +646,8 @@ const translations = {
     "chronicle.copied": "Скопировано",
     "chronicle.copy": "Копировать",
     "chronicle.error": "Ошибка генерации отчёта",
-    "chronicle.recallPrefix": "[RECALLING_DATA]: Ранее мы работали над этим модулем (сессия от {date}). Текущие изменения дополняют прошлый патч.",
+    "chronicle.recallPrefix":
+      "[RECALLING_DATA]: Ранее мы работали над этим модулем (сессия от {date}). Текущие изменения дополняют прошлый патч.",
     "chronicle.recallFiles": "Затронутые файлы",
     "chronicle.recallActions": "Прошлые действия",
 
@@ -614,11 +667,14 @@ const translations = {
     "health.error": "Ошибка сканирования",
     "health.stabilize": "Начать стабилизацию",
     "health.alertDismissed": "Тревога принята",
-    "health.alertCritical": "[CRITICAL_ANOMALY]: Обнаружена нестабильность в секторе `{sector}`. Вероятность багов повышена.",
+    "health.alertCritical":
+      "[CRITICAL_ANOMALY]: Обнаружена нестабильность в секторе `{sector}`. Вероятность багов повышена.",
     "health.alertFileSize": "Обнаружено {count} файл(ов) свыше 500 строк",
     "health.alertComplexity": "Обнаружено {count} функций свыше 100 строк",
-    "health.alertScoreLow": "Показатель «{category}» критически низок: {value}/100",
-    "health.alertBugMarkers": "Высокая концентрация маркеров BUG/FIXME: {count}",
+    "health.alertScoreLow":
+      "Показатель «{category}» критически низок: {value}/100",
+    "health.alertBugMarkers":
+      "Высокая концентрация маркеров BUG/FIXME: {count}",
     "health.alertStabilize": "Начать операцию по стабилизации?",
     "health.catFileSize": "РАЗМЕР ФАЙЛОВ",
     "health.catComplexity": "СЛОЖНОСТЬ",
@@ -626,8 +682,10 @@ const translations = {
     "health.catCleanliness": "ЧИСТОТА",
 
     // Blast Radius
-    "blast.warning": "[TACTICAL_WARNING]: Высокий радиус поражения (Blast Radius). Повреждение этого узла затронет {count} зависимых систем.",
-    "blast.low": "[PRE_COMMIT_SCAN]: Радиус поражения: {count} зависимый файл(ов).",
+    "blast.warning":
+      "[TACTICAL_WARNING]: Высокий радиус поражения (Blast Radius). Повреждение этого узла затронет {count} зависимых систем.",
+    "blast.low":
+      "[PRE_COMMIT_SCAN]: Радиус поражения: {count} зависимый файл(ов).",
     "blast.dependents": "Затронутые системы",
     "blast.openMap": "Показать на тактической карте",
 
@@ -708,8 +766,10 @@ const translations = {
 
     // Mission Objective
     "mission.label": "ТЕКУЩАЯ ЦЕЛЬ",
-    "mission.noObjective": "Нет активной цели — сканируй TODO или создай вручную",
-    "mission.scanHint": "Цели не найдены. Сканируй проект на TODO или создай задачу вручную.",
+    "mission.noObjective":
+      "Нет активной цели — сканируй TODO или создай вручную",
+    "mission.scanHint":
+      "Цели не найдены. Сканируй проект на TODO или создай задачу вручную.",
     "mission.scanTodos": "Сканировать TODO из кода",
     "mission.complete": "Завершить задачу",
 
@@ -725,7 +785,8 @@ const translations = {
 
     // Proactive analysis
     "proactive.header": "[PROACTIVE_LOG]: Анализ фоновых процессов завершён.",
-    "proactive.changedFiles": "Обнаружено {count} изменённых файл(ов) в рабочем пространстве.",
+    "proactive.changedFiles":
+      "Обнаружено {count} изменённых файл(ов) в рабочем пространстве.",
     "proactive.suggestion": "Оператор, инициировать протокол стабилизации?",
 
     // Waveform
@@ -734,7 +795,8 @@ const translations = {
 
     // Intel Feed
     "intel.title": "РАЗВЕДДАННЫЕ",
-    "intel.empty": "Записей нет. Используй голосовые или текстовые брифинги для добавления оперативных данных.",
+    "intel.empty":
+      "Записей нет. Используй голосовые или текстовые брифинги для добавления оперативных данных.",
     "intel.voiceTag": "ГОЛОС",
     "intel.textTag": "ТЕКСТ",
     "intel.proactiveTag": "АВТО",
@@ -746,11 +808,29 @@ const translations = {
     "intel.done": "Выполнено",
     "intel.archived": "В архиве",
     "intel.processing": "Обработка разведданных...",
-    "intel.processed": "[INTEL_PROCESSED]: Брифинг проанализирован. Намерение сформулировано. Подзадачи сгенерированы.",
+    "intel.processed":
+      "[INTEL_PROCESSED]: Брифинг проанализирован. Намерение сформулировано. Подзадачи сгенерированы.",
     "intel.voiceCommand": "[VOICE_COMMAND]",
     "intel.expBonus": "x1.5 EXP (бонус брифинга)",
     "intel.mpReward": "+5 MP (голосовой брифинг)",
     "cmd.toggleIntelFeed": "Разведданные",
+
+    // Sound packs
+    "settings.soundPack": "Звуковая схема",
+    "settings.soundDefault": "Тактическая",
+    "settings.soundJarvis": "Jarvis",
+    "settings.soundPipboy": "Pip-Boy",
+    "settings.soundRetro": "Ретро-терминал",
+
+    // Self-Repair
+    "repair.title": "АВТОРЕМОНТ",
+    "repair.running": "Ремонт...",
+    "repair.toolStart": "Запуск {tool}...",
+    "repair.toolDone": "{tool} — исправлено",
+    "repair.toolFailed": "{tool} — ошибка",
+    "repair.complete":
+      "Авторемонт завершён: {ok}/{total} инструментов пройдено",
+    "repair.noTools": "Линтеры не обнаружены в проекте",
 
     // Images
     "image.attach": "Прикрепить изображение",

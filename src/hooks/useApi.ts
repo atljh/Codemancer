@@ -56,8 +56,7 @@ const api = {
       body: JSON.stringify({ action }),
     }),
 
-  resetPlayer: () =>
-    fetchJson<Player>("/api/game/reset", { method: "POST" }),
+  resetPlayer: () => fetchJson<Player>("/api/game/reset", { method: "POST" }),
 
   awardMp: (amount = 5, reason = "voice_briefing") =>
     fetchJson<Player>("/api/game/mp_reward", {
@@ -78,7 +77,7 @@ const api = {
   completeQuest: (questId: string) =>
     fetchJson<{ quest: Quest; player: Player }>(
       `/api/quests/${questId}/complete`,
-      { method: "POST" }
+      { method: "POST" },
     ),
 
   scanTodos: (directory: string) =>
@@ -113,13 +112,13 @@ const api = {
     }),
 
   searchFiles: (root: string, query: string, max_results = 100) =>
-    fetchJson<{ matches: { path: string; line: number; text: string }[]; truncated: boolean }>(
-      "/api/files/search",
-      {
-        method: "POST",
-        body: JSON.stringify({ root, query, max_results }),
-      }
-    ),
+    fetchJson<{
+      matches: { path: string; line: number; text: string }[];
+      truncated: boolean;
+    }>("/api/files/search", {
+      method: "POST",
+      body: JSON.stringify({ root, query, max_results }),
+    }),
 
   // Settings
   getSettings: () => fetchJson<AppSettings>("/api/settings/"),
@@ -145,10 +144,13 @@ const api = {
 
   // Chat / Claude API
   chatSend: (messages: ChatMessagePayload[], projectContext = "") =>
-    fetchJson<{ content: string; model: string; tokens_used: number }>("/api/chat/send", {
-      method: "POST",
-      body: JSON.stringify({ messages, project_context: projectContext }),
-    }),
+    fetchJson<{ content: string; model: string; tokens_used: number }>(
+      "/api/chat/send",
+      {
+        method: "POST",
+        body: JSON.stringify({ messages, project_context: projectContext }),
+      },
+    ),
 
   chatStream: (messages: ChatMessagePayload[], projectContext = "") =>
     fetch(`${API_BASE}/api/chat/stream`, {
@@ -158,39 +160,52 @@ const api = {
     }),
 
   getChatModels: (provider?: AIProvider) =>
-    fetchJson<AIModel[]>(`/api/chat/models${provider ? `?provider=${provider}` : ""}`),
+    fetchJson<AIModel[]>(
+      `/api/chat/models${provider ? `?provider=${provider}` : ""}`,
+    ),
 
   getAllChatModels: () =>
     fetchJson<Record<string, AIModel[]>>("/api/chat/models"),
 
   // Commands
   execCommand: (cmd: string, args: string[] = []) =>
-    fetchJson<{ status: string; output: string; exit_code: number }>("/api/commands/exec", {
-      method: "POST",
-      body: JSON.stringify({ cmd, args }),
-    }),
+    fetchJson<{ status: string; output: string; exit_code: number }>(
+      "/api/commands/exec",
+      {
+        method: "POST",
+        body: JSON.stringify({ cmd, args }),
+      },
+    ),
 
   // Recent projects
   getRecentProjects: () =>
-    fetchJson<{ path: string; name: string; last_opened: number }[]>("/api/settings/recent-projects"),
+    fetchJson<{ path: string; name: string; last_opened: number }[]>(
+      "/api/settings/recent-projects",
+    ),
 
   addRecentProject: (path: string, name?: string) =>
-    fetchJson<{ path: string; name: string; last_opened: number }[]>("/api/settings/add-project", {
-      method: "POST",
-      body: JSON.stringify({ path, name: name || "" }),
-    }),
+    fetchJson<{ path: string; name: string; last_opened: number }[]>(
+      "/api/settings/add-project",
+      {
+        method: "POST",
+        body: JSON.stringify({ path, name: name || "" }),
+      },
+    ),
 
   // Conversations
-  getConversations: () =>
-    fetchJson<ConversationMeta[]>("/api/conversations/"),
+  getConversations: () => fetchJson<ConversationMeta[]>("/api/conversations/"),
 
   createConversation: () =>
     fetchJson<ConversationMeta>("/api/conversations/", { method: "POST" }),
 
   getConversation: (id: string) =>
-    fetchJson<{ id: string; title: string; created_at: number; updated_at: number; messages: ChatMessage[] }>(
-      `/api/conversations/${id}`
-    ),
+    fetchJson<{
+      id: string;
+      title: string;
+      created_at: number;
+      updated_at: number;
+      messages: ChatMessage[];
+    }>(`/api/conversations/${id}`),
 
   saveMessages: (id: string, messages: ChatMessage[]) =>
     fetchJson<ConversationMeta>(`/api/conversations/${id}/messages`, {
@@ -199,7 +214,9 @@ const api = {
     }),
 
   deleteConversation: (id: string) =>
-    fetchJson<{ ok: boolean }>(`/api/conversations/${id}`, { method: "DELETE" }),
+    fetchJson<{ ok: boolean }>(`/api/conversations/${id}`, {
+      method: "DELETE",
+    }),
 
   renameConversation: (id: string, title: string) =>
     fetchJson<ConversationMeta>(`/api/conversations/${id}`, {
@@ -210,8 +227,7 @@ const api = {
   // Git
   gitStatus: () => fetchJson<GitStatus>("/api/git/status"),
 
-  gitBranches: () =>
-    fetchJson<{ branches: GitBranch[] }>("/api/git/branches"),
+  gitBranches: () => fetchJson<{ branches: GitBranch[] }>("/api/git/branches"),
 
   gitStage: (paths: string[]) =>
     fetchJson<{ ok: boolean }>("/api/git/stage", {
@@ -245,7 +261,7 @@ const api = {
   // Chronicle
   getChronicleEvents: (sessionId?: string, limit = 50, offset = 0) =>
     fetchJson<ChronicleEvent[]>(
-      `/api/chronicle/events?limit=${limit}&offset=${offset}${sessionId ? `&session_id=${sessionId}` : ""}`
+      `/api/chronicle/events?limit=${limit}&offset=${offset}${sessionId ? `&session_id=${sessionId}` : ""}`,
     ),
 
   getChronicleSessions: (limit = 20) =>
@@ -287,50 +303,107 @@ const api = {
   focusStatus: () => fetchJson<FocusStatus>("/api/game/focus/status"),
 
   replaceInFiles: (root: string, search: string, replace: string) =>
-    fetchJson<{ files_modified: number; replacements_made: number }>("/api/files/replace", {
-      method: "POST",
-      body: JSON.stringify({ root, search, replace }),
-    }),
+    fetchJson<{ files_modified: number; replacements_made: number }>(
+      "/api/files/replace",
+      {
+        method: "POST",
+        body: JSON.stringify({ root, search, replace }),
+      },
+    ),
 
   // Proactive analysis
   proactivePulse: () =>
-    fetchJson<{ has_findings: boolean; findings: { severity: string; type: string; message: string; detail: string }[]; diff_summary: string; changed_files: number }>("/api/proactive/pulse"),
+    fetchJson<{
+      has_findings: boolean;
+      findings: {
+        severity: string;
+        type: string;
+        message: string;
+        detail: string;
+      }[];
+      diff_summary: string;
+      changed_files: number;
+    }>("/api/proactive/pulse"),
 
   // Intel logs
   getIntelLogs: (status?: string, limit = 50) =>
     fetchJson<IntelLog[]>(
-      `/api/chronicle/intel?limit=${limit}${status ? `&status=${status}` : ""}`
+      `/api/chronicle/intel?limit=${limit}${status ? `&status=${status}` : ""}`,
     ),
 
-  createIntelLog: (data: { source: string; raw_input: string; intent: string; subtasks: string[]; exp_multiplier?: number }) =>
+  createIntelLog: (data: {
+    source: string;
+    raw_input: string;
+    intent: string;
+    subtasks: string[];
+    exp_multiplier?: number;
+  }) =>
     fetchJson<IntelLog>("/api/chronicle/intel", {
       method: "POST",
       body: JSON.stringify(data),
     }),
 
   updateIntelStatus: (intelId: number, status: string) =>
-    fetchJson<{ ok: boolean }>(`/api/chronicle/intel/${intelId}?status=${status}`, {
-      method: "PATCH",
-    }),
+    fetchJson<{ ok: boolean }>(
+      `/api/chronicle/intel/${intelId}?status=${status}`,
+      {
+        method: "PATCH",
+      },
+    ),
 
   // Intelligence processing
-  processIntelligence: (rawInput: string, source = "text", projectContext = "") =>
+  processIntelligence: (
+    rawInput: string,
+    source = "text",
+    projectContext = "",
+  ) =>
     fetchJson<IntelligenceResult>("/api/chat/process_intelligence", {
       method: "POST",
-      body: JSON.stringify({ raw_input: rawInput, source, project_context: projectContext }),
+      body: JSON.stringify({
+        raw_input: rawInput,
+        source,
+        project_context: projectContext,
+      }),
     }),
 
   // Telegram / COMMS
-  analyzeTelegramMessage: (messageText: string, senderName: string, projectContext: string, projectFiles: string[]) =>
+  analyzeTelegramMessage: (
+    messageText: string,
+    senderName: string,
+    projectContext: string,
+    projectFiles: string[],
+  ) =>
     fetchJson<TelegramAnalysis>("/api/telegram/analyze", {
       method: "POST",
-      body: JSON.stringify({ message_text: messageText, sender_name: senderName, project_context: projectContext, project_files: projectFiles }),
+      body: JSON.stringify({
+        message_text: messageText,
+        sender_name: senderName,
+        project_context: projectContext,
+        project_files: projectFiles,
+      }),
     }),
 
-  extractTelegramQuest: (messageText: string, senderName: string, linkedFiles: string[], questTitle?: string) =>
+  extractTelegramQuest: (
+    messageText: string,
+    senderName: string,
+    linkedFiles: string[],
+    questTitle?: string,
+  ) =>
     fetchJson<Quest>("/api/telegram/extract_quest", {
       method: "POST",
-      body: JSON.stringify({ message_text: messageText, sender_name: senderName, linked_files: linkedFiles, quest_title: questTitle || "" }),
+      body: JSON.stringify({
+        message_text: messageText,
+        sender_name: senderName,
+        linked_files: linkedFiles,
+        quest_title: questTitle || "",
+      }),
+    }),
+
+  // Self-repair (streaming)
+  selfRepairStream: () =>
+    fetch(`${API_BASE}/api/repair/run`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
     }),
 };
 

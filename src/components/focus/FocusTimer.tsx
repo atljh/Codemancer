@@ -23,7 +23,8 @@ export function FocusTimer() {
   useEffect(() => {
     if (!showMenu) return;
     const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setShowMenu(false);
+      if (menuRef.current && !menuRef.current.contains(e.target as Node))
+        setShowMenu(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);

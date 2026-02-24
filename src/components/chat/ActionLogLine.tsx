@@ -14,11 +14,7 @@ export function ActionLogLine({ log }: ActionLogLineProps) {
         : "text-theme-text-dim";
 
   const statusLabel =
-    log.status === "done"
-      ? "DONE"
-      : log.status === "error"
-        ? "ERR"
-        : "...";
+    log.status === "done" ? "DONE" : log.status === "error" ? "ERR" : "...";
 
   return (
     <motion.div

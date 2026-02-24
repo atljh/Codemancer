@@ -13,10 +13,17 @@ interface MessageBubbleProps {
 
 function formatTimestamp(ts: number): string {
   const d = new Date(ts);
-  return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return d.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 }
 
-export const MessageBubble = memo(function MessageBubble({ message, onApplyCode }: MessageBubbleProps) {
+export const MessageBubble = memo(function MessageBubble({
+  message,
+  onApplyCode,
+}: MessageBubbleProps) {
   const isUser = message.role === "user";
   const isSystem = message.role === "system";
   const { t } = useTranslation();
@@ -68,9 +75,15 @@ export const MessageBubble = memo(function MessageBubble({ message, onApplyCode 
         `}
       >
         {/* Timestamp + prefix header */}
-        <div className={`text-[10px] mb-1.5 tracking-wider font-bold ${
-          isSystem ? "text-theme-status-warning/50" : isUser ? "text-theme-accent/40" : "text-theme-purple/40"
-        }`}>
+        <div
+          className={`text-[10px] mb-1.5 tracking-wider font-bold ${
+            isSystem
+              ? "text-theme-status-warning/50"
+              : isUser
+                ? "text-theme-accent/40"
+                : "text-theme-purple/40"
+          }`}
+        >
           [{timestamp}] [{prefix}]
         </div>
 
@@ -140,36 +153,77 @@ export const MessageBubble = memo(function MessageBubble({ message, onApplyCode 
             },
             // Paragraphs
             p({ children }) {
-              return <p className="whitespace-pre-wrap leading-relaxed text-[13px] mb-1.5 last:mb-0">{children}</p>;
+              return (
+                <p className="whitespace-pre-wrap leading-relaxed text-[13px] mb-1.5 last:mb-0">
+                  {children}
+                </p>
+              );
             },
             // Bold
             strong({ children }) {
-              return <strong className="font-bold text-theme-text">{children}</strong>;
+              return (
+                <strong className="font-bold text-theme-text">
+                  {children}
+                </strong>
+              );
             },
             // Lists
             ul({ children }) {
-              return <ul className="list-disc list-inside text-[13px] leading-relaxed mb-1.5 space-y-0.5">{children}</ul>;
+              return (
+                <ul className="list-disc list-inside text-[13px] leading-relaxed mb-1.5 space-y-0.5">
+                  {children}
+                </ul>
+              );
             },
             ol({ children }) {
-              return <ol className="list-decimal list-inside text-[13px] leading-relaxed mb-1.5 space-y-0.5">{children}</ol>;
+              return (
+                <ol className="list-decimal list-inside text-[13px] leading-relaxed mb-1.5 space-y-0.5">
+                  {children}
+                </ol>
+              );
             },
             // Headings
             h1({ children }) {
-              return <h1 className="text-sm font-bold text-theme-text mb-1 mt-2">{children}</h1>;
+              return (
+                <h1 className="text-sm font-bold text-theme-text mb-1 mt-2">
+                  {children}
+                </h1>
+              );
             },
             h2({ children }) {
-              return <h2 className="text-sm font-bold text-theme-text mb-1 mt-2">{children}</h2>;
+              return (
+                <h2 className="text-sm font-bold text-theme-text mb-1 mt-2">
+                  {children}
+                </h2>
+              );
             },
             h3({ children }) {
-              return <h3 className="text-[13px] font-bold text-theme-text mb-1 mt-1.5">{children}</h3>;
+              return (
+                <h3 className="text-[13px] font-bold text-theme-text mb-1 mt-1.5">
+                  {children}
+                </h3>
+              );
             },
             // Links
             a({ href, children }) {
-              return <a href={href} target="_blank" rel="noopener noreferrer" className="text-theme-accent underline underline-offset-2 hover:text-theme-accent/80">{children}</a>;
+              return (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-theme-accent underline underline-offset-2 hover:text-theme-accent/80"
+                >
+                  {children}
+                </a>
+              );
             },
             // Blockquote
             blockquote({ children }) {
-              return <blockquote className="border-l-2 border-theme-accent/30 pl-2.5 my-1.5 text-theme-text-dim italic">{children}</blockquote>;
+              return (
+                <blockquote className="border-l-2 border-theme-accent/30 pl-2.5 my-1.5 text-theme-text-dim italic">
+                  {children}
+                </blockquote>
+              );
             },
             // Horizontal rule
             hr() {

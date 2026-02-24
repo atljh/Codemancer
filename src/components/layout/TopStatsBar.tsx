@@ -1,5 +1,18 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Settings, FolderOpen, Shield, HardDrive, ChevronDown, GitBranch, FolderTree, ScrollText, Radar, Volume2, VolumeX } from "lucide-react";
+import {
+  Settings,
+  FolderOpen,
+  Shield,
+  HardDrive,
+  ChevronDown,
+  GitBranch,
+  FolderTree,
+  ScrollText,
+  Radar,
+  Volume2,
+  VolumeX,
+  Wrench,
+} from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { StatBar } from "../bars/StatBar";
 import { ExpBar } from "../bars/ExpBar";
@@ -7,6 +20,7 @@ import { FocusTimer } from "../focus/FocusTimer";
 import { WaveformVisualizer } from "../ui/WaveformVisualizer";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
+import { useAudio } from "../../hooks/useAudio";
 import { useTranslation } from "../../hooks/useTranslation";
 import { shortenPath } from "../../utils/paths";
 
@@ -40,7 +54,10 @@ export function TopStatsBar() {
   const setSoundEnabled = useGameStore((s) => s.setSoundEnabled);
   const ttsEnabled = useGameStore((s) => s.ttsEnabled);
   const setTtsEnabled = useGameStore((s) => s.setTtsEnabled);
+  const selfRepairActive = useGameStore((s) => s.selfRepairActive);
+  const setSelfRepairActive = useGameStore((s) => s.setSelfRepairActive);
   const api = useApi();
+  const { playSound } = useAudio();
   const { t } = useTranslation();
 
   const [recentProjects, setRecentProjects] = useState<RecentProject[]>([]);
@@ -50,7 +67,10 @@ export function TopStatsBar() {
   // Close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
@@ -92,7 +112,17 @@ export function TopStatsBar() {
         addActionLog({ action: t("project.scanFailed"), status: "error" });
       }
     },
-    [settings, setSettings, setFileTreeRoot, api, addActionLog, setProjectScan, setPlayer, addActionCard, t]
+    [
+      settings,
+      setSettings,
+      setFileTreeRoot,
+      api,
+      addActionLog,
+      setProjectScan,
+      setPlayer,
+      addActionCard,
+      t,
+    ],
   );
 
   const handlePickFolder = async () => {
@@ -117,6 +147,79 @@ export function TopStatsBar() {
     setShowDropdown(!showDropdown);
   };
 
+  const handleSelfRepair = async () => {
+    if (selfRepairActive) return;
+    setSelfRepairActive(true);
+    playSound("self_repair_start");
+    addActionLog({ action: t("repair.running"), status: "pending" });
+
+    try {
+      const res = await api.selfRepairStream();
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("No stream");
+
+      const decoder = new TextDecoder();
+      let buf = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split("\n\n");
+        buf = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.type === "tool_start") {
+              playSound("self_repair_tick");
+              addActionLog({
+                action: (t("repair.toolStart") as string).replace(
+                  "{tool}",
+                  data.tool,
+                ),
+                status: "pending",
+                toolName: data.tool,
+              });
+            } else if (data.type === "tool_result") {
+              const ok = data.status === "success";
+              addActionLog({
+                action: ok
+                  ? (t("repair.toolDone") as string).replace(
+                      "{tool}",
+                      data.tool,
+                    )
+                  : (t("repair.toolFailed") as string).replace(
+                      "{tool}",
+                      data.tool,
+                    ),
+                status: ok ? "done" : "error",
+                toolName: data.tool,
+                expGained: ok ? 15 : 0,
+              });
+            } else if (data.type === "complete") {
+              playSound("self_repair_done");
+              addActionLog({
+                action: (t("repair.complete") as string)
+                  .replace("{ok}", String(data.tools_succeeded))
+                  .replace("{total}", String(data.tools_run)),
+                status: data.tools_succeeded > 0 ? "done" : "error",
+                expGained: data.tools_succeeded * 25,
+              });
+            }
+          } catch {
+            // parse error, skip
+          }
+        }
+      }
+    } catch {
+      addActionLog({ action: t("repair.noTools"), status: "error" });
+    } finally {
+      setSelfRepairActive(false);
+    }
+  };
+
   return (
     <div className="h-11 flex items-center gap-4 px-4 glass-panel border-b border-[var(--theme-glass-border)] shrink-0">
       {/* Operative ID + Level */}
@@ -136,7 +239,10 @@ export function TopStatsBar() {
       <div className="w-px h-5 bg-[var(--theme-glass-border)]" />
 
       {/* Folder picker + project path + recent projects dropdown */}
-      <div className="flex items-center gap-1.5 min-w-0 relative" ref={dropdownRef}>
+      <div
+        className="flex items-center gap-1.5 min-w-0 relative"
+        ref={dropdownRef}
+      >
         <button
           onClick={handlePickFolder}
           className="p-1 rounded hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent transition-colors shrink-0"
@@ -154,7 +260,10 @@ export function TopStatsBar() {
             <span className="text-theme-text-dimmer ml-1.5">
               [{projectScan.total_files} files]
             </span>
-            <ChevronDown className="w-2.5 h-2.5 ml-0.5 shrink-0" strokeWidth={1.5} />
+            <ChevronDown
+              className="w-2.5 h-2.5 ml-0.5 shrink-0"
+              strokeWidth={1.5}
+            />
           </button>
         )}
 
@@ -169,7 +278,9 @@ export function TopStatsBar() {
                 title={p.path}
               >
                 <span className="text-theme-text">{p.name}</span>
-                <span className="text-theme-text-dimmer ml-2">{shortenPath(p.path)}</span>
+                <span className="text-theme-text-dimmer ml-2">
+                  {shortenPath(p.path)}
+                </span>
               </button>
             ))}
           </div>
@@ -182,10 +293,20 @@ export function TopStatsBar() {
       {/* Stat Bars */}
       <div className="flex items-center gap-4 flex-1 max-w-lg">
         <div className="flex-1">
-          <StatBar label={t("stats.hp")} current={player.hp} max={player.max_hp} color="red" />
+          <StatBar
+            label={t("stats.hp")}
+            current={player.hp}
+            max={player.max_hp}
+            color="red"
+          />
         </div>
         <div className="flex-1">
-          <StatBar label={t("stats.mp")} current={player.mp} max={player.max_mp} color="purple" />
+          <StatBar
+            label={t("stats.mp")}
+            current={player.mp}
+            max={player.max_mp}
+            color="purple"
+          />
         </div>
         <div className="flex-1">
           <ExpBar />
@@ -197,7 +318,10 @@ export function TopStatsBar() {
         <>
           <div className="w-px h-5 bg-[var(--theme-glass-border)]" />
           <div className="flex items-center gap-1">
-            <HardDrive className="w-3 h-3 text-theme-accent/60" strokeWidth={1.5} />
+            <HardDrive
+              className="w-3 h-3 text-theme-accent/60"
+              strokeWidth={1.5}
+            />
             <span className="text-[10px] font-mono text-theme-accent/60">
               {t("stats.data")}: {formatBytes(totalBytesProcessed)}
             </span>
@@ -227,7 +351,9 @@ export function TopStatsBar() {
               ? "text-theme-accent/60 hover:text-theme-accent"
               : "text-theme-text-dimmer hover:text-theme-text-dim"
           }`}
-          title={soundEnabled ? (ttsEnabled ? "TTS + SFX" : "SFX only") : "Muted"}
+          title={
+            soundEnabled ? (ttsEnabled ? "TTS + SFX" : "SFX only") : "Muted"
+          }
         >
           {soundEnabled ? (
             <Volume2 className="w-3 h-3" strokeWidth={1.5} />
@@ -237,7 +363,22 @@ export function TopStatsBar() {
         </button>
       </div>
 
-      {/* Chronicle + Health + Explorer + Git + Settings */}
+      {/* Self-Repair + Chronicle + Health + Explorer + Git + Settings */}
+      <button
+        onClick={handleSelfRepair}
+        disabled={selfRepairActive}
+        className={`p-1.5 rounded transition-colors ${
+          selfRepairActive
+            ? "bg-theme-status-warning/20 text-theme-status-warning animate-pulse"
+            : "hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent"
+        }`}
+        title={t("repair.title")}
+      >
+        <Wrench
+          className={`w-4 h-4 ${selfRepairActive ? "animate-spin" : ""}`}
+          strokeWidth={1.5}
+        />
+      </button>
       <button
         onClick={toggleChronicle}
         className={`p-1.5 rounded transition-colors ${

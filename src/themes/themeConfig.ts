@@ -1,4 +1,4 @@
-export type ThemeId = "dark-ops" | "midnight" | "phantom" | "arctic";
+export type ThemeId = "dark-ops" | "midnight" | "phantom" | "arctic" | "hacker";
 
 export interface MonacoColors {
   bg: string;
@@ -112,6 +112,28 @@ export const themes: Record<ThemeId, ThemeConfig> = {
       selection: "#0077b620",
       lineNumber: "#8a9bb0",
       lineNumberActive: "#1a2a3a",
+    },
+  },
+  hacker: {
+    id: "hacker",
+    label: "HACKER",
+    accentRgb: "0,255,65",
+    accentHue: 135,
+    previewBg: "#020a02",
+    previewAccent: "#00ff41",
+    previewSurface: "#0a1a0a",
+    monacoBase: "vs-dark",
+    monaco: {
+      bg: "#020a02",
+      surface: "#061208",
+      border: "#0a3a0a",
+      text: "#33ff66",
+      textDim: "#1a8a2e",
+      accent: "#00ff41",
+      lineHighlight: "#0a1a0a",
+      selection: "#00ff4120",
+      lineNumber: "#1a5a2a",
+      lineNumberActive: "#33ff66",
     },
   },
 };

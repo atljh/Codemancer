@@ -13,7 +13,17 @@ export default defineConfig(async () => ({
     tailwindcss(),
     nodePolyfills({
       // buffer excluded — handled via resolve.alias to avoid duplicate Buffer classes (GramJS compat)
-      include: ["util", "events", "stream", "string_decoder", "path", "os", "crypto", "net", "assert"],
+      include: [
+        "util",
+        "events",
+        "stream",
+        "string_decoder",
+        "path",
+        "os",
+        "crypto",
+        "net",
+        "assert",
+      ],
       globals: { Buffer: false, global: true, process: true },
     }),
   ],
