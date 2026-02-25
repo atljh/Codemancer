@@ -60,40 +60,80 @@ function getAnomalyText(locale: Locale, anomaly: CriticalAnomaly): string {
     });
   }
   // BUG/FIXME markers
-  const markerMatch = anomaly.message.match(/:\s*(\d+)$/);
-  if (markerMatch) {
+  const markerMatch = anomaly.message.match(/:\s*(\d+)/);
+  if (markerMatch && anomaly.category === "cleanliness") {
     return t(locale, "health.alertBugMarkers", { count: markerMatch[1] });
   }
   return anomaly.message;
 }
 
-function buildAlertMessage(locale: Locale, result: HealthWatchResult): string {
-  const critical = result.anomalies.filter((a) => a.severity === "critical");
-  if (critical.length === 0) return "";
+/** Determine the highest severity in a set of anomalies */
+function topSeverity(
+  anomalies: CriticalAnomaly[],
+): "critical" | "warning" | "info" | "notice" {
+  if (anomalies.some((a) => a.severity === "critical")) return "critical";
+  if (anomalies.some((a) => a.severity === "warning")) return "warning";
+  if (anomalies.some((a) => a.severity === "info")) return "info";
+  return "notice";
+}
 
-  const sectors = [...new Set(critical.map((a) => a.sector))];
+function buildAlertMessage(locale: Locale, result: HealthWatchResult): string {
+  // Include warnings and above (skip pure info/notice)
+  const significant = result.anomalies.filter(
+    (a) => a.severity === "critical" || a.severity === "warning",
+  );
+  // Also gather info items for a summary section
+  const informational = result.anomalies.filter(
+    (a) => a.severity === "info" || a.severity === "notice",
+  );
+
+  if (significant.length === 0 && informational.length === 0) return "";
+
+  const severity = topSeverity(result.anomalies);
+  const sectors = [
+    ...new Set(result.anomalies.map((a) => a.sector)),
+  ];
   const sectorLabel = sectors.join(", ");
 
   const lines: string[] = [];
   lines.push(
-    `**${t(locale, "health.alertCritical", { sector: sectorLabel })}**`,
+    `**${t(locale, "health.alertStabilityReport", { sector: sectorLabel })}**`,
   );
   lines.push("");
 
-  for (const anomaly of critical) {
+  // Warnings
+  for (const anomaly of significant) {
     const catLabel = t(
       locale,
       CATEGORY_KEYS[anomaly.category] ?? "health.catComplexity",
     );
     const text = getAnomalyText(locale, anomaly);
-    lines.push(`- **${catLabel}**: ${text}`);
+    const badge = anomaly.severity === "critical" ? "CRITICAL" : "WARNING";
+    lines.push(`- **[${badge}] ${catLabel}**: ${text}`);
     for (const detail of anomaly.details.slice(0, 3)) {
       lines.push(`  - \`${detail}\``);
     }
   }
 
+  // Info items — compact
+  if (informational.length > 0) {
+    if (significant.length > 0) lines.push("");
+    for (const anomaly of informational) {
+      const catLabel = t(
+        locale,
+        CATEGORY_KEYS[anomaly.category] ?? "health.catComplexity",
+      );
+      const text = getAnomalyText(locale, anomaly);
+      lines.push(`- **[INFO] ${catLabel}**: ${text}`);
+    }
+  }
+
   lines.push("");
-  lines.push(t(locale, "health.alertStabilize"));
+  lines.push(
+    severity === "critical" || severity === "warning"
+      ? t(locale, "health.alertStabilize")
+      : t(locale, "health.alertReviewRecommended"),
+  );
 
   return lines.join("\n");
 }
@@ -141,10 +181,14 @@ export function useHealthWatch() {
 
         setLastHealthAlertHash(hash);
 
-        // Trigger smart alert shudder + thud sound
-        const { triggerSmartAlert } = useGameStore.getState();
-        triggerSmartAlert();
-        playSoundRef.current("smart_alert");
+        const severity = topSeverity(result.anomalies);
+
+        // Only shudder + sound for critical/warning, not info
+        if (severity === "critical" || severity === "warning") {
+          const { triggerSmartAlert } = useGameStore.getState();
+          triggerSmartAlert();
+          playSoundRef.current("smart_alert");
+        }
 
         addMessage({
           role: "system",

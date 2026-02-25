@@ -269,7 +269,7 @@ export interface HealthScanResult {
 }
 
 export interface CriticalAnomaly {
-  severity: "critical" | "warning";
+  severity: "critical" | "warning" | "info" | "notice";
   category: string;
   sector: string;
   message: string;

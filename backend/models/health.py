@@ -36,7 +36,7 @@ class HealthScanResponse(BaseModel):
 
 
 class CriticalAnomaly(BaseModel):
-    severity: str  # "critical" | "warning"
+    severity: str  # "critical" | "warning" | "info" | "notice"
     category: str  # "file_size" | "complexity" | "coverage" | "cleanliness"
     sector: str  # affected directory/area
     message: str

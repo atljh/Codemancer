@@ -156,16 +156,23 @@ class HealthService:
         return results
 
     def watch(self) -> HealthWatchResponse:
-        """Fast check for critical anomalies only."""
-        large_files = self._find_large_files(threshold=800)
-        complex_fns = self._find_complex_functions(threshold=150)
+        """Stability report — checks for structural issues.
+
+        Severity levels:
+          critical — only for LSP/import errors or broken builds
+          warning  — functions > 100 lines, low scores
+          info     — large files (> 500 lines), minor markers
+          notice   — files > 500 lines (informational)
+        """
+        large_files = self._find_large_files(threshold=500)
+        complex_fns = self._find_complex_functions(threshold=100)
         anomalies_raw = self._find_anomalies()
         untested = self._find_untested_files()
         scores = self._compute_scores(complex_fns, untested, anomalies_raw, large_files)
 
-        critical: list[CriticalAnomaly] = []
+        findings: list[CriticalAnomaly] = []
 
-        # Critical: files over 800 lines (warning for 500-800)
+        # Files > 500 lines — NOTICE (informational, not alarming)
         if large_files:
             sectors = set()
             details = []
@@ -174,15 +181,15 @@ class HealthService:
                 sector = "/".join(parts[:2]) if len(parts) > 1 else parts[0]
                 sectors.add(sector)
                 details.append(f"{lf.file} ({lf.lines} lines)")
-            critical.append(CriticalAnomaly(
-                severity="critical" if any(lf.lines >= 1200 for lf in large_files) else "warning",
+            findings.append(CriticalAnomaly(
+                severity="info",
                 category="file_size",
                 sector=", ".join(sorted(sectors)),
-                message=f"Detected {len(large_files)} file(s) exceeding 800 lines",
+                message=f"{len(large_files)} file(s) exceed 500 lines",
                 details=details,
             ))
 
-        # Critical: functions over 150 lines (warning for less)
+        # Functions > 100 lines — INFO/WARNING (cognitive load indicator)
         if complex_fns:
             sectors = set()
             details = []
@@ -191,45 +198,45 @@ class HealthService:
                 sector = "/".join(parts[:2]) if len(parts) > 1 else parts[0]
                 sectors.add(sector)
                 details.append(f"{cf.file}:{cf.name} ({cf.lines} lines)")
-            critical.append(CriticalAnomaly(
-                severity="critical" if any(cf.lines >= 300 for cf in complex_fns) else "warning",
+            findings.append(CriticalAnomaly(
+                severity="warning" if any(cf.lines >= 200 for cf in complex_fns) else "info",
                 category="complexity",
                 sector=", ".join(sorted(sectors)),
-                message=f"Detected {len(complex_fns)} function(s) exceeding 150 lines",
+                message=f"{len(complex_fns)} function(s) with elevated cognitive complexity",
                 details=details,
             ))
 
-        # Critical: score below 15, Warning: below 30 (coverage exempt — no tests is common)
+        # Score-based warnings — only WARNING, never CRITICAL for scores
         for field in ("complexity", "cleanliness", "file_size"):
             val = getattr(scores, field)
-            if val < 15:
-                critical.append(CriticalAnomaly(
-                    severity="critical",
-                    category=field,
-                    sector="project-wide",
-                    message=f"{field.replace('_', ' ').title()} score critically low: {val}/100",
-                    details=[],
-                ))
-            elif val < 30:
-                critical.append(CriticalAnomaly(
+            if val < 20:
+                findings.append(CriticalAnomaly(
                     severity="warning",
                     category=field,
                     sector="project-wide",
-                    message=f"{field.replace('_', ' ').title()} score low: {val}/100",
+                    message=f"{field.replace('_', ' ').title()} index: {val}/100",
+                    details=[],
+                ))
+            elif val < 40:
+                findings.append(CriticalAnomaly(
+                    severity="info",
+                    category=field,
+                    sector="project-wide",
+                    message=f"{field.replace('_', ' ').title()} index: {val}/100",
                     details=[],
                 ))
 
-        # Coverage: only warn, never critical (many projects lack tests)
+        # Coverage: only info (many projects lack tests)
         if scores.coverage < 20:
-            critical.append(CriticalAnomaly(
-                severity="warning",
+            findings.append(CriticalAnomaly(
+                severity="info",
                 category="coverage",
                 sector="project-wide",
-                message=f"Coverage score low: {scores.coverage}/100",
+                message=f"Coverage index: {scores.coverage}/100",
                 details=[],
             ))
 
-        # Warning: BUG/FIXME count high
+        # BUG/FIXME markers — WARNING only at high counts
         bug_tags = [a for a in anomalies_raw if a.tag in ("BUG", "FIXME")]
         if len(bug_tags) >= 5:
             sectors = set()
@@ -239,17 +246,23 @@ class HealthService:
                 sector = "/".join(parts[:2]) if len(parts) > 1 else parts[0]
                 sectors.add(sector)
                 details.append(f"{bt.file}:{bt.line} — {bt.tag}: {bt.text}")
-            critical.append(CriticalAnomaly(
+            findings.append(CriticalAnomaly(
                 severity="warning",
                 category="cleanliness",
                 sector=", ".join(sorted(sectors)),
-                message=f"High concentration of BUG/FIXME markers: {len(bug_tags)}",
+                message=f"{len(bug_tags)} unresolved BUG/FIXME markers",
                 details=details,
             ))
 
+        # True CRITICAL: reserved for broken imports / LSP errors
+        # (These would be injected by external LSP integration if available)
+
+        has_critical = any(a.severity == "critical" for a in findings)
+        has_warnings = any(a.severity in ("critical", "warning") for a in findings)
+
         return HealthWatchResponse(
-            has_critical=any(a.severity == "critical" for a in critical),
-            anomalies=critical,
+            has_critical=has_critical or has_warnings,
+            anomalies=findings,
             scores=scores,
         )
 
