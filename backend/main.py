@@ -17,9 +17,11 @@ from routes import telegram as telegram_route
 from routes import repair as repair_route
 from routes import missions as missions_route
 from routes import refinery as refinery_route
+from routes import supervisor as supervisor_route
 from services.file_service import FileService
 from services.context_aggregator import ContextAggregator
 from services.signal_poller import SignalPoller
+from services.agentic_supervisor import AgenticSupervisor
 
 STATE_FILE = Path(__file__).parent / "state.json"
 
@@ -94,6 +96,13 @@ async def lifespan(app: FastAPI):
     refinery_route.operations_store = missions_route._operations
     signal_poller.start()
 
+    # Agentic Supervisor
+    agentic_supervisor = AgenticSupervisor()
+    supervisor_route.supervisor = agentic_supervisor
+    supervisor_route.file_service = file_service
+    signal_poller.supervisor = agentic_supervisor
+    refinery_route.agentic_supervisor = agentic_supervisor
+
     yield
 
     signal_poller.stop()
@@ -127,6 +136,7 @@ app.include_router(telegram_route.router)
 app.include_router(repair_route.router)
 app.include_router(missions_route.router)
 app.include_router(refinery_route.router)
+app.include_router(supervisor_route.router)
 
 @app.get("/health")
 async def health():

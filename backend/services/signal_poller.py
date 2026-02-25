@@ -35,6 +35,15 @@ class SignalPoller:
         self._settings_loader = settings_loader
         self._task: asyncio.Task | None = None
         self._running = False
+        self._supervisor = None
+
+    @property
+    def supervisor(self):
+        return self._supervisor
+
+    @supervisor.setter
+    def supervisor(self, value):
+        self._supervisor = value
 
     @property
     def active(self) -> bool:
@@ -131,6 +140,15 @@ class SignalPoller:
                             )
                         except Exception as e:
                             logger.warning(f"Auto-triage failed: {e}")
+
+                    # Supervisor auto-plan for high-priority signals
+                    if self._supervisor and settings.get("supervisor_enabled", False):
+                        try:
+                            self._supervisor.on_signals_triaged(
+                                new_signals, settings, workspace,
+                            )
+                        except Exception as e:
+                            logger.warning(f"Supervisor auto-plan failed: {e}")
 
                     # Convert to mission signals and synthesize operations
                     mission_signals = self._aggregator.to_mission_signals(new_signals)

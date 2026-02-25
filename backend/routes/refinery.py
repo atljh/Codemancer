@@ -16,6 +16,7 @@ aggregator: ContextAggregator | None = None
 poller: SignalPoller | None = None
 chronicle_service = None
 operations_store: dict[str, Operation] | None = None
+agentic_supervisor = None
 
 
 class IngestRequest(BaseModel):
@@ -186,6 +187,14 @@ async def triage_signals(req: TriageRequest | None = None):
         new_ops = synthesize_operations(mission_signals, existing)
         for op in new_ops:
             operations_store[op.id] = op
+
+    # Supervisor auto-plan for high-priority triaged signals
+    if agentic_supervisor and settings.get("supervisor_enabled", False):
+        try:
+            agentic_supervisor.on_signals_triaged(triaged, settings, workspace)
+        except Exception as e:
+            import logging
+            logging.getLogger("refinery").warning(f"Supervisor auto-plan failed: {e}")
 
     return {"ok": True, "triaged": len(triaged)}
 

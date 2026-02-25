@@ -51,6 +51,9 @@ DEFAULT_SETTINGS = {
     # AI Triage
     "signal_ai_triage_enabled": False,
     "signal_hide_low_priority": False,
+    # Agentic Supervisor
+    "supervisor_enabled": False,
+    "supervisor_sandbox_mode": True,
 }
 
 
@@ -96,6 +99,9 @@ class AppSettings(BaseModel):
     # AI Triage
     signal_ai_triage_enabled: bool = False
     signal_hide_low_priority: bool = False
+    # Agentic Supervisor
+    supervisor_enabled: bool = False
+    supervisor_sandbox_mode: bool = True
 
 
 def load_settings() -> dict:
