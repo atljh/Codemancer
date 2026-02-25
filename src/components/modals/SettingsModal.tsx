@@ -87,7 +87,7 @@ export function SettingsModal() {
   const toggleSettings = useGameStore((s) => s.toggleSettings);
   const setSettings = useGameStore((s) => s.setSettings);
   const setFileTreeRoot = useGameStore((s) => s.setFileTreeRoot);
-  const player = useGameStore((s) => s.player);
+  const agent = useGameStore((s) => s.agent);
   const api = useApi();
   const { t } = useTranslation();
 
@@ -132,10 +132,10 @@ export function SettingsModal() {
     }
   };
 
-  const handleResetPlayer = async () => {
+  const handleReset = async () => {
     try {
-      const p = await api.resetPlayer();
-      useGameStore.getState().setPlayer(p);
+      const a = await api.resetAgent();
+      useGameStore.getState().setAgent(a);
     } catch {
       /* silent */
     }
@@ -215,10 +215,10 @@ export function SettingsModal() {
               {/* Operative info */}
               <div className="mt-auto px-3 pt-3 border-t border-[var(--theme-glass-border)]">
                 <div className="text-[10px] text-theme-text-dim font-mono tracking-wider">
-                  {player.name} // LV.{player.level}
+                  {agent.name}
                 </div>
                 <div className="text-[9px] text-theme-text-dimmer font-mono mt-0.5">
-                  EXP: {player.total_exp}
+                  INTG: {agent.integrity_score.toFixed(1)}%
                 </div>
               </div>
             </div>
@@ -245,7 +245,7 @@ export function SettingsModal() {
                     draft={draft}
                     setDraft={setDraft}
                     onBrowse={handleBrowseWorkspace}
-                    onResetPlayer={handleResetPlayer}
+                    onReset={handleReset}
                     t={t}
                   />
                 )}
@@ -305,13 +305,13 @@ function GeneralTab({
   draft,
   setDraft,
   onBrowse,
-  onResetPlayer,
+  onReset,
   t,
 }: {
   draft: AppSettings;
   setDraft: (d: AppSettings) => void;
   onBrowse: () => void;
-  onResetPlayer: () => void;
+  onReset: () => void;
   t: (key: TranslationKey) => string;
 }) {
   return (
@@ -414,7 +414,7 @@ function GeneralTab({
           {t("settings.dangerZone")}
         </h3>
         <button
-          onClick={onResetPlayer}
+          onClick={onReset}
           className="flex items-center gap-2 px-3 py-2.5 rounded border border-theme-status-error/15 bg-theme-status-error/5 text-theme-status-error hover:bg-theme-status-error/10 text-sm font-mono tracking-wider transition-colors"
         >
           <RotateCcw className="w-4 h-4" strokeWidth={1.5} />

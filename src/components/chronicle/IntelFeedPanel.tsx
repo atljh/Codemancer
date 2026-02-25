@@ -203,12 +203,6 @@ export function IntelFeedPanel() {
                         {log.status}
                       </span>
 
-                      {log.exp_multiplier > 1 && (
-                        <span className="text-[8px] font-mono text-theme-status-warning/60 ml-1">
-                          x{log.exp_multiplier} EXP
-                        </span>
-                      )}
-
                       <div className="ml-auto flex gap-1">
                         {log.status === "pending" && (
                           <button

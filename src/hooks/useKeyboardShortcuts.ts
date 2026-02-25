@@ -398,10 +398,10 @@ async function openProjectDialog() {
     /* ignore */
   }
 
-  // Refresh player
+  // Refresh agent status
   try {
-    const player = await api.getStatus();
-    state.setPlayer(player);
+    const agent = await api.getStatus();
+    state.setAgent(agent);
   } catch {
     /* ignore */
   }

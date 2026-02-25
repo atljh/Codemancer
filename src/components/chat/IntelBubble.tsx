@@ -116,13 +116,6 @@ export function IntelBubble({ message }: IntelBubbleProps) {
           </div>
         )}
 
-        {/* EXP bonus indicator for voice briefings */}
-        {source === "voice" && (
-          <div className="mt-2 flex items-center gap-2 text-[8px] font-mono text-theme-accent/40">
-            <span>{t("intel.mpReward")}</span>
-            <span>{t("intel.expBonus")}</span>
-          </div>
-        )}
       </div>
     </motion.div>
   );

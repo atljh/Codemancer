@@ -18,7 +18,6 @@ export function CodeEditor() {
   const openFiles = useGameStore((s) => s.openFiles);
   const updateFileContent = useGameStore((s) => s.updateFileContent);
   const markFileSaved = useGameStore((s) => s.markFileSaved);
-  const setPlayer = useGameStore((s) => s.setPlayer);
   const addActionLog = useGameStore((s) => s.addActionLog);
   const themeId = useGameStore((s) => s.settings.theme) as ThemeId;
   const fontSize = useGameStore((s) => s.settings.font_size);
@@ -30,17 +29,15 @@ export function CodeEditor() {
     try {
       await api.writeFile(file.path, file.content);
       markFileSaved(file.path);
-      const result = await api.performAction("file_save");
-      setPlayer(result.player);
+      try { await api.trackFile(file.path); } catch { /* non-critical */ }
       addActionLog({
         action: t("editor.savedSuccess"),
         status: "done",
-        expGained: result.exp_gained,
       });
     } catch {
       addActionLog({ action: "Save failed", status: "error" });
     }
-  }, [file, api, markFileSaved, setPlayer, addActionLog, t]);
+  }, [file, api, markFileSaved, addActionLog, t]);
 
   // Ctrl+S keybinding
   useEffect(() => {

@@ -3,23 +3,23 @@ const translations = {
     // Panels
     "panel.battleLog": "Command Console",
     "panel.quests": "Operational Objectives",
-    "panel.explorer": "Asset Library",
+    "panel.explorer": "Registry",
     "panel.settings": "Settings",
 
     // Stats
-    "stats.level": "Clearance",
-    "stats.totalExp": "Total Mastery",
-    "stats.hp": "SYS INTEGRITY",
-    "stats.mp": "CORE LOAD",
-    "stats.exp": "MASTERY",
     "stats.arcaneCoder": "Bridge Commander",
+    "stats.integrity": "INTG",
+    "stats.agentStatus": "STATUS",
+    "stats.processing": "PROCESSING",
+    "stats.idle": "IDLE",
+    "stats.knowledge": "KNOWLEDGE",
+    "stats.data": "DATA",
 
     // Chat
     "chat.placeholder": "Execute command...",
     "chat.emptyState": "System initialized. Awaiting input...",
     "chat.spellReceived": "Command acknowledged.",
     "chat.connectionLost": "Connection to command server lost...",
-    "chat.noMp": "Core load capacity exceeded!",
     "chat.missionLogs": "Mission Logs",
     "chat.newMission": "New Mission",
     "chat.deleteConfirm": "Delete this conversation?",
@@ -27,11 +27,6 @@ const translations = {
 
     // Command Input
     "command.placeholder": "Enter your command...",
-
-    // Level up
-    "levelUp.title": "CLEARANCE UPGRADED",
-    "levelUp.continue": "Acknowledge",
-    "levelUp.description": "Bridge authorization level increased",
 
     // Files / Editor
     "editor.selectFile": "Select a file to begin coding...",
@@ -41,7 +36,7 @@ const translations = {
 
     // Diff Viewer
     "diff.viewDiff": "View Diff",
-    "diff.apply": "Deploy Patch +50 MASTERY",
+    "diff.apply": "Deploy Patch",
     "diff.applied": "Patch deployed to",
     "diff.applyError": "Failed to apply changes",
     "diff.loading": "Loading editor...",
@@ -97,7 +92,7 @@ const translations = {
 
     // Welcome (legacy)
     "welcome.back":
-      "Operative {name} online. Clearance {level}. Operations resumed.",
+      "Operative {name} online. System integrity {integrity}%. Operations resumed.",
     "welcome.error":
       "Command server unresponsive. Initialize backend to begin operations.",
 
@@ -108,7 +103,7 @@ const translations = {
     "quests.noActive": "No active operational objectives",
 
     // Asset Library (File Explorer)
-    "explorer.title": "Asset Library",
+    "explorer.title": "Registry",
     "explorer.refresh": "Refresh",
     "explorer.noRoot": "Set a workspace root in settings",
     "explorer.empty": "No assets loaded",
@@ -119,7 +114,7 @@ const translations = {
     "editor.tabs.chat": "CONSOLE",
     "editor.closeTab": "Close",
     "editor.save": "Save",
-    "editor.savedSuccess": "Asset saved +5 MASTERY",
+    "editor.savedSuccess": "Asset saved",
 
     // AI commit
     "git.generateMessage": "Generate commit message",
@@ -155,11 +150,11 @@ const translations = {
     "tool.runCommand": "Executing command",
     "tool.cmdSuccess": "Command completed successfully",
     "tool.cmdFailed": "Command failed — integrity loss: -{hp}",
-    "tool.cmdRepairHint": "[CRITICAL_ANOMALY_DETECTED] Analyzing failure... initiating repair protocol",
+    "tool.cmdRepairHint":
+      "[CRITICAL_ANOMALY_DETECTED] Analyzing failure... initiating repair protocol",
     "tool.dataAcquired": "Data acquired",
     "tool.success": "Success",
     "tool.fault": "Fault",
-    "stats.data": "DATA",
 
     // Multi-provider settings
     "settings.aiProvider": "AI Provider",
@@ -288,7 +283,7 @@ const translations = {
     "cmd.save": "Save File",
     "cmd.closeTab": "Close Tab",
     "cmd.newFile": "New File",
-    "cmd.toggleExplorer": "Toggle Asset Library",
+    "cmd.toggleExplorer": "Toggle Registry",
     "cmd.toggleGit": "Toggle Git Panel",
     "cmd.toggleChronicle": "Toggle Chronicle",
     "cmd.toggleHealth": "Toggle Health Panel",
@@ -324,7 +319,6 @@ const translations = {
     "focus.start": "Focus",
     "focus.stop": "End Focus",
     "focus.active": "DEEP FOCUS",
-    "focus.expBoost": "x2 EXP",
     "focus.min25": "25 MIN",
     "focus.min50": "50 MIN",
     "focus.lostSync": "Focus lost — window unfocused",
@@ -377,8 +371,6 @@ const translations = {
     "intel.processed":
       "[INTEL_PROCESSED]: Briefing analyzed. Intent formulated. Subtasks generated.",
     "intel.voiceCommand": "[VOICE_COMMAND]",
-    "intel.expBonus": "x1.5 MASTERY (briefing bonus)",
-    "intel.mpReward": "+5 CORE LOAD (voice briefing)",
     "cmd.toggleIntelFeed": "Intel Feed",
 
     // Sound packs
@@ -403,13 +395,15 @@ const translations = {
     "image.pasteHint": "Paste image from clipboard (Cmd+V)",
 
     // MissionControl / Command Bridge
-    "bridge.title": "COMMAND BRIDGE",
-    "bridge.tab": "BRIDGE",
+    "bridge.title": "TIMELINE",
+    "bridge.tab": "TIMELINE",
     "bridge.operations": "Operations",
-    "bridge.noOperations": "No active operations. Run a scan to detect signals.",
+    "bridge.noOperations":
+      "No active operations. Run a scan to detect signals.",
     "bridge.scan": "SCAN SIGNALS",
     "bridge.scanning": "Scanning...",
-    "bridge.scanComplete": "Scan complete: {signals} signals → {ops} operations",
+    "bridge.scanComplete":
+      "Scan complete: {signals} signals → {ops} operations",
     "bridge.newOperation": "New Operation",
     "bridge.complete": "Complete Operation",
     "bridge.delete": "Remove",
@@ -419,7 +413,6 @@ const translations = {
     "bridge.status.COMPLETED": "COMPLETED",
     "bridge.signals": "Signals",
     "bridge.sectors": "Linked Sectors",
-    "bridge.expReward": "+{exp} EXP",
     "bridge.signalSource.TELEGRAM": "COMMS",
     "bridge.signalSource.CODE_TODO": "CODE",
     "bridge.signalSource.LSP_ERRORS": "LSP",
@@ -428,14 +421,19 @@ const translations = {
     "bridge.briefing.registered": "MISSION REGISTERED.",
     "bridge.totalOps": "{count} operations",
     "bridge.totalSignals": "{count} signals intercepted",
-    "cmd.toggleBridge": "Command Bridge",
+    "cmd.toggleBridge": "Timeline",
+
+    // Timeline statuses
+    "timeline.active": "ACTIVE",
+    "timeline.pending": "PENDING",
+    "timeline.done": "DONE",
 
     // COMMS Intercept (Telegram)
-    "comms.tab": "INTERCEPT",
-    "comms.title": "SIGNAL INTERCEPT",
+    "comms.tab": "INTEL",
+    "comms.title": "INTELLIGENCE BRIDGE",
     "comms.activeSignals": "Active Signals",
     "comms.noSignals": "No active signals detected",
-    "comms.intercepted": "Intercepted Data Packets",
+    "comms.intercepted": "RAW DATA",
     "comms.noMessages": "Select a signal to view data",
     "comms.connected": "Secure channel established",
     "comms.disconnected": "Communications offline",
@@ -451,8 +449,10 @@ const translations = {
     "comms.verify": "Verify",
     "comms.analyze": "ANALYZE",
     "comms.analyzing": "Analyzing signal...",
-    "comms.extractQuest": "EXTRACT QUEST",
-    "comms.questExtracted": "Quest extracted from signal",
+    "comms.extractQuest": "PROCESS",
+    "comms.questExtracted": "Operation created from signal",
+    "comms.process": "PROCESS",
+    "comms.processing": "Processing...",
     "comms.linkedSector": "LINKED TO SECTOR",
     "comms.signalReceived": "Signal: defect in sector {sector}",
     "comms.noApiCredentials": "Configure Telegram API in Settings",
@@ -471,23 +471,23 @@ const translations = {
     // Panels
     "panel.battleLog": "Командная консоль",
     "panel.quests": "Оперативные цели",
-    "panel.explorer": "Библиотека активов",
+    "panel.explorer": "Реестр",
     "panel.settings": "Настройки",
 
     // Stats
-    "stats.level": "Допуск",
-    "stats.totalExp": "Мастерство",
-    "stats.hp": "ЦЕЛОСТНОСТЬ",
-    "stats.mp": "НАГРУЗКА",
-    "stats.exp": "ПРОГРЕСС",
     "stats.arcaneCoder": "Командир мостика",
+    "stats.integrity": "ЦЕЛОСТ",
+    "stats.agentStatus": "СТАТУС",
+    "stats.processing": "ОБРАБОТКА",
+    "stats.idle": "ОЖИДАНИЕ",
+    "stats.knowledge": "БАЗА",
+    "stats.data": "ДАННЫЕ",
 
     // Chat
     "chat.placeholder": "Выполнить команду...",
     "chat.emptyState": "Система инициализирована. Ожидание ввода...",
     "chat.spellReceived": "Команда принята.",
     "chat.connectionLost": "Связь с командным сервером потеряна...",
-    "chat.noMp": "Нагрузка на ядро превышена!",
     "chat.missionLogs": "Журнал миссий",
     "chat.newMission": "Новая миссия",
     "chat.deleteConfirm": "Удалить этот диалог?",
@@ -495,11 +495,6 @@ const translations = {
 
     // Command Input
     "command.placeholder": "Введите команду...",
-
-    // Level up
-    "levelUp.title": "ДОПУСК ПОВЫШЕН",
-    "levelUp.continue": "Принято",
-    "levelUp.description": "Уровень авторизации мостика повышен",
 
     // Files / Editor
     "editor.selectFile": "Выберите файл, чтобы начать...",
@@ -509,7 +504,7 @@ const translations = {
 
     // Diff Viewer
     "diff.viewDiff": "Показать Diff",
-    "diff.apply": "Развернуть патч +50 ПРОГРЕСС",
+    "diff.apply": "Развернуть патч",
     "diff.applied": "Патч развёрнут для",
     "diff.applyError": "Не удалось применить изменения",
     "diff.loading": "Загрузка редактора...",
@@ -563,7 +558,7 @@ const translations = {
 
     // Welcome (legacy)
     "welcome.back":
-      "Оператор {name} на связи. Допуск {level}. Операции возобновлены.",
+      "Оператор {name} на связи. Целостность системы {integrity}%. Операции возобновлены.",
     "welcome.error":
       "Командный сервер не отвечает. Запустите бэкенд для начала операций.",
 
@@ -574,7 +569,7 @@ const translations = {
     "quests.noActive": "Нет активных оперативных целей",
 
     // Asset Library (File Explorer)
-    "explorer.title": "Библиотека активов",
+    "explorer.title": "Реестр",
     "explorer.refresh": "Обновить",
     "explorer.noRoot": "Укажите корень проекта в настройках",
     "explorer.empty": "Активы не загружены",
@@ -585,7 +580,7 @@ const translations = {
     "editor.tabs.chat": "КОНСОЛЬ",
     "editor.closeTab": "Закрыть",
     "editor.save": "Сохранить",
-    "editor.savedSuccess": "Актив сохранён +5 ПРОГРЕСС",
+    "editor.savedSuccess": "Актив сохранён",
 
     // AI commit
     "git.generateMessage": "Сгенерировать сообщение коммита",
@@ -621,11 +616,11 @@ const translations = {
     "tool.runCommand": "Выполнение команды",
     "tool.cmdSuccess": "Команда выполнена успешно",
     "tool.cmdFailed": "Команда провалена — потеря целостности: -{hp}",
-    "tool.cmdRepairHint": "[CRITICAL_ANOMALY_DETECTED] Анализ ошибки... запуск протокола ремонта",
+    "tool.cmdRepairHint":
+      "[CRITICAL_ANOMALY_DETECTED] Анализ ошибки... запуск протокола ремонта",
     "tool.dataAcquired": "Данные получены",
     "tool.success": "Успех",
     "tool.fault": "Ошибка",
-    "stats.data": "ДАННЫЕ",
 
     // Multi-provider settings
     "settings.aiProvider": "Провайдер ИИ",
@@ -755,7 +750,7 @@ const translations = {
     "cmd.save": "Сохранить файл",
     "cmd.closeTab": "Закрыть вкладку",
     "cmd.newFile": "Новый файл",
-    "cmd.toggleExplorer": "Библиотека активов",
+    "cmd.toggleExplorer": "Реестр",
     "cmd.toggleGit": "Git панель",
     "cmd.toggleChronicle": "Хроника",
     "cmd.toggleHealth": "Оценка угроз",
@@ -791,7 +786,6 @@ const translations = {
     "focus.start": "Фокус",
     "focus.stop": "Завершить",
     "focus.active": "ГЛУБОКИЙ ФОКУС",
-    "focus.expBoost": "x2 EXP",
     "focus.min25": "25 МИН",
     "focus.min50": "50 МИН",
     "focus.lostSync": "Фокус потерян — окно неактивно",
@@ -844,8 +838,6 @@ const translations = {
     "intel.processed":
       "[INTEL_PROCESSED]: Брифинг проанализирован. Намерение сформулировано. Подзадачи сгенерированы.",
     "intel.voiceCommand": "[VOICE_COMMAND]",
-    "intel.expBonus": "x1.5 ПРОГРЕСС (бонус брифинга)",
-    "intel.mpReward": "+5 НАГРУЗКА (голосовой брифинг)",
     "cmd.toggleIntelFeed": "Разведданные",
 
     // Sound packs
@@ -871,10 +863,11 @@ const translations = {
     "image.pasteHint": "Вставьте изображение из буфера обмена (Cmd+V)",
 
     // MissionControl / Command Bridge
-    "bridge.title": "КОМАНДНЫЙ МОСТИК",
-    "bridge.tab": "МОСТИК",
+    "bridge.title": "ТАЙМЛАЙН",
+    "bridge.tab": "ТАЙМЛАЙН",
     "bridge.operations": "Операции",
-    "bridge.noOperations": "Нет активных операций. Запустите сканирование для обнаружения сигналов.",
+    "bridge.noOperations":
+      "Нет активных операций. Запустите сканирование для обнаружения сигналов.",
     "bridge.scan": "СКАНИРОВАТЬ СИГНАЛЫ",
     "bridge.scanning": "Сканирование...",
     "bridge.scanComplete": "Скан завершён: {signals} сигналов → {ops} операций",
@@ -887,7 +880,6 @@ const translations = {
     "bridge.status.COMPLETED": "ЗАВЕРШЕНО",
     "bridge.signals": "Сигналы",
     "bridge.sectors": "Связанные секторы",
-    "bridge.expReward": "+{exp} EXP",
     "bridge.signalSource.TELEGRAM": "СВЯЗЬ",
     "bridge.signalSource.CODE_TODO": "КОД",
     "bridge.signalSource.LSP_ERRORS": "LSP",
@@ -896,14 +888,19 @@ const translations = {
     "bridge.briefing.registered": "МИССИЯ ЗАРЕГИСТРИРОВАНА.",
     "bridge.totalOps": "{count} операций",
     "bridge.totalSignals": "{count} сигналов перехвачено",
-    "cmd.toggleBridge": "Командный мостик",
+    "cmd.toggleBridge": "Таймлайн",
+
+    // Timeline statuses
+    "timeline.active": "АКТИВНО",
+    "timeline.pending": "ОЖИДАНИЕ",
+    "timeline.done": "ГОТОВО",
 
     // COMMS Intercept (Telegram)
-    "comms.tab": "ПЕРЕХВАТ",
-    "comms.title": "ПЕРЕХВАТ СИГНАЛОВ",
+    "comms.tab": "РАЗВЕДКА",
+    "comms.title": "МОСТ РАЗВЕДКИ",
     "comms.activeSignals": "Активные сигналы",
     "comms.noSignals": "Активных сигналов не обнаружено",
-    "comms.intercepted": "Перехваченные пакеты данных",
+    "comms.intercepted": "СЫРЫЕ ДАННЫЕ",
     "comms.noMessages": "Выберите сигнал для просмотра",
     "comms.connected": "Защищённый канал установлен",
     "comms.disconnected": "Связь отключена",
@@ -919,8 +916,10 @@ const translations = {
     "comms.verify": "Подтвердить",
     "comms.analyze": "АНАЛИЗ",
     "comms.analyzing": "Анализ сигнала...",
-    "comms.extractQuest": "ИЗВЛЕЧЬ ЗАДАЧУ",
-    "comms.questExtracted": "Задача извлечена из сигнала",
+    "comms.extractQuest": "ОБРАБОТАТЬ",
+    "comms.questExtracted": "Операция создана из сигнала",
+    "comms.process": "ОБРАБОТАТЬ",
+    "comms.processing": "Обработка...",
     "comms.linkedSector": "СВЯЗАНО С СЕКТОРОМ",
     "comms.signalReceived": "Сигнал: дефект в секторе {sector}",
     "comms.noApiCredentials": "Настройте Telegram API в Настройках",

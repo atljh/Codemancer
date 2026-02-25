@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Copy, Check, FileText, Zap, Clock } from "lucide-react";
+import { X, Copy, Check, FileText, Clock } from "lucide-react";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -151,15 +151,6 @@ export function ChroniclePanel() {
                             >
                               {ev.action_type}
                             </span>
-                            {ev.exp_gained > 0 && (
-                              <span className="text-[9px] font-mono text-theme-accent flex items-center gap-0.5 ml-auto">
-                                <Zap
-                                  className="w-2.5 h-2.5"
-                                  strokeWidth={1.5}
-                                />
-                                +{ev.exp_gained}
-                              </span>
-                            )}
                           </div>
                           {ev.description && (
                             <p className="text-[11px] text-theme-text-dim">

@@ -1,11 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Crosshair,
-  ScanLine,
-  Plus,
-  Signal,
-} from "lucide-react";
 import { MissionNode } from "./MissionNode";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
@@ -22,11 +16,8 @@ export function MissionControl() {
   const setOperations = useGameStore((s) => s.setOperations);
   const updateOperationInStore = useGameStore((s) => s.updateOperation);
   const selectOperation = useGameStore((s) => s.selectOperation);
-  const setPlayer = useGameStore((s) => s.setPlayer);
+  const setAgent = useGameStore((s) => s.setAgent);
   const workspaceRoot = useGameStore((s) => s.settings.workspace_root);
-  const setMissionBriefingActive = useGameStore(
-    (s) => s.setMissionBriefingActive,
-  );
 
   const api = useApi();
   const { playSound } = useAudio();
@@ -48,7 +39,10 @@ export function MissionControl() {
 
   // Load operations on mount
   useEffect(() => {
-    api.getOperations().then(setOperations).catch(() => {});
+    api
+      .getOperations()
+      .then(setOperations)
+      .catch(() => {});
   }, [api, setOperations]);
 
   // Auto-scan every 5 minutes
@@ -91,15 +85,16 @@ export function MissionControl() {
   const handleComplete = useCallback(
     async (opId: string) => {
       try {
-        const result = await api.completeOperation(opId);
-        updateOperationInStore(opId, { status: "COMPLETED" as OperationStatus });
-        if (result.player) setPlayer(result.player);
+        await api.completeOperation(opId);
+        updateOperationInStore(opId, {
+          status: "COMPLETED" as OperationStatus,
+        });
         playSound("mission_complete");
       } catch {
         // error
       }
     },
-    [api, updateOperationInStore, setPlayer, playSound],
+    [api, updateOperationInStore, setAgent, playSound],
   );
 
   const handleStatusChange = useCallback(
@@ -130,10 +125,6 @@ export function MissionControl() {
     }
   }, [newTitle, api, setOperations, playSound, selectOperation]);
 
-  const handleVoiceBriefing = useCallback(() => {
-    setMissionBriefingActive(true);
-  }, [setMissionBriefingActive]);
-
   // Split operations by status
   const activeOps = operations.filter((o) => o.status !== "COMPLETED");
   const completedOps = operations.filter((o) => o.status === "COMPLETED");
@@ -141,48 +132,37 @@ export function MissionControl() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="shrink-0 px-4 py-3 border-b border-[var(--theme-glass-border)] flex items-center gap-3 bridge-brackets">
-        <Crosshair
-          className="w-4 h-4 text-theme-accent"
-          strokeWidth={1.5}
-        />
-        <h2 className="text-xs font-bold tracking-[0.15em] text-theme-accent uppercase">
+      <div className="shrink-0 px-4 py-3 border-b border-[rgba(255,255,255,0.1)] flex items-center gap-3">
+        <h2 className="text-[11px] font-mono text-theme-text-dim tracking-widest uppercase">
           {t("bridge.title")}
         </h2>
 
         <div className="ml-auto flex items-center gap-2">
           {/* Stats */}
           <span className="text-[9px] font-mono text-theme-text-dimmer">
-            {t("bridge.totalOps").replace(
-              "{count}",
-              String(operations.length),
-            )}
+            {t("bridge.totalOps").replace("{count}", String(operations.length))}
           </span>
 
           {/* Scan button */}
           <button
             onClick={() => runScan(false)}
             disabled={scanning || !workspaceRoot}
-            className={`flex items-center gap-1 text-[9px] font-mono font-bold px-2 py-1 rounded transition-colors ${
+            className={`text-[9px] font-mono font-bold px-2 py-1 rounded transition-colors ${
               scanning
-                ? "bg-theme-accent/20 text-theme-accent animate-pulse"
-                : "bg-theme-accent/10 text-theme-accent hover:bg-theme-accent/20"
+                ? "text-[var(--theme-accent)] animate-pulse"
+                : "text-theme-text-dim hover:text-[var(--theme-accent)]"
             }`}
           >
-            <ScanLine
-              className={`w-3 h-3 ${scanning ? "animate-spin" : ""}`}
-              strokeWidth={1.5}
-            />
-            {scanning ? t("bridge.scanning") : t("bridge.scan")}
+            [{scanning ? t("bridge.scanning") : t("bridge.scan")}]
           </button>
 
           {/* New operation */}
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="p-1 rounded bg-theme-accent/10 text-theme-accent hover:bg-theme-accent/20 transition-colors"
+            className="text-[9px] font-mono text-theme-text-dim hover:text-[var(--theme-accent)] transition-colors"
             title={t("bridge.newOperation")}
           >
-            <Plus className="w-3.5 h-3.5" strokeWidth={1.5} />
+            [+NEW]
           </button>
         </div>
       </div>
@@ -194,7 +174,7 @@ export function MissionControl() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="shrink-0 px-4 py-2 border-b border-[var(--theme-glass-border)] overflow-hidden"
+            className="shrink-0 px-4 py-2 border-b border-[rgba(255,255,255,0.1)] overflow-hidden"
           >
             <div className="flex gap-2">
               <input
@@ -202,15 +182,15 @@ export function MissionControl() {
                 onChange={(e) => setNewTitle(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCreate()}
                 placeholder={t("bridge.newOperation")}
-                className="flex-1 text-xs font-mono bg-theme-bg-inset border border-[var(--theme-glass-border)] rounded px-2 py-1.5 text-theme-text placeholder-theme-text-dimmer focus:border-theme-accent/40 outline-none"
+                className="flex-1 text-xs font-mono bg-theme-bg-inset border border-[rgba(255,255,255,0.1)] rounded px-2 py-1.5 text-theme-text placeholder-theme-text-dimmer focus:border-[var(--theme-accent)]/40 outline-none"
                 autoFocus
               />
               <button
                 onClick={handleCreate}
                 disabled={!newTitle.trim()}
-                className="text-[9px] font-mono font-bold px-3 py-1 rounded bg-theme-accent/15 text-theme-accent hover:bg-theme-accent/25 transition-colors disabled:opacity-30"
+                className="text-[9px] font-mono font-bold px-3 py-1 rounded text-[var(--theme-accent)] hover:text-theme-text-bright transition-colors disabled:opacity-30"
               >
-                {t("bridge.newOperation")}
+                [CREATE]
               </button>
             </div>
           </motion.div>
@@ -220,20 +200,10 @@ export function MissionControl() {
       {/* Timeline */}
       <div className="flex-1 overflow-y-auto px-4 py-3 scrollbar-thin">
         {operations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-            <Signal
-              className="w-8 h-8 text-theme-text-dimmer"
-              strokeWidth={1}
-            />
-            <p className="text-xs text-theme-text-dim font-mono max-w-xs">
-              {t("bridge.noOperations")}
+          <div className="flex flex-col items-center justify-center h-full gap-2 text-center">
+            <p className="text-xs text-theme-text-dim font-mono">
+              No active operations.
             </p>
-            <button
-              onClick={handleVoiceBriefing}
-              className="text-[9px] font-mono text-theme-accent/60 hover:text-theme-accent underline underline-offset-2 transition-colors"
-            >
-              Mission Briefing Demo
-            </button>
           </div>
         ) : (
           <>
@@ -250,9 +220,7 @@ export function MissionControl() {
                   selectOperation(selectedOpId === op.id ? null : op.id)
                 }
                 onComplete={() => handleComplete(op.id)}
-                onStatusChange={(status) =>
-                  handleStatusChange(op.id, status)
-                }
+                onStatusChange={(status) => handleStatusChange(op.id, status)}
               />
             ))}
 
@@ -260,11 +228,11 @@ export function MissionControl() {
             {completedOps.length > 0 && (
               <div className="mt-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="flex-1 h-px bg-emerald-500/20" />
-                  <span className="text-[8px] font-mono text-emerald-500/50 tracking-wider uppercase">
+                  <div className="flex-1 h-px bg-[rgba(255,255,255,0.05)]" />
+                  <span className="text-[8px] font-mono text-theme-text-dimmer tracking-wider uppercase">
                     {t("bridge.status.COMPLETED")} ({completedOps.length})
                   </span>
-                  <div className="flex-1 h-px bg-emerald-500/20" />
+                  <div className="flex-1 h-px bg-[rgba(255,255,255,0.05)]" />
                 </div>
                 {completedOps.slice(0, 5).map((op, idx) => (
                   <MissionNode

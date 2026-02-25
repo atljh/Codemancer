@@ -1,8 +1,6 @@
 import { useMemo } from "react";
 import type {
-  Player,
-  ActionType,
-  ExpGainResponse,
+  AgentStatus,
   Quest,
   FileTreeNode,
   SyntaxCheckResponse,
@@ -52,37 +50,41 @@ interface ChatMessagePayload {
 }
 
 const api = {
-  getStatus: () => fetchJson<Player>("/api/game/status"),
+  getStatus: () => fetchJson<AgentStatus>("/api/game/status"),
 
-  performAction: (action: ActionType) =>
-    fetchJson<ExpGainResponse>("/api/game/action", {
+  trackFile: (path: string) =>
+    fetchJson<{ ok: boolean; known_files_count: number }>(
+      "/api/game/track_file",
+      {
+        method: "POST",
+        body: JSON.stringify({ path }),
+      },
+    ),
+
+  updateIntegrity: () =>
+    fetchJson<AgentStatus>("/api/game/update_integrity", {
       method: "POST",
-      body: JSON.stringify({ action }),
     }),
 
-  resetPlayer: () => fetchJson<Player>("/api/game/reset", { method: "POST" }),
-
-  awardMp: (amount = 5, reason = "voice_briefing") =>
-    fetchJson<Player>("/api/game/mp_reward", {
+  resetAgent: () =>
+    fetchJson<AgentStatus>("/api/game/reset", {
       method: "POST",
-      body: JSON.stringify({ amount, reason }),
     }),
 
   getQuests: () => fetchJson<Quest[]>("/api/quests/"),
 
   getActiveQuests: () => fetchJson<Quest[]>("/api/quests/active"),
 
-  createQuest: (title: string, description = "", exp_reward = 50) =>
+  createQuest: (title: string, description = "") =>
     fetchJson<Quest>("/api/quests/", {
       method: "POST",
-      body: JSON.stringify({ title, description, exp_reward }),
+      body: JSON.stringify({ title, description }),
     }),
 
   completeQuest: (questId: string) =>
-    fetchJson<{ quest: Quest; player: Player }>(
-      `/api/quests/${questId}/complete`,
-      { method: "POST" },
-    ),
+    fetchJson<{ quest: Quest }>(`/api/quests/${questId}/complete`, {
+      method: "POST",
+    }),
 
   scanTodos: (directory: string) =>
     fetchJson<Quest[]>("/api/quests/scan", {
@@ -340,7 +342,6 @@ const api = {
     raw_input: string;
     intent: string;
     subtasks: string[];
-    exp_multiplier?: number;
   }) =>
     fetchJson<IntelLog>("/api/chronicle/intel", {
       method: "POST",
@@ -445,7 +446,7 @@ const api = {
     }),
 
   completeOperation: (opId: string) =>
-    fetchJson<{ operation: Operation; player: Player; exp_gained: number }>(
+    fetchJson<{ operation: Operation }>(
       `/api/missions/operations/${opId}/complete`,
       { method: "POST" },
     ),
@@ -474,8 +475,7 @@ const api = {
       `/api/missions/signals?limit=${limit}${source ? `&source=${source}` : ""}`,
     ),
 
-  getMissionStatus: () =>
-    fetchJson<MissionStatus>("/api/missions/status"),
+  getMissionStatus: () => fetchJson<MissionStatus>("/api/missions/status"),
 };
 
 export { api };

@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Settings,
   FolderOpen,
-  Hexagon,
   HardDrive,
   ChevronDown,
   GitBranch,
@@ -12,11 +11,10 @@ import {
   Volume2,
   VolumeX,
   Wrench,
-  Crosshair,
+  Activity,
+  Brain,
 } from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
-import { StatBar } from "../bars/StatBar";
-import { ExpBar } from "../bars/ExpBar";
 import { FocusTimer } from "../focus/FocusTimer";
 import { WaveformVisualizer } from "../ui/WaveformVisualizer";
 import { useGameStore } from "../../stores/gameStore";
@@ -32,12 +30,12 @@ interface RecentProject {
 }
 
 export function TopStatsBar() {
-  const player = useGameStore((s) => s.player);
+  const agent = useGameStore((s) => s.agent);
   const settings = useGameStore((s) => s.settings);
   const projectScan = useGameStore((s) => s.projectScan);
   const toggleSettings = useGameStore((s) => s.toggleSettings);
   const setSettings = useGameStore((s) => s.setSettings);
-  const setPlayer = useGameStore((s) => s.setPlayer);
+  const setAgent = useGameStore((s) => s.setAgent);
   const setProjectScan = useGameStore((s) => s.setProjectScan);
   const setFileTreeRoot = useGameStore((s) => s.setFileTreeRoot);
   const addActionCard = useGameStore((s) => s.addActionCard);
@@ -57,8 +55,7 @@ export function TopStatsBar() {
   const setTtsEnabled = useGameStore((s) => s.setTtsEnabled);
   const selfRepairActive = useGameStore((s) => s.selfRepairActive);
   const setSelfRepairActive = useGameStore((s) => s.setSelfRepairActive);
-  const showMissionControl = useGameStore((s) => s.showMissionControl);
-  const toggleMissionControl = useGameStore((s) => s.toggleMissionControl);
+  const isAiResponding = useGameStore((s) => s.isAiResponding);
   const api = useApi();
   const { playSound, stopRepairMusic } = useAudio();
   const { t } = useTranslation();
@@ -102,14 +99,13 @@ export function TopStatsBar() {
       try {
         const scan = await api.scanProject(path, true);
         setProjectScan(scan);
-        const updatedPlayer = await api.getStatus();
-        setPlayer(updatedPlayer);
+        const updatedAgent = await api.getStatus();
+        setAgent(updatedAgent);
         await api.addRecentProject(path);
         addActionCard({
           fileName: `[PROJECT LOADED]: ${shortenPath(path)}`,
           status: "done",
           filePath: path,
-          expGained: scan.exp_gained,
         });
       } catch {
         addActionLog({ action: t("project.scanFailed"), status: "error" });
@@ -122,7 +118,7 @@ export function TopStatsBar() {
       api,
       addActionLog,
       setProjectScan,
-      setPlayer,
+      setAgent,
       addActionCard,
       t,
     ],
@@ -199,7 +195,6 @@ export function TopStatsBar() {
                     ),
                 status: ok ? "done" : "error",
                 toolName: data.tool,
-                expGained: ok ? 15 : 0,
               });
             } else if (data.type === "complete") {
               playSound("self_repair_done");
@@ -208,7 +203,6 @@ export function TopStatsBar() {
                   .replace("{ok}", String(data.tools_succeeded))
                   .replace("{total}", String(data.tools_run)),
                 status: data.tools_succeeded > 0 ? "done" : "error",
-                expGained: data.tools_succeeded * 25,
               });
             }
           } catch {
@@ -224,23 +218,30 @@ export function TopStatsBar() {
     }
   };
 
+  const iconBtnClass = (active: boolean) =>
+    `p-1.5 rounded transition-colors ${
+      active
+        ? "text-[var(--theme-accent)]"
+        : "text-[#484f58] hover:text-[#8b949e]"
+    }`;
+
+  // Integrity color
+  const integrityColor =
+    agent.integrity_score > 80
+      ? "text-green-400"
+      : agent.integrity_score > 50
+        ? "text-yellow-400"
+        : "text-red-400";
+
   return (
-    <div className="h-11 flex items-center gap-4 px-4 glass-panel border-b border-[var(--theme-glass-border)] shrink-0">
-      {/* Commander ID + Clearance */}
-      <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded glass-panel-bright flex items-center justify-center animate-glow-pulse">
-          <Hexagon className="w-3 h-3 text-theme-accent" strokeWidth={1.5} />
-        </div>
-        <span className="text-xs font-bold text-theme-text tracking-wide uppercase">
-          {player.name}
-        </span>
-        <span className="text-[10px] text-theme-accent font-mono font-bold tracking-wider">
-          {t("stats.level").toUpperCase()} {player.level}
-        </span>
-      </div>
+    <div className="h-11 flex items-center gap-3 px-4 bg-[var(--theme-bg-elevated)] border-b border-[rgba(255,255,255,0.1)] shrink-0">
+      {/* Agent name */}
+      <span className="text-xs font-bold text-theme-text-bright tracking-wide uppercase">
+        {agent.name}
+      </span>
 
       {/* Divider */}
-      <div className="w-px h-5 bg-[var(--theme-glass-border)]" />
+      <div className="w-px h-5 bg-[rgba(255,255,255,0.1)]" />
 
       {/* Folder picker + project path + recent projects dropdown */}
       <div
@@ -249,7 +250,7 @@ export function TopStatsBar() {
       >
         <button
           onClick={handlePickFolder}
-          className="p-1 rounded hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent transition-colors shrink-0"
+          className="p-1 rounded text-[#484f58] hover:text-[#8b949e] transition-colors shrink-0"
           title={t("project.selectFolder")}
         >
           <FolderOpen className="w-3.5 h-3.5" strokeWidth={1.5} />
@@ -257,7 +258,7 @@ export function TopStatsBar() {
         {projectScan && (
           <button
             onClick={handleToggleDropdown}
-            className="flex items-center gap-0.5 text-[10px] text-theme-text-dim font-mono truncate max-w-[200px] hover:text-theme-accent transition-colors"
+            className="flex items-center gap-0.5 text-[10px] text-theme-text-dim font-mono truncate max-w-[200px] hover:text-[#8b949e] transition-colors"
             title={projectScan.path}
           >
             {shortenPath(projectScan.path)}
@@ -273,12 +274,12 @@ export function TopStatsBar() {
 
         {/* Recent projects dropdown */}
         {showDropdown && recentProjects.length > 0 && (
-          <div className="absolute top-full left-0 mt-1 z-50 glass-panel border border-[var(--theme-glass-border)] rounded shadow-lg min-w-[240px] py-1">
+          <div className="absolute top-full left-0 mt-1 z-50 bg-[var(--theme-bg-elevated)] border border-[rgba(255,255,255,0.1)] rounded shadow-lg min-w-[240px] py-1">
             {recentProjects.map((p) => (
               <button
                 key={p.path}
                 onClick={() => loadAndSwitchProject(p.path)}
-                className="w-full text-left px-3 py-1.5 text-[10px] font-mono text-theme-text-dim hover:bg-theme-accent/10 hover:text-theme-accent transition-colors truncate"
+                className="w-full text-left px-3 py-1.5 text-[10px] font-mono text-theme-text-dim hover:text-[#8b949e] hover:bg-white/4 transition-colors truncate"
                 title={p.path}
               >
                 <span className="text-theme-text">{p.name}</span>
@@ -292,46 +293,62 @@ export function TopStatsBar() {
       </div>
 
       {/* Divider */}
-      <div className="w-px h-5 bg-[var(--theme-glass-border)]" />
+      <div className="w-px h-5 bg-[rgba(255,255,255,0.1)]" />
 
-      {/* Bridge Gauges */}
-      <div className="flex items-center gap-4 flex-1 max-w-lg">
-        <div className="flex-1">
-          <StatBar
-            label={t("stats.hp")}
-            current={player.hp}
-            max={player.max_hp}
-            color="integrity"
-          />
+      {/* Metrics */}
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        {/* Integrity */}
+        <div className="flex items-center gap-1">
+          <Activity className={`w-3 h-3 ${integrityColor}`} strokeWidth={1.5} />
+          <span className={`text-[10px] font-mono font-bold ${integrityColor}`}>
+            {t("stats.integrity")}:
+          </span>
+          <span className={`text-[10px] font-mono tabular-nums ${integrityColor}`}>
+            {agent.integrity_score.toFixed(1)}%
+          </span>
         </div>
-        <div className="flex-1">
-          <StatBar
-            label={t("stats.mp")}
-            current={player.mp}
-            max={player.max_mp}
-            color="thermal"
-          />
-        </div>
-        <div className="flex-1">
-          <ExpBar />
-        </div>
-      </div>
 
-      {/* Memory Usage */}
-      {totalBytesProcessed > 0 && (
-        <>
-          <div className="w-px h-5 bg-[var(--theme-glass-border)]" />
+        {/* Status */}
+        <div className="flex items-center gap-1">
+          <span className="text-[10px] font-mono text-theme-text-dim">
+            {t("stats.agentStatus")}:
+          </span>
+          {isAiResponding ? (
+            <span className="text-[10px] font-mono font-bold text-yellow-400 flex items-center gap-0.5">
+              {t("stats.processing")}
+              <span className="inline-block w-1 h-1 rounded-full bg-yellow-400 animate-pulse" />
+            </span>
+          ) : (
+            <span className="text-[10px] font-mono text-green-400">
+              {t("stats.idle")}
+            </span>
+          )}
+        </div>
+
+        {/* Knowledge */}
+        <div className="flex items-center gap-1">
+          <Brain className="w-3 h-3 text-theme-text-dimmer" strokeWidth={1.5} />
+          <span className="text-[10px] font-mono text-theme-text-dim">
+            {t("stats.knowledge")}:
+          </span>
+          <span className="text-[10px] font-mono text-theme-text tabular-nums">
+            {agent.known_files_count}/{agent.total_files}
+          </span>
+        </div>
+
+        {/* Data processed */}
+        {totalBytesProcessed > 0 && (
           <div className="flex items-center gap-1">
             <HardDrive
-              className="w-3 h-3 text-theme-accent/60"
+              className="w-3 h-3 text-theme-text-dimmer"
               strokeWidth={1.5}
             />
-            <span className="text-[10px] font-mono text-theme-accent/60">
+            <span className="text-[10px] font-mono text-theme-text-dim">
               {t("stats.data")}: {formatBytes(totalBytesProcessed)}
             </span>
           </div>
-        </>
-      )}
+        )}
+      </div>
 
       {/* Focus timer */}
       <FocusTimer />
@@ -352,7 +369,7 @@ export function TopStatsBar() {
           }}
           className={`p-1 rounded transition-colors ${
             soundEnabled
-              ? "text-theme-accent/60 hover:text-theme-accent"
+              ? "text-theme-text-dim hover:text-[#8b949e]"
               : "text-theme-text-dimmer hover:text-theme-text-dim"
           }`}
           title={
@@ -367,25 +384,14 @@ export function TopStatsBar() {
         </button>
       </div>
 
-      {/* Bridge + Self-Repair + Chronicle + Health + Explorer + Git + Settings */}
-      <button
-        onClick={toggleMissionControl}
-        className={`p-1.5 rounded transition-colors ${
-          showMissionControl
-            ? "bg-theme-accent/15 text-theme-accent"
-            : "hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent"
-        }`}
-        title={t("bridge.title")}
-      >
-        <Crosshair className="w-4 h-4" strokeWidth={1.5} />
-      </button>
+      {/* Toolbar buttons */}
       <button
         onClick={handleSelfRepair}
         disabled={selfRepairActive}
         className={`p-1.5 rounded transition-colors ${
           selfRepairActive
-            ? "bg-theme-status-warning/20 text-theme-status-warning animate-pulse"
-            : "hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent"
+            ? "text-theme-status-warning animate-pulse"
+            : "text-[#484f58] hover:text-[#8b949e]"
         }`}
         title={t("repair.title")}
       >
@@ -396,51 +402,35 @@ export function TopStatsBar() {
       </button>
       <button
         onClick={toggleChronicle}
-        className={`p-1.5 rounded transition-colors ${
-          showChronicle
-            ? "bg-theme-accent/15 text-theme-accent"
-            : "hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent"
-        }`}
+        className={iconBtnClass(showChronicle)}
         title={t("chronicle.title")}
       >
         <ScrollText className="w-4 h-4" strokeWidth={1.5} />
       </button>
       <button
         onClick={toggleHealthPanel}
-        className={`p-1.5 rounded transition-colors ${
-          showHealthPanel
-            ? "bg-theme-accent/15 text-theme-accent"
-            : "hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent"
-        }`}
+        className={iconBtnClass(showHealthPanel)}
         title={t("health.title")}
       >
         <Radar className="w-4 h-4" strokeWidth={1.5} />
       </button>
       <button
         onClick={toggleFileExplorer}
-        className={`p-1.5 rounded transition-colors ${
-          showFileExplorer
-            ? "bg-theme-accent/15 text-theme-accent"
-            : "hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent"
-        }`}
+        className={iconBtnClass(showFileExplorer)}
         title={t("explorer.title")}
       >
         <FolderTree className="w-4 h-4" strokeWidth={1.5} />
       </button>
       <button
         onClick={toggleGitPanel}
-        className={`p-1.5 rounded transition-colors ${
-          showGitPanel
-            ? "bg-theme-accent/15 text-theme-accent"
-            : "hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent"
-        }`}
+        className={iconBtnClass(showGitPanel)}
         title={t("git.panelTitle")}
       >
         <GitBranch className="w-4 h-4" strokeWidth={1.5} />
       </button>
       <button
         onClick={toggleSettings}
-        className="p-1.5 rounded hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent transition-colors"
+        className="p-1.5 rounded text-[#484f58] hover:text-[#8b949e] transition-colors"
       >
         <Settings className="w-4 h-4" strokeWidth={1.5} />
       </button>

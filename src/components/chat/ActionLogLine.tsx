@@ -26,11 +26,7 @@ export function ActionLogLine({ log }: ActionLogLineProps) {
       <span className="text-theme-accent/30">&gt;&gt; </span>
       <span className="text-theme-text/60">{log.action}</span>
       <span className="ml-2">
-        [<span className={`font-bold ${statusColor}`}>{statusLabel}</span>
-        {log.expGained != null && log.expGained > 0 && (
-          <span className="text-theme-status-warning"> +{log.expGained}</span>
-        )}
-        ]
+        [<span className={`font-bold ${statusColor}`}>{statusLabel}</span>]
       </span>
     </motion.div>
   );

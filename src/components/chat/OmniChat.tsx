@@ -33,9 +33,8 @@ function getToolDisplayName(toolName: string): string {
 export function OmniChat() {
   const messages = useGameStore((s) => s.messages);
   const addMessage = useGameStore((s) => s.addMessage);
-  const setPlayer = useGameStore((s) => s.setPlayer);
-  const triggerLevelUp = useGameStore((s) => s.triggerLevelUp);
-  const player = useGameStore((s) => s.player);
+  const setAgent = useGameStore((s) => s.setAgent);
+  const agent = useGameStore((s) => s.agent);
   const settings = useGameStore((s) => s.settings);
   const projectScan = useGameStore((s) => s.projectScan);
   const isAiResponding = useGameStore((s) => s.isAiResponding);
@@ -190,7 +189,7 @@ export function OmniChat() {
       const cmd = trimmed.toLowerCase();
 
       if (cmd === "/status") {
-        let info = `**${player.name}** | Lv.${player.level} | EXP: ${player.total_exp}\nHP: ${player.hp}/${player.max_hp} | MP: ${player.mp}/${player.max_mp}`;
+        let info = `**${agent.name}** | INTG: ${agent.integrity_score.toFixed(1)}% | KNOWLEDGE: ${agent.known_files_count}/${agent.total_files}`;
         if (projectScan) {
           info += `\n\nProject: ${shortenPath(projectScan.path)}\nFiles: ${projectScan.total_files} | Dirs: ${projectScan.total_dirs}`;
         } else {
@@ -252,7 +251,7 @@ export function OmniChat() {
       addMessage({ role: "system", content: t("slash.unknown") });
       return true;
     },
-    [addMessage, player, projectScan, t, handleGitCommand],
+    [addMessage, agent, projectScan, t, handleGitCommand],
   );
 
   const handleSend = useCallback(
@@ -263,11 +262,6 @@ export function OmniChat() {
         // Auto-save after slash command
         const cid = useGameStore.getState().currentConversationId;
         if (cid) saveCurrentMessages(cid);
-        return;
-      }
-
-      if (player.mp < 5) {
-        addMessage({ role: "system", content: t("chat.noMp") });
         return;
       }
 
@@ -307,13 +301,12 @@ export function OmniChat() {
             playSound("plan_confirm");
           }
 
-          // Save intel log with voice bonus
+          // Save intel log
           const intelLog = await api.createIntelLog({
             source: "voice",
             raw_input: actualText,
             intent: intelResult.intent,
             subtasks: intelResult.subtasks,
-            exp_multiplier: 1.5,
           });
 
           // Show intel bubble in chat
@@ -329,14 +322,6 @@ export function OmniChat() {
             content: `${t("intel.processed")}\n---meta---\n${meta}`,
             type: "intel_entry",
           });
-
-          // Voice briefing MP reward: +5 MP
-          try {
-            const updatedPlayer = await api.awardMp(5, "voice_briefing");
-            setPlayer(updatedPlayer);
-          } catch {
-            // ignore
-          }
         } catch {
           // Intelligence processing failed, continue with normal chat
         }
@@ -344,17 +329,6 @@ export function OmniChat() {
 
       // Save immediately after user message so it's never lost
       if (convId) saveCurrentMessages(convId);
-
-      try {
-        const result = await api.performAction("message");
-        setPlayer(result.player);
-
-        if (result.leveled_up && result.new_level !== null) {
-          triggerLevelUp(result.new_level);
-        }
-      } catch (e) {
-        console.warn("[OmniChat] performAction failed:", e);
-      }
 
       // Check for authentication based on provider
       const hasAuth = (() => {
@@ -486,10 +460,10 @@ export function OmniChat() {
                 }
                 // TTS: speak the beginning of the response
                 if (accumulated) sayText(accumulated.slice(0, 300));
-                // Refresh player to get updated stats
+                // Refresh agent to get updated stats
                 try {
-                  const updatedPlayer = await api.getStatus();
-                  setPlayer(updatedPlayer);
+                  const updatedAgent = await api.getStatus();
+                  setAgent(updatedAgent);
                 } catch {
                   // ignore
                 }
@@ -534,7 +508,6 @@ export function OmniChat() {
                 addActionLog({
                   action: `[DATA_ACQUIRED]: ${displayName} — ${data.summary}`,
                   status: data.status === "success" ? "done" : "error",
-                  expGained: data.exp_gained || undefined,
                   toolName: data.tool_name,
                   toolId: data.tool_id,
                   bytesProcessed: data.bytes_processed,
@@ -549,31 +522,19 @@ export function OmniChat() {
                   filePath: data.file_path || "",
                   oldContent: data.old_content,
                   newContent: data.new_content,
-                  expGained: data.exp_gained,
                 });
               }
 
               // Command result event (run_command)
               if (data.type === "command_result") {
                 const exitCode = data.exit_code as number;
-                const hpDamage = data.hp_damage as number;
                 const cmdOutput = (data.output || "") as string;
                 const command = (data.command || "") as string;
                 const isFail = exitCode !== 0;
                 playSound(isFail ? "glitch" : "mission_complete");
 
-                // Refresh player stats (HP may have changed)
-                if (isFail && hpDamage > 0) {
-                  try {
-                    const p = await api.getStatus();
-                    setPlayer(p);
-                  } catch {
-                    /* ignore */
-                  }
-                }
-
                 const statusLine = isFail
-                  ? t("tool.cmdFailed", { hp: String(hpDamage) })
+                  ? t("tool.cmdFailed", { hp: "0" })
                   : t("tool.cmdSuccess");
                 const outputPreview =
                   cmdOutput.length > 1500
@@ -633,9 +594,8 @@ export function OmniChat() {
     [
       addMessage,
       api,
-      setPlayer,
-      triggerLevelUp,
-      player.mp,
+      setAgent,
+      agent,
       settings.ai_provider,
       settings.anthropic_api_key,
       settings.auth_method,

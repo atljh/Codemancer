@@ -6,7 +6,7 @@ import { useThemeEffect } from "./hooks/useThemeEffect";
 import translations from "./i18n/translations";
 
 function App() {
-  const setPlayer = useGameStore((s) => s.setPlayer);
+  const setAgent = useGameStore((s) => s.setAgent);
   const addMessage = useGameStore((s) => s.addMessage);
   const setSettings = useGameStore((s) => s.setSettings);
   const setFileTreeRoot = useGameStore((s) => s.setFileTreeRoot);
@@ -18,15 +18,10 @@ function App() {
   );
   const setMessages = useGameStore((s) => s.setMessages);
   const setFocusStatus = useGameStore((s) => s.setFocusStatus);
-  const sessionStartTime = useGameStore((s) => s.sessionStartTime);
   const theme = useGameStore((s) => s.settings.theme);
   const api = useApi();
 
   useThemeEffect(theme);
-  const timersRef = useRef<{
-    hp?: ReturnType<typeof setInterval>;
-    mp?: ReturnType<typeof setInterval>;
-  }>({});
   const initRef = useRef(false);
 
   // Initialize
@@ -56,10 +51,10 @@ function App() {
       }
 
       try {
-        const player = await api.getStatus();
-        setPlayer(player);
+        const agentData = await api.getStatus();
+        setAgent(agentData);
       } catch {
-        // player load failed
+        // agent load failed
       }
 
       // Load conversations and restore last one
@@ -91,11 +86,11 @@ function App() {
       // Show welcome message only for fresh sessions (no restored conversation)
       if (!restoredConversation) {
         const ws = useGameStore.getState().settings.workspace_root;
-        const p = useGameStore.getState().player;
+        const a = useGameStore.getState().agent;
         if (ws) {
           const msg = translations[locale]["welcome.back"]
-            .replace("{name}", p.name)
-            .replace("{level}", String(p.level));
+            .replace("{name}", a.name)
+            .replace("{integrity}", String(a.integrity_score));
           addMessage({ role: "system", content: msg });
         }
       }
@@ -105,43 +100,17 @@ function App() {
     init();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // HP drain after 2 hours
+  // Periodic status refresh (every 5 min)
   useEffect(() => {
-    const TWO_HOURS = 2 * 60 * 60 * 1000;
-
-    timersRef.current.hp = setInterval(() => {
-      const elapsed = Date.now() - sessionStartTime;
-      if (elapsed > TWO_HOURS) {
-        const store = useGameStore.getState();
-        if (store.player.hp > 1) {
-          setPlayer({ ...store.player, hp: store.player.hp - 1 });
-        }
+    const interval = setInterval(async () => {
+      try {
+        setAgent(await api.getStatus());
+      } catch {
+        // ignore
       }
-    }, 60_000);
-
-    return () => clearInterval(timersRef.current.hp);
-  }, [sessionStartTime, setPlayer]);
-
-  // MP regen: sync with backend every 30 seconds
-  useEffect(() => {
-    timersRef.current.mp = setInterval(async () => {
-      const store = useGameStore.getState();
-      if (store.player.mp < store.player.max_mp) {
-        try {
-          const player = await api.getStatus();
-          setPlayer(player);
-        } catch {
-          // offline — regen locally as fallback
-          const s = useGameStore.getState();
-          if (s.player.mp < s.player.max_mp) {
-            setPlayer({ ...s.player, mp: s.player.mp + 1 });
-          }
-        }
-      }
-    }, 30_000);
-
-    return () => clearInterval(timersRef.current.mp);
-  }, [setPlayer, api]);
+    }, 300_000);
+    return () => clearInterval(interval);
+  }, [api, setAgent]);
 
   return <AppLayout />;
 }

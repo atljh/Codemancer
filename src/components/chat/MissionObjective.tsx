@@ -15,7 +15,7 @@ import type { Quest } from "../../types/game";
 export function MissionObjective() {
   const quests = useGameStore((s) => s.quests);
   const setQuests = useGameStore((s) => s.setQuests);
-  const setPlayer = useGameStore((s) => s.setPlayer);
+  const setAgent = useGameStore((s) => s.setAgent);
   const workspaceRoot = useGameStore((s) => s.settings.workspace_root);
   const api = useApi();
   const { t } = useTranslation();
@@ -55,15 +55,14 @@ export function MissionObjective() {
   const handleComplete = useCallback(
     async (questId: string) => {
       try {
-        const result = await api.completeQuest(questId);
-        setPlayer(result.player);
+        await api.completeQuest(questId);
         const all = await api.getQuests();
         setQuests(all);
       } catch {
         // ignore
       }
     },
-    [api, setPlayer, setQuests],
+    [api, setAgent, setQuests],
   );
 
   const activeQuests = quests.filter((q) => q.status === "active");
@@ -91,11 +90,6 @@ export function MissionObjective() {
               <span className="text-xs font-mono text-theme-text truncate">
                 {primary.title}
               </span>
-              {primary.exp_reward > 0 && (
-                <span className="text-[9px] font-mono text-theme-accent/50 shrink-0">
-                  +{primary.exp_reward} EXP
-                </span>
-              )}
             </div>
           ) : (
             <div className="flex items-baseline gap-2">
@@ -212,11 +206,6 @@ function QuestRow({
             <span className="text-[8px] font-mono text-theme-accent/40 truncate max-w-[180px]">
               {quest.source_file}
               {quest.line_number ? `:${quest.line_number}` : ""}
-            </span>
-          )}
-          {quest.exp_reward > 0 && (
-            <span className="text-[8px] font-mono text-theme-accent/40">
-              +{quest.exp_reward} EXP
             </span>
           )}
         </div>

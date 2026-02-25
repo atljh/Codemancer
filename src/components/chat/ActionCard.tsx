@@ -33,11 +33,6 @@ export function ActionCard({ card }: ActionCardProps) {
           {card.status}
         </span>
       </div>
-      {card.expGained != null && card.expGained > 0 && (
-        <span className="text-[10px] text-theme-status-warning font-mono font-bold tracking-wider">
-          +{card.expGained} EXP
-        </span>
-      )}
       {hasDiff && (
         <button
           onClick={() =>

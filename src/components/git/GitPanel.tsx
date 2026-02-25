@@ -32,7 +32,7 @@ export function GitPanel() {
   const { t } = useTranslation();
   const gitStatus = useGameStore((s) => s.gitStatus);
   const setGitStatus = useGameStore((s) => s.setGitStatus);
-  const setPlayer = useGameStore((s) => s.setPlayer);
+  const setAgent = useGameStore((s) => s.setAgent);
   const addActionLog = useGameStore((s) => s.addActionLog);
 
   const [commitMsg, setCommitMsg] = useState("");
@@ -93,11 +93,10 @@ export function GitPanel() {
       addActionLog({
         action: `${t("git.committed")}: ${result.hash} — ${result.message}`,
         status: "done",
-        expGained: result.exp_gained,
       });
-      // Refresh player for EXP update
-      const player = await api.getStatus();
-      setPlayer(player);
+      // Refresh agent status
+      const agent = await api.getStatus();
+      setAgent(agent);
       await refresh();
     } catch {
       addActionLog({ action: "Commit failed", status: "error" });

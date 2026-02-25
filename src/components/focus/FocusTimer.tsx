@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Timer, X, Zap } from "lucide-react";
+import { Timer, X } from "lucide-react";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -119,9 +119,8 @@ export function FocusTimer() {
           <span className="text-[10px] font-mono font-bold text-theme-accent tabular-nums">
             {formatTime(remainingSeconds)}
           </span>
-          <span className="text-[8px] font-mono font-bold text-theme-accent/70 flex items-center gap-0.5">
-            <Zap className="w-2.5 h-2.5" strokeWidth={2} />
-            {t("focus.expBoost")}
+          <span className="text-[8px] font-mono font-bold text-theme-accent/70">
+            {t("focus.active")}
           </span>
         </div>
         <button

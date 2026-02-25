@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useApi } from "./useApi";
+import { useAudio } from "./useAudio";
 import { useGameStore } from "../stores/gameStore";
 import translations, { type TranslationKey } from "../i18n/translations";
 import type { CriticalAnomaly, HealthWatchResult } from "../types/game";
@@ -99,6 +100,9 @@ function buildAlertMessage(locale: Locale, result: HealthWatchResult): string {
 
 export function useHealthWatch() {
   const api = useApi();
+  const { playSound } = useAudio();
+  const playSoundRef = useRef(playSound);
+  playSoundRef.current = playSound;
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -117,6 +121,16 @@ export function useHealthWatch() {
 
       try {
         const result = await api.healthWatch();
+
+        // Update integrity score from health results
+        try {
+          const agentStatus = await api.updateIntegrity();
+          const { setAgent } = useGameStore.getState();
+          setAgent(agentStatus);
+        } catch {
+          // non-critical
+        }
+
         if (!result.has_critical) return;
 
         const hash = computeHash(result);
@@ -126,6 +140,12 @@ export function useHealthWatch() {
         if (!message) return;
 
         setLastHealthAlertHash(hash);
+
+        // Trigger smart alert shudder + thud sound
+        const { triggerSmartAlert } = useGameStore.getState();
+        triggerSmartAlert();
+        playSoundRef.current("smart_alert");
+
         addMessage({
           role: "system",
           content: message,

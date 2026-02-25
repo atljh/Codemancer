@@ -1,25 +1,11 @@
-export interface Player {
+export interface AgentStatus {
   name: string;
-  level: number;
-  total_exp: number;
-  exp_progress: number;
-  exp_for_next_level: number;
-  hp: number;
-  max_hp: number;
-  mp: number;
-  max_mp: number;
+  known_files_count: number;
+  total_files: number;
   total_bytes_processed: number;
+  integrity_score: number; // 0-100
+  focus_active: boolean;
 }
-
-export type ActionType =
-  | "message"
-  | "code_apply"
-  | "bug_fix"
-  | "lines_written"
-  | "syntax_check_pass"
-  | "file_save"
-  | "project_scan"
-  | "git_commit";
 
 export interface GitFileEntry {
   path: string;
@@ -45,14 +31,6 @@ export interface GitBranch {
 export interface GitCommitResponse {
   hash: string;
   message: string;
-  exp_gained: number;
-}
-
-export interface ExpGainResponse {
-  exp_gained: number;
-  player: Player;
-  leveled_up: boolean;
-  new_level: number | null;
 }
 
 export type QuestStatus = "active" | "completed" | "failed";
@@ -61,7 +39,6 @@ export interface Quest {
   id: string;
   title: string;
   description: string;
-  exp_reward: number;
   status: QuestStatus;
   source_file: string | null;
   line_number: number | null;
@@ -73,13 +50,11 @@ export interface ActionCardData {
   filePath: string;
   oldContent?: string;
   newContent?: string;
-  expGained?: number;
 }
 
 export interface ActionLogData {
   action: string;
   status: "pending" | "done" | "error";
-  expGained?: number;
   toolName?: string;
   toolId?: string;
   bytesProcessed?: number;
@@ -191,7 +166,6 @@ export interface ProjectScanResult {
   total_dirs: number;
   key_files: string[];
   file_types: Record<string, number>;
-  exp_gained: number;
 }
 
 export interface ProjectContextResult extends ProjectScanResult {
@@ -205,7 +179,6 @@ export interface ChronicleEvent {
   action_type: string;
   description: string;
   files_affected: string[];
-  exp_gained: number;
   session_id: string;
 }
 
@@ -311,7 +284,6 @@ export interface FocusStatus {
   started_at: string | null;
   duration_minutes: number;
   remaining_seconds: number;
-  exp_multiplier: number;
 }
 
 // Intel log types
@@ -323,7 +295,6 @@ export interface IntelLog {
   intent: string;
   subtasks: string[];
   status: string;
-  exp_multiplier: number;
   session_id: string;
 }
 
@@ -345,7 +316,14 @@ export interface TelegramDialog {
 }
 
 export interface TelegramMedia {
-  type: "photo" | "video" | "document" | "gif" | "sticker" | "voice" | "webpage";
+  type:
+    | "photo"
+    | "video"
+    | "document"
+    | "gif"
+    | "sticker"
+    | "voice"
+    | "webpage";
   url?: string;
   fileName?: string;
   mimeType?: string;
@@ -375,7 +353,11 @@ export interface TelegramAnalysis {
 // MissionControl types
 export type SignalSource = "TELEGRAM" | "CODE_TODO" | "LSP_ERRORS";
 
-export type OperationStatus = "ANALYSIS" | "DEPLOYING" | "TESTING" | "COMPLETED";
+export type OperationStatus =
+  | "ANALYSIS"
+  | "DEPLOYING"
+  | "TESTING"
+  | "COMPLETED";
 
 export interface MissionSignal {
   id: string;
@@ -394,7 +376,6 @@ export interface Operation {
   status: OperationStatus;
   signals: MissionSignal[];
   related_sectors: string[];
-  exp_reward: number;
   created_at: string;
   updated_at: string;
   children: string[];

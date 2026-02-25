@@ -12,7 +12,7 @@ export function WelcomeScreen() {
   const setSettings = useGameStore((s) => s.setSettings);
   const setFileTreeRoot = useGameStore((s) => s.setFileTreeRoot);
   const setProjectScan = useGameStore((s) => s.setProjectScan);
-  const setPlayer = useGameStore((s) => s.setPlayer);
+  const setAgent = useGameStore((s) => s.setAgent);
   const toggleSettings = useGameStore((s) => s.toggleSettings);
   const addActionCard = useGameStore((s) => s.addActionCard);
   const api = useApi();
@@ -43,8 +43,8 @@ export function WelcomeScreen() {
       setProjectScan(scan);
 
       try {
-        const updatedPlayer = await api.getStatus();
-        setPlayer(updatedPlayer);
+        const agentStatus = await api.getStatus();
+        setAgent(agentStatus);
       } catch {
         /* ok */
       }
@@ -53,7 +53,6 @@ export function WelcomeScreen() {
         fileName: `[PROJECT LOADED]: ${shortenPath(path)}`,
         status: "done",
         filePath: path,
-        expGained: scan.exp_gained,
       });
     } catch {
       // scan failed
@@ -167,7 +166,7 @@ export function WelcomeScreen() {
                 <div className="text-theme-status-warning/50">TODO</div>
                 <div className="text-theme-text/30">fix auth</div>
                 <div className="text-theme-status-success/50 mt-0.5">
-                  +50 EXP
+                  TRACKED
                 </div>
               </div>
             }

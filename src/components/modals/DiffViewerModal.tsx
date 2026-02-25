@@ -17,8 +17,6 @@ const DiffEditor = lazy(() =>
 export function DiffViewerModal() {
   const diffViewer = useGameStore((s) => s.diffViewer);
   const closeDiffViewer = useGameStore((s) => s.closeDiffViewer);
-  const setPlayer = useGameStore((s) => s.setPlayer);
-  const triggerLevelUp = useGameStore((s) => s.triggerLevelUp);
   const addMessage = useGameStore((s) => s.addMessage);
   const api = useApi();
   const { t } = useTranslation();
@@ -33,15 +31,16 @@ export function DiffViewerModal() {
     setApplying(true);
     try {
       await api.writeFile(diffViewer.filePath, diffViewer.newContent);
-      const result = await api.performAction("code_apply");
-      setPlayer(result.player);
+      // Track the file
+      try {
+        await api.trackFile(diffViewer.filePath);
+      } catch {
+        // not critical
+      }
       addMessage({
         role: "system",
-        content: `${t("diff.applied")} ${diffViewer.fileName} +${result.exp_gained} EXP`,
+        content: `${t("diff.applied")} ${diffViewer.fileName}`,
       });
-      if (result.leveled_up && result.new_level !== null) {
-        triggerLevelUp(result.new_level);
-      }
       closeDiffViewer();
     } catch {
       addMessage({

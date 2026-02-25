@@ -53,8 +53,8 @@ export function getCommands(): Command[] {
           s.setProjectScan(scan);
           const tree = await api.getFileTree(path);
           s.setFileTree(tree);
-          const player = await api.getStatus();
-          s.setPlayer(player);
+          const agent = await api.getStatus();
+          s.setAgent(agent);
         } catch {
           /* not in Tauri or cancelled */
         }

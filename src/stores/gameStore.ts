@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type {
-  Player,
+  AgentStatus,
   Quest,
   ChatMessage,
   EditorFile,
@@ -20,11 +20,9 @@ import type {
 } from "../types/game";
 
 interface GameState {
-  player: Player;
+  agent: AgentStatus;
   quests: Quest[];
   messages: ChatMessage[];
-  showLevelUp: boolean;
-  newLevel: number;
   isForging: boolean;
 
   // Editor state
@@ -116,14 +114,15 @@ interface GameState {
   showMissionControl: boolean;
   missionBriefingActive: boolean;
 
+  // Smart Alert
+  smartAlertActive: boolean;
+
   // Actions
-  setPlayer: (player: Player) => void;
+  setAgent: (agent: AgentStatus) => void;
   setQuests: (quests: Quest[]) => void;
   addMessage: (
     msg: Omit<ChatMessage, "id" | "timestamp"> & { id?: string },
   ) => void;
-  triggerLevelUp: (level: number) => void;
-  dismissLevelUp: () => void;
   setForging: (v: boolean) => void;
 
   // Editor actions
@@ -226,6 +225,9 @@ interface GameState {
   // Self-repair actions
   setSelfRepairActive: (v: boolean) => void;
 
+  // Smart Alert actions
+  triggerSmartAlert: () => void;
+
   // MissionControl actions
   setOperations: (ops: Operation[]) => void;
   addOperation: (op: Operation) => void;
@@ -236,17 +238,13 @@ interface GameState {
   setMissionBriefingActive: (v: boolean) => void;
 }
 
-const defaultPlayer: Player = {
+const defaultAgent: AgentStatus = {
   name: "Codemancer",
-  level: 0,
-  total_exp: 0,
-  exp_progress: 0,
-  exp_for_next_level: 100,
-  hp: 100,
-  max_hp: 100,
-  mp: 50,
-  max_mp: 50,
+  known_files_count: 0,
+  total_files: 0,
   total_bytes_processed: 0,
+  integrity_score: 100,
+  focus_active: false,
 };
 
 const defaultSettings: AppSettings = {
@@ -273,11 +271,9 @@ const defaultSettings: AppSettings = {
 };
 
 export const useGameStore = create<GameState>((set) => ({
-  player: defaultPlayer,
+  agent: defaultAgent,
   quests: [],
   messages: [],
-  showLevelUp: false,
-  newLevel: 0,
   isForging: false,
 
   currentFile: null,
@@ -336,8 +332,9 @@ export const useGameStore = create<GameState>((set) => ({
   selectedOperationId: null,
   showMissionControl: false,
   missionBriefingActive: false,
+  smartAlertActive: false,
 
-  setPlayer: (player) => set({ player }),
+  setAgent: (agent) => set({ agent }),
   setQuests: (quests) => set({ quests }),
 
   addMessage: (msg) =>
@@ -348,8 +345,6 @@ export const useGameStore = create<GameState>((set) => ({
       ],
     })),
 
-  triggerLevelUp: (level) => set({ showLevelUp: true, newLevel: level }),
-  dismissLevelUp: () => set({ showLevelUp: false }),
   setForging: (v) => set({ isForging: v }),
 
   // Editor actions
@@ -547,10 +542,15 @@ export const useGameStore = create<GameState>((set) => ({
   // Self-repair
   setSelfRepairActive: (v) => set({ selfRepairActive: v }),
 
+  // Smart Alert
+  triggerSmartAlert: () => {
+    set({ smartAlertActive: true });
+    setTimeout(() => set({ smartAlertActive: false }), 600);
+  },
+
   // MissionControl
   setOperations: (ops) => set({ operations: ops }),
-  addOperation: (op) =>
-    set((s) => ({ operations: [op, ...s.operations] })),
+  addOperation: (op) => set((s) => ({ operations: [op, ...s.operations] })),
   updateOperation: (id, updates) =>
     set((s) => ({
       operations: s.operations.map((o) =>
