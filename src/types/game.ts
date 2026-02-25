@@ -79,7 +79,8 @@ export interface ChatMessage {
     | "blast_radius"
     | "command_result"
     | "proactive_log"
-    | "intel_entry";
+    | "intel_entry"
+    | "agent_proposal";
   actionCard?: ActionCardData;
   actionLog?: ActionLogData;
   images?: ImageAttachment[];
@@ -178,6 +179,9 @@ export interface AppSettings {
   // AI Triage
   signal_ai_triage_enabled: boolean;
   signal_hide_low_priority: boolean;
+  // Agentic Supervisor
+  supervisor_enabled: boolean;
+  supervisor_sandbox_mode: boolean;
 }
 
 export interface ProjectScanResult {
@@ -458,6 +462,49 @@ export interface RefineryStatus {
   total_signals: number;
   new_signals: number;
   polling_active: boolean;
+}
+
+// Agentic Supervisor types
+export type PlanStepStatus =
+  | "pending"
+  | "running"
+  | "completed"
+  | "failed"
+  | "skipped"
+  | "simulated";
+
+export type PlanStatus =
+  | "proposed"
+  | "approved"
+  | "executing"
+  | "completed"
+  | "failed"
+  | "dismissed";
+
+export interface PlanStep {
+  index: number;
+  tool: string;
+  description: string;
+  input: Record<string, unknown>;
+  status: PlanStepStatus;
+  result_summary: string | null;
+  old_content: string | null;
+  new_content: string | null;
+  file_path: string | null;
+}
+
+export interface ActionPlan {
+  id: string;
+  signal_id: string;
+  signal_title: string;
+  signal_reason: string | null;
+  steps: PlanStep[];
+  status: PlanStatus;
+  sandbox_mode: boolean;
+  created_at: string;
+  updated_at: string;
+  affected_files: string[];
+  execution_log: string[];
 }
 
 export type CommsAuthState =

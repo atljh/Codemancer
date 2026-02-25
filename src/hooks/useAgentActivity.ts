@@ -56,6 +56,7 @@ export function useAgentActivity() {
     commsMsgCount: 0,
     lastSaveTime: 0 as number | null,
     refineryNewCount: 0,
+    supervisorProposalCount: 0,
   });
 
   useEffect(() => {
@@ -153,7 +154,15 @@ export function useAgentActivity() {
       }
       prev.refineryNewCount = state.refineryNewCount;
 
-      // 5) FILE_SAVED
+      // 5) SUPERVISOR_PROPOSAL
+      if (state.supervisorProposalCount > prev.supervisorProposalCount) {
+        emit(
+          t(state.locale, "activity.supervisorProposal", { sector: "tactical" }),
+        );
+      }
+      prev.supervisorProposalCount = state.supervisorProposalCount;
+
+      // 6) FILE_SAVED
       if (
         state.lastSaveTime &&
         state.lastSaveTime !== prev.lastSaveTime
@@ -225,6 +234,7 @@ export function useAgentActivity() {
       commsMsgCount: s.commsMessages.length,
       lastSaveTime: s.lastSaveTime,
       refineryNewCount: s.refineryNewCount,
+      supervisorProposalCount: s.supervisorProposalCount,
     };
 
     return () => {

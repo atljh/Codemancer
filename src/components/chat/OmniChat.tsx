@@ -8,6 +8,7 @@ import { RecallBubble } from "./RecallBubble";
 import { BlastRadiusBubble } from "./BlastRadiusBubble";
 import { ProactiveLogBubble } from "./ProactiveLogBubble";
 import { IntelBubble } from "./IntelBubble";
+import { AgentProposalCard } from "./AgentProposalCard";
 import { MissionObjective } from "./MissionObjective";
 import { CommandInput } from "./CommandInput";
 import { ConversationDrawer } from "./ConversationDrawer";
@@ -82,6 +83,7 @@ export function OmniChat() {
               "command_result",
               "proactive_log",
               "intel_entry",
+              "agent_proposal",
             ].includes(m.type!),
         );
       try {
@@ -668,6 +670,9 @@ export function OmniChat() {
             }
             if (msg.type === "blast_radius") {
               return <BlastRadiusBubble key={msg.id} message={msg} />;
+            }
+            if (msg.type === "agent_proposal") {
+              return <AgentProposalCard key={msg.id} message={msg} />;
             }
             if (msg.type === "proactive_log") {
               return <ProactiveLogBubble key={msg.id} message={msg} />;

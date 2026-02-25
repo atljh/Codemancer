@@ -32,6 +32,7 @@ import type {
   MissionStatus,
   UnifiedSignal,
   RefineryStatus,
+  ActionPlan,
 } from "../types/game";
 
 const API_BASE = "http://127.0.0.1:8420";
@@ -538,6 +539,34 @@ const api = {
         body: JSON.stringify({ signal_ids: signalIds ?? null }),
       },
     ),
+
+  // Agentic Supervisor
+  getSupervisorPlans: (status?: string, limit?: number) => {
+    const q = new URLSearchParams();
+    if (status) q.set("status", status);
+    if (limit) q.set("limit", String(limit));
+    const qs = q.toString();
+    return fetchJson<ActionPlan[]>(
+      `/api/supervisor/plans${qs ? `?${qs}` : ""}`,
+    );
+  },
+
+  getSupervisorPlan: (planId: string) =>
+    fetchJson<ActionPlan>(`/api/supervisor/plans/${planId}`),
+
+  dismissSupervisorPlan: (planId: string) =>
+    fetchJson<{ ok: boolean; status: string }>(
+      `/api/supervisor/plans/${planId}/dismiss`,
+      { method: "POST" },
+    ),
+
+  executeSupervisorPlan: (planId: string) =>
+    fetch(`${API_BASE}/api/supervisor/plans/${planId}/execute`, {
+      method: "POST",
+    }),
+
+  getSupervisorProposalCount: () =>
+    fetchJson<{ count: number }>("/api/supervisor/proposals/count"),
 };
 
 export { api };

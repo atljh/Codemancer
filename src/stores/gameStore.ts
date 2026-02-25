@@ -124,6 +124,10 @@ interface GameState {
   refinerySignals: UnifiedSignal[];
   refineryNewCount: number;
 
+  // Agentic Supervisor
+  supervisorProposalCount: number;
+  supervisorActiveFiles: string[];
+
   // Actions
   setAgent: (agent: AgentStatus) => void;
   setQuests: (quests: Quest[]) => void;
@@ -240,6 +244,10 @@ interface GameState {
   setRefinerySignals: (signals: UnifiedSignal[]) => void;
   setRefineryNewCount: (count: number) => void;
 
+  // Agentic Supervisor actions
+  setSupervisorProposalCount: (count: number) => void;
+  setSupervisorActiveFiles: (files: string[]) => void;
+
   // MissionControl actions
   setOperations: (ops: Operation[]) => void;
   addOperation: (op: Operation) => void;
@@ -296,6 +304,8 @@ const defaultSettings: AppSettings = {
   signal_slack_poll_interval: 300,
   signal_ai_triage_enabled: false,
   signal_hide_low_priority: false,
+  supervisor_enabled: false,
+  supervisor_sandbox_mode: true,
 };
 
 export const useGameStore = create<GameState>((set) => ({
@@ -364,6 +374,8 @@ export const useGameStore = create<GameState>((set) => ({
   refineryStatus: null,
   refinerySignals: [],
   refineryNewCount: 0,
+  supervisorProposalCount: 0,
+  supervisorActiveFiles: [],
 
   setAgent: (agent) => set({ agent }),
   setQuests: (quests) => set({ quests }),
@@ -583,6 +595,10 @@ export const useGameStore = create<GameState>((set) => ({
   setRefineryStatus: (status) => set({ refineryStatus: status }),
   setRefinerySignals: (signals) => set({ refinerySignals: signals }),
   setRefineryNewCount: (count) => set({ refineryNewCount: count }),
+
+  // Agentic Supervisor
+  setSupervisorProposalCount: (count) => set({ supervisorProposalCount: count }),
+  setSupervisorActiveFiles: (files) => set({ supervisorActiveFiles: files }),
 
   // MissionControl
   setOperations: (ops) => set({ operations: ops }),

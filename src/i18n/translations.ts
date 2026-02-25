@@ -559,6 +559,32 @@ const translations = {
     "refinery.triage": "TRIAGE",
     "refinery.triaging": "TRIAGING...",
     "refinery.triageComplete": "Triaged {count} signals",
+    // Agentic Supervisor
+    "supervisor.proposalLabel": "AGENT PROPOSAL",
+    "supervisor.execute": "EXECUTE",
+    "supervisor.dismiss": "DISMISS",
+    "supervisor.sandboxMode": "SANDBOX",
+    "supervisor.step": "Steps",
+    "supervisor.planComplete": "Plan completed successfully",
+    "supervisor.executionError": "Execution failed",
+    "supervisor.statusPending": "Pending",
+    "supervisor.statusRunning": "Running...",
+    "supervisor.statusCompleted": "Completed",
+    "supervisor.statusSimulated": "Simulated",
+    "supervisor.statusSkipped": "Skipped",
+    "supervisor.statusFailed": "Failed",
+    "supervisor.affectedFiles": "Affected files",
+    "supervisor.signalContext": "Signal context",
+    "activity.supervisorProposal":
+      "[AGENTIC_SUPERVISOR]: New action plan generated for sector '{sector}'. Awaiting authorization.",
+    "settings.tabIntegrations": "Integrations",
+    "settings.supervisorSection": "Agentic Supervisor",
+    "settings.supervisorEnabled": "Enable Supervisor",
+    "settings.supervisorEnabledHint":
+      "Automatically generate action plans for high-priority signals (level 4-5).",
+    "settings.supervisorSandbox": "Sandbox Mode",
+    "settings.supervisorSandboxHint":
+      "Simulate file writes (show diff without writing) and block command execution.",
   },
   ru: {
     // Panels
@@ -1119,6 +1145,32 @@ const translations = {
     "refinery.triage": "ТРИАЖ",
     "refinery.triaging": "ТРИАЖ...",
     "refinery.triageComplete": "Протриажено {count} сигналов",
+    // Agentic Supervisor
+    "supervisor.proposalLabel": "ПЛАН АГЕНТА",
+    "supervisor.execute": "ВЫПОЛНИТЬ",
+    "supervisor.dismiss": "ОТКЛОНИТЬ",
+    "supervisor.sandboxMode": "ПЕСОЧНИЦА",
+    "supervisor.step": "Шаги",
+    "supervisor.planComplete": "План выполнен успешно",
+    "supervisor.executionError": "Ошибка выполнения",
+    "supervisor.statusPending": "Ожидание",
+    "supervisor.statusRunning": "Выполняется...",
+    "supervisor.statusCompleted": "Завершено",
+    "supervisor.statusSimulated": "Симуляция",
+    "supervisor.statusSkipped": "Пропущено",
+    "supervisor.statusFailed": "Ошибка",
+    "supervisor.affectedFiles": "Затронутые файлы",
+    "supervisor.signalContext": "Контекст сигнала",
+    "activity.supervisorProposal":
+      "[AGENTIC_SUPERVISOR]: Сгенерирован план действий для сектора '{sector}'. Ожидание авторизации.",
+    "settings.tabIntegrations": "Интеграции",
+    "settings.supervisorSection": "Агент-супервизор",
+    "settings.supervisorEnabled": "Включить супервизор",
+    "settings.supervisorEnabledHint":
+      "Автоматически генерировать планы действий для высокоприоритетных сигналов (уровень 4-5).",
+    "settings.supervisorSandbox": "Режим песочницы",
+    "settings.supervisorSandboxHint":
+      "Симулировать запись файлов (показать diff без записи) и блокировать выполнение команд.",
   },
 } as const;
 

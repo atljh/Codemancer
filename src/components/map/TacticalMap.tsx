@@ -59,6 +59,13 @@ export function TacticalMap() {
     );
   }, [showRefineryLayer, refinerySignals]);
 
+  // Supervisor active files
+  const supervisorActiveFiles = useGameStore((s) => s.supervisorActiveFiles);
+  const supervisorFileSet = useMemo(
+    () => new Set(supervisorActiveFiles),
+    [supervisorActiveFiles],
+  );
+
   // Observe container size
   useEffect(() => {
     const el = containerRef.current;
@@ -282,6 +289,11 @@ export function TacticalMap() {
         >
           {t("refinery.title")}
         </button>
+        {supervisorFileSet.size > 0 && (
+          <span className="text-[9px] font-mono px-2 py-1 rounded bg-amber-500/15 text-amber-400 animate-glow-pulse">
+            SUPERVISOR ({supervisorFileSet.size})
+          </span>
+        )}
         <button
           onClick={resetView}
           className="text-[9px] font-mono px-2 py-1 rounded bg-white/5 text-theme-text-dim hover:text-theme-text hover:bg-white/8"
@@ -401,6 +413,10 @@ export function TacticalMap() {
             missionSectors.has(ln.id) || missionSectors.has(ln.node.path);
           const isRefinery =
             refineryFileSet.has(ln.id) || refineryFileSet.has(ln.node.path);
+          const isSupervisor =
+            supervisorFileSet.has(ln.id) ||
+            supervisorFileSet.has(ln.node.path) ||
+            supervisorFileSet.has(fullNodePath);
           const showLabel =
             isActive ||
             isDependent ||
@@ -410,7 +426,8 @@ export function TacticalMap() {
             isBountySource ||
             isBountyTarget ||
             isMissionSector ||
-            isRefinery;
+            isRefinery ||
+            isSupervisor;
 
           let fill = "var(--theme-accent)";
           // If fog of war is on but no files are open, show all nodes normally
@@ -432,6 +449,9 @@ export function TacticalMap() {
           } else if (isBlastTarget) {
             fill = "hsl(30, 70%, 50%)";
             nodeOpacity = 0.9;
+          } else if (isSupervisor) {
+            fill = "hsl(45, 90%, 55%)";
+            nodeOpacity = 1;
           } else if (isMissionSector) {
             fill = "hsl(190, 90%, 55%)";
             nodeOpacity = 1;

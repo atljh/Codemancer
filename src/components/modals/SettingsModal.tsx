@@ -4,6 +4,7 @@ import {
   X,
   Settings,
   Brain,
+  BrainCog,
   Palette,
   Globe,
   FolderOpen,
@@ -79,7 +80,7 @@ const FALLBACK_MODELS: Record<string, AIModel[]> = {
   custom: [],
 };
 
-type SettingsTab = "general" | "ai" | "appearance";
+type SettingsTab = "general" | "ai" | "integrations" | "appearance";
 
 export function SettingsModal() {
   const showSettings = useGameStore((s) => s.showSettings);
@@ -151,6 +152,11 @@ export function SettingsModal() {
       id: "ai",
       label: t("settings.tabAi"),
       icon: <Brain className="w-3.5 h-3.5" strokeWidth={1.5} />,
+    },
+    {
+      id: "integrations",
+      label: t("settings.tabIntegrations"),
+      icon: <Radio className="w-3.5 h-3.5" strokeWidth={1.5} />,
     },
     {
       id: "appearance",
@@ -259,6 +265,13 @@ export function SettingsModal() {
                     t={t}
                   />
                 )}
+                {activeTab === "integrations" && (
+                  <IntegrationsTab
+                    draft={draft}
+                    setDraft={setDraft}
+                    t={t}
+                  />
+                )}
                 {activeTab === "appearance" && (
                   <AppearanceTab draft={draft} setDraft={setDraft} t={t} />
                 )}
@@ -360,8 +373,39 @@ function GeneralTab({
         </p>
       </SettingsField>
 
+      <div className="mt-5 pt-4 border-t border-theme-status-error/10">
+        <h3 className="text-xs font-mono font-bold text-theme-status-error/70 uppercase tracking-[0.15em] mb-3">
+          {t("settings.dangerZone")}
+        </h3>
+        <button
+          onClick={onReset}
+          className="flex items-center gap-2 px-3 py-2.5 rounded border border-theme-status-error/15 bg-theme-status-error/5 text-theme-status-error hover:bg-theme-status-error/10 text-sm font-mono tracking-wider transition-colors"
+        >
+          <RotateCcw className="w-4 h-4" strokeWidth={1.5} />
+          {t("settings.resetProgress")}
+        </button>
+        <p className="text-[11px] text-theme-text-dimmer mt-1.5 font-mono">
+          {t("settings.resetHint")}
+        </p>
+      </div>
+    </>
+  );
+}
+
+/* ───── Integrations Tab ───── */
+function IntegrationsTab({
+  draft,
+  setDraft,
+  t,
+}: {
+  draft: AppSettings;
+  setDraft: (d: AppSettings) => void;
+  t: (key: TranslationKey) => string;
+}) {
+  return (
+    <>
       {/* Telegram */}
-      <div className="mt-5 pt-4 border-t border-[var(--theme-glass-border)]">
+      <div>
         <div className="flex items-center gap-2 mb-3">
           <Radio
             className="w-3.5 h-3.5 text-theme-accent/40"
@@ -409,7 +453,7 @@ function GeneralTab({
         </div>
       </div>
 
-      {/* Signal Refinery */}
+      {/* Signal Refinery — GitHub */}
       <div className="mt-5 pt-4 border-t border-[var(--theme-glass-border)]">
         <div className="flex items-center gap-2 mb-3">
           <Radio
@@ -762,20 +806,55 @@ function GeneralTab({
         </div>
       </div>
 
-      <div className="mt-5 pt-4 border-t border-theme-status-error/10">
-        <h3 className="text-xs font-mono font-bold text-theme-status-error/70 uppercase tracking-[0.15em] mb-3">
-          {t("settings.dangerZone")}
-        </h3>
-        <button
-          onClick={onReset}
-          className="flex items-center gap-2 px-3 py-2.5 rounded border border-theme-status-error/15 bg-theme-status-error/5 text-theme-status-error hover:bg-theme-status-error/10 text-sm font-mono tracking-wider transition-colors"
-        >
-          <RotateCcw className="w-4 h-4" strokeWidth={1.5} />
-          {t("settings.resetProgress")}
-        </button>
-        <p className="text-[11px] text-theme-text-dimmer mt-1.5 font-mono">
-          {t("settings.resetHint")}
-        </p>
+      {/* Agentic Supervisor */}
+      <div className="mt-5 pt-4 border-t border-[var(--theme-glass-border)]">
+        <div className="flex items-center gap-2 mb-3">
+          <BrainCog
+            className="w-3.5 h-3.5 text-amber-400/60"
+            strokeWidth={1.5}
+          />
+          <h3 className="text-xs font-mono font-bold text-theme-text-dim uppercase tracking-[0.15em]">
+            {t("settings.supervisorSection")}
+          </h3>
+        </div>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={draft.supervisor_enabled}
+                onChange={(e) =>
+                  setDraft({ ...draft, supervisor_enabled: e.target.checked })
+                }
+                className="accent-amber-400"
+              />
+              <span className="text-[11px] font-mono text-theme-text-dim tracking-wider">
+                {t("settings.supervisorEnabled")}
+              </span>
+            </label>
+          </div>
+          <p className="text-[11px] text-theme-text-dimmer font-mono">
+            {t("settings.supervisorEnabledHint")}
+          </p>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={draft.supervisor_sandbox_mode}
+                onChange={(e) =>
+                  setDraft({ ...draft, supervisor_sandbox_mode: e.target.checked })
+                }
+                className="accent-blue-400"
+              />
+              <span className="text-[11px] font-mono text-theme-text-dim tracking-wider">
+                {t("settings.supervisorSandbox")}
+              </span>
+            </label>
+          </div>
+          <p className="text-[11px] text-theme-text-dimmer font-mono">
+            {t("settings.supervisorSandboxHint")}
+          </p>
+        </div>
       </div>
     </>
   );
