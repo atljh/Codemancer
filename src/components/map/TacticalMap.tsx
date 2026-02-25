@@ -375,7 +375,8 @@ export function TacticalMap() {
           const isBlastTarget = blastSet.has(ln.id);
           const isBountySource = ln.id === bountyZoneSource;
           const isBountyTarget = bountySet.has(ln.id);
-          const isMissionSector = missionSectors.has(ln.id) || missionSectors.has(ln.node.path);
+          const isMissionSector =
+            missionSectors.has(ln.id) || missionSectors.has(ln.node.path);
           const showLabel =
             isActive ||
             isDependent ||

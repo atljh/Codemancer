@@ -55,12 +55,14 @@ pnpm install                     # Frontend
 cd backend && uv sync && cd ..   # Backend
 pnpm tauri dev                   # Launch
 ```
+
 </details>
 
 <details>
 <summary>Platform-specific dependencies</summary>
 
 **macOS:**
+
 ```bash
 xcode-select --install
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -69,6 +71,7 @@ npm install -g pnpm
 ```
 
 **Linux (Debian/Ubuntu):**
+
 ```bash
 sudo apt update
 sudo apt install libwebkit2gtk-4.1-dev build-essential curl wget file \
@@ -79,12 +82,14 @@ npm install -g pnpm
 ```
 
 **Windows:**
+
 ```powershell
 # Install Rust from https://rustup.rs
 # Install C++ Build Tools via Visual Studio Installer
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 npm install -g pnpm
 ```
+
 </details>
 
 ---
@@ -109,15 +114,15 @@ Messages, commits, bug fixes, file saves — everything feeds your experience ba
   <img src="docs/gifs/exp-growth.gif" alt="EXP bar filling up and level-up notification" width="700" />
 </p>
 
-| Action | EXP |
-|--------|-----|
-| Send message | +10 |
-| Save file | +5 |
-| Apply code | +50 |
-| Fix bug | +100 |
-| Git commit | variable |
-| Tool execution | +15-25 |
-| Focus mode | x2 multiplier |
+| Action         | EXP           |
+| -------------- | ------------- |
+| Send message   | +10           |
+| Save file      | +5            |
+| Apply code     | +50           |
+| Fix bug        | +100          |
+| Git commit     | variable      |
+| Tool execution | +15-25        |
+| Focus mode     | x2 multiplier |
 
 **Level formula:** `level = floor(sqrt(total_exp / 100))`
 
@@ -157,11 +162,11 @@ Switch between Dark Ops (cyan), Midnight (blue), Phantom (amber), Arctic (light)
 
 4 audio personalities for every UI interaction:
 
-| Pack | Style |
-|------|-------|
-| **Default** | Tactical sci-fi bleeps |
-| **Jarvis** | Warm sine tones, AI assistant feel |
-| **Pip-Boy** | 8-bit square waves, Fallout vibes |
+| Pack               | Style                                   |
+| ------------------ | --------------------------------------- |
+| **Default**        | Tactical sci-fi bleeps                  |
+| **Jarvis**         | Warm sine tones, AI assistant feel      |
+| **Pip-Boy**        | 8-bit square waves, Fallout vibes       |
 | **Retro Terminal** | Sawtooth warble, floppy seek, CRT noise |
 
 ---
@@ -194,12 +199,12 @@ Automatic knowledge base. Generate PR reports in one click. The agent recalls pr
 
 ### Multi-Provider AI Chat
 
-| Provider | Setup |
-|----------|-------|
-| **Anthropic** | API key or OAuth |
-| **OpenAI** | API key |
-| **Gemini** | API key |
-| **Custom** | Any OpenAI-compatible endpoint (Ollama, LM Studio) |
+| Provider      | Setup                                              |
+| ------------- | -------------------------------------------------- |
+| **Anthropic** | API key or OAuth                                   |
+| **OpenAI**    | API key                                            |
+| **Gemini**    | API key                                            |
+| **Custom**    | Any OpenAI-compatible endpoint (Ollama, LM Studio) |
 
 Streaming responses, persistent conversations, project context injection.
 
@@ -264,18 +269,18 @@ src-tauri/                  # Rust — Tauri 2.0 shell
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Desktop Shell | Tauri 2.0 (Rust) |
-| Frontend | React 19, TypeScript, Vite 7 |
-| Styling | Tailwind CSS 4.2, Framer Motion 12 |
-| State | Zustand 5 |
-| Editor | Monaco Editor |
-| Audio | Web Audio API (procedural), Web Speech API (TTS/STT) |
-| Icons | Lucide React |
-| Backend | Python 3.12+, FastAPI, Uvicorn |
-| AI SDKs | anthropic, openai, google-genai |
-| Package Managers | pnpm, uv, cargo |
+| Layer            | Technology                                           |
+| ---------------- | ---------------------------------------------------- |
+| Desktop Shell    | Tauri 2.0 (Rust)                                     |
+| Frontend         | React 19, TypeScript, Vite 7                         |
+| Styling          | Tailwind CSS 4.2, Framer Motion 12                   |
+| State            | Zustand 5                                            |
+| Editor           | Monaco Editor                                        |
+| Audio            | Web Audio API (procedural), Web Speech API (TTS/STT) |
+| Icons            | Lucide React                                         |
+| Backend          | Python 3.12+, FastAPI, Uvicorn                       |
+| AI SDKs          | anthropic, openai, google-genai                      |
+| Package Managers | pnpm, uv, cargo                                      |
 
 ## Building for Production
 

@@ -3,41 +3,41 @@
    4 themes, ~30 semantic CSS custom properties each
    ═══════════════════════════════════════════════ */
 
-/* ── Dark Ops — Default tactical cyan ── */
+/* ── Dark Ops — Default muted blue ── */
 :root,
 [data-theme="dark-ops"] {
-  --theme-bg-deep: #0a0c10;
+  --theme-bg-deep: #0d1117;
   --theme-bg-base: #0d1117;
-  --theme-bg-elevated: #111820;
-  --theme-bg-inset: #080a0e;
-  --theme-bg-empty: #1a2030;
+  --theme-bg-elevated: #161b22;
+  --theme-bg-inset: #010409;
+  --theme-bg-empty: #21262d;
 
-  --theme-accent: #00d4ff;
-  --theme-accent-dim: #0891b2;
-  --theme-accent-rgb: 0, 212, 255;
-  --theme-accent-hue: 190;
+  --theme-accent: #58a6ff;
+  --theme-accent-dim: #388bfd;
+  --theme-accent-rgb: 88, 166, 255;
+  --theme-accent-hue: 212;
 
-  --theme-text: #c8d6e5;
-  --theme-text-dim: #5a6b7f;
-  --theme-text-dimmer: #3a4a5f;
-  --theme-text-bright: #ffffff;
+  --theme-text: #8b949e;
+  --theme-text-dim: #484f58;
+  --theme-text-dimmer: #30363d;
+  --theme-text-bright: #c9d1d9;
 
   --theme-status-success: #22c55e;
   --theme-status-warning: #ffaa00;
   --theme-status-error: #cc3333;
 
-  --theme-glass-bg: rgba(13, 17, 23, 0.85);
-  --theme-glass-bg-bright: rgba(17, 24, 32, 0.9);
-  --theme-glass-border: rgba(0, 212, 255, 0.1);
-  --theme-glass-border-bright: rgba(0, 212, 255, 0.15);
+  --theme-glass-bg: rgba(13, 17, 23, 0.95);
+  --theme-glass-bg-bright: rgba(22, 27, 34, 0.95);
+  --theme-glass-border: rgba(255, 255, 255, 0.1);
+  --theme-glass-border-bright: rgba(255, 255, 255, 0.15);
 
-  --theme-grid-color: rgba(0, 212, 255, 0.03);
-  --theme-grid-line: rgba(0, 212, 255, 0.02);
-  --theme-corner-color: rgba(0, 212, 255, 0.3);
+  --theme-grid-color: rgba(255, 255, 255, 0.01);
+  --theme-grid-line: rgba(255, 255, 255, 0.01);
+  --theme-corner-color: rgba(255, 255, 255, 0.15);
 
   --theme-purple: #a855f7;
   --theme-purple-dim: #7c3aed;
-  --theme-exp-hue-start: 190;
+  --theme-exp-hue-start: 212;
 }
 
 /* ── Midnight — Deep electric blue ── */
@@ -53,23 +53,23 @@
   --theme-accent-rgb: 77, 159, 255;
   --theme-accent-hue: 216;
 
-  --theme-text: #b8c8dc;
-  --theme-text-dim: #4a5e78;
-  --theme-text-dimmer: #2e3e54;
-  --theme-text-bright: #e8f0ff;
+  --theme-text: #7a8a9e;
+  --theme-text-dim: #3e4e62;
+  --theme-text-dimmer: #2a3848;
+  --theme-text-bright: #b8c8dc;
 
   --theme-status-success: #22c55e;
   --theme-status-warning: #ffaa00;
   --theme-status-error: #cc3333;
 
-  --theme-glass-bg: rgba(10, 14, 20, 0.85);
-  --theme-glass-bg-bright: rgba(15, 21, 32, 0.9);
-  --theme-glass-border: rgba(77, 159, 255, 0.1);
-  --theme-glass-border-bright: rgba(77, 159, 255, 0.15);
+  --theme-glass-bg: rgba(10, 14, 20, 0.95);
+  --theme-glass-bg-bright: rgba(15, 21, 32, 0.95);
+  --theme-glass-border: rgba(255, 255, 255, 0.1);
+  --theme-glass-border-bright: rgba(255, 255, 255, 0.15);
 
-  --theme-grid-color: rgba(77, 159, 255, 0.025);
-  --theme-grid-line: rgba(77, 159, 255, 0.015);
-  --theme-corner-color: rgba(77, 159, 255, 0.3);
+  --theme-grid-color: rgba(255, 255, 255, 0.01);
+  --theme-grid-line: rgba(255, 255, 255, 0.01);
+  --theme-corner-color: rgba(255, 255, 255, 0.15);
 
   --theme-purple: #8b5cf6;
   --theme-purple-dim: #6d28d9;
@@ -79,33 +79,33 @@
 /* ── Phantom — Warm amber dark ── */
 [data-theme="phantom"] {
   --theme-bg-deep: #0f0d0a;
-  --theme-bg-base: #161310;
-  --theme-bg-elevated: #1e1a15;
+  --theme-bg-base: #141210;
+  --theme-bg-elevated: #1c1915;
   --theme-bg-inset: #0a0907;
-  --theme-bg-empty: #252018;
+  --theme-bg-empty: #222018;
 
-  --theme-accent: #ffaa00;
-  --theme-accent-dim: #cc8800;
-  --theme-accent-rgb: 255, 170, 0;
+  --theme-accent: #e09800;
+  --theme-accent-dim: #b07700;
+  --theme-accent-rgb: 224, 152, 0;
   --theme-accent-hue: 40;
 
-  --theme-text: #d4c8b0;
-  --theme-text-dim: #7a6e5a;
-  --theme-text-dimmer: #4a4235;
-  --theme-text-bright: #fff5e0;
+  --theme-text: #9e9080;
+  --theme-text-dim: #5e5448;
+  --theme-text-dimmer: #3e3830;
+  --theme-text-bright: #d4c8b0;
 
   --theme-status-success: #22c55e;
   --theme-status-warning: #ffaa00;
   --theme-status-error: #cc3333;
 
-  --theme-glass-bg: rgba(22, 19, 16, 0.85);
-  --theme-glass-bg-bright: rgba(30, 26, 21, 0.9);
-  --theme-glass-border: rgba(255, 170, 0, 0.1);
-  --theme-glass-border-bright: rgba(255, 170, 0, 0.15);
+  --theme-glass-bg: rgba(20, 18, 16, 0.95);
+  --theme-glass-bg-bright: rgba(28, 25, 21, 0.95);
+  --theme-glass-border: rgba(255, 255, 255, 0.1);
+  --theme-glass-border-bright: rgba(255, 255, 255, 0.15);
 
-  --theme-grid-color: rgba(255, 170, 0, 0.025);
-  --theme-grid-line: rgba(255, 170, 0, 0.015);
-  --theme-corner-color: rgba(255, 170, 0, 0.3);
+  --theme-grid-color: rgba(255, 255, 255, 0.01);
+  --theme-grid-line: rgba(255, 255, 255, 0.01);
+  --theme-corner-color: rgba(255, 255, 255, 0.15);
 
   --theme-purple: #d97706;
   --theme-purple-dim: #b45309;
@@ -125,79 +125,27 @@
   --theme-accent-rgb: 0, 255, 65;
   --theme-accent-hue: 135;
 
-  --theme-text: #33ff66;
-  --theme-text-dim: #1a8a2e;
-  --theme-text-dimmer: #0d5a1a;
-  --theme-text-bright: #80ffaa;
+  --theme-text: #2a8a3a;
+  --theme-text-dim: #1a5a2a;
+  --theme-text-dimmer: #0d3a18;
+  --theme-text-bright: #55dd70;
 
   --theme-status-success: #00ff41;
   --theme-status-warning: #66ff00;
   --theme-status-error: #ff0040;
 
-  --theme-glass-bg: rgba(6, 18, 8, 0.9);
-  --theme-glass-bg-bright: rgba(10, 26, 10, 0.92);
-  --theme-glass-border: rgba(0, 255, 65, 0.12);
-  --theme-glass-border-bright: rgba(0, 255, 65, 0.2);
+  --theme-glass-bg: rgba(6, 18, 8, 0.95);
+  --theme-glass-bg-bright: rgba(10, 26, 10, 0.95);
+  --theme-glass-border: rgba(255, 255, 255, 0.1);
+  --theme-glass-border-bright: rgba(255, 255, 255, 0.15);
 
-  --theme-grid-color: rgba(0, 255, 65, 0.04);
-  --theme-grid-line: rgba(0, 255, 65, 0.025);
-  --theme-corner-color: rgba(0, 255, 65, 0.4);
+  --theme-grid-color: rgba(255, 255, 255, 0.01);
+  --theme-grid-line: rgba(255, 255, 255, 0.01);
+  --theme-corner-color: rgba(255, 255, 255, 0.15);
 
   --theme-purple: #00cc33;
   --theme-purple-dim: #009926;
   --theme-exp-hue-start: 135;
-}
-
-/* Matrix scanline + phosphor glow for hacker theme */
-[data-theme="hacker"] .tactical-grid::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 255, 65, 0.015) 2px,
-    rgba(0, 255, 65, 0.015) 4px
-  );
-  pointer-events: none;
-  z-index: 1;
-}
-
-[data-theme="hacker"] .tactical-grid::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(0, 255, 65, 0.03) 50%,
-    transparent 100%
-  );
-  background-size: 100% 8px;
-  animation: matrix-scanline 8s linear infinite;
-  pointer-events: none;
-  z-index: 1;
-}
-
-@keyframes matrix-scanline {
-  0% {
-    transform: translateY(-100%);
-  }
-  100% {
-    transform: translateY(100%);
-  }
-}
-
-[data-theme="hacker"] * {
-  text-shadow: 0 0 6px rgba(0, 255, 65, 0.15);
-}
-
-[data-theme="hacker"] .glass-panel,
-[data-theme="hacker"] .glass-panel-bright {
-  box-shadow:
-    inset 0 0 30px rgba(0, 255, 65, 0.02),
-    0 0 15px rgba(0, 255, 65, 0.03);
 }
 
 /* ── Arctic — Light cold steel ── */
@@ -213,23 +161,23 @@
   --theme-accent-rgb: 0, 119, 182;
   --theme-accent-hue: 201;
 
-  --theme-text: #1a2a3a;
-  --theme-text-dim: #5a6e82;
+  --theme-text: #4a5e72;
+  --theme-text-dim: #6a7e92;
   --theme-text-dimmer: #8a9bb0;
-  --theme-text-bright: #0a1520;
+  --theme-text-bright: #1a2a3a;
 
   --theme-status-success: #16a34a;
   --theme-status-warning: #d97706;
   --theme-status-error: #dc2626;
 
-  --theme-glass-bg: rgba(255, 255, 255, 0.85);
-  --theme-glass-bg-bright: rgba(255, 255, 255, 0.92);
-  --theme-glass-border: rgba(0, 119, 182, 0.15);
-  --theme-glass-border-bright: rgba(0, 119, 182, 0.25);
+  --theme-glass-bg: rgba(255, 255, 255, 0.95);
+  --theme-glass-bg-bright: rgba(255, 255, 255, 0.97);
+  --theme-glass-border: rgba(0, 0, 0, 0.1);
+  --theme-glass-border-bright: rgba(0, 0, 0, 0.15);
 
-  --theme-grid-color: rgba(0, 119, 182, 0.04);
-  --theme-grid-line: rgba(0, 119, 182, 0.03);
-  --theme-corner-color: rgba(0, 119, 182, 0.3);
+  --theme-grid-color: rgba(0, 0, 0, 0.01);
+  --theme-grid-line: rgba(0, 0, 0, 0.01);
+  --theme-corner-color: rgba(0, 119, 182, 0.2);
 
   --theme-purple: #7c3aed;
   --theme-purple-dim: #6d28d9;

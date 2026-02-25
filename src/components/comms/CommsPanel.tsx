@@ -20,7 +20,7 @@ export function CommsPanel() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-panel rounded-lg p-6 text-center tactical-corners"
+          className="bg-[var(--theme-bg-elevated)] border border-[rgba(255,255,255,0.1)] rounded-lg p-6 text-center"
         >
           <WifiOff
             className="w-8 h-8 text-theme-text-dimmer mx-auto mb-3"
@@ -31,7 +31,7 @@ export function CommsPanel() {
           </p>
           <button
             onClick={toggleSettings}
-            className="flex items-center gap-2 mx-auto px-4 py-2 rounded glass-panel-bright text-theme-accent text-xs font-mono font-bold tracking-[0.1em] uppercase hover:bg-theme-accent/8 transition-colors"
+            className="flex items-center gap-2 mx-auto px-4 py-2 rounded border border-[rgba(255,255,255,0.15)] text-theme-text-dim text-xs font-mono tracking-[0.1em] uppercase hover:text-[var(--theme-accent)] transition-colors"
           >
             <Settings className="w-3.5 h-3.5" strokeWidth={1.5} />
             {t("panel.settings")}
@@ -50,16 +50,16 @@ export function CommsPanel() {
   return (
     <div className="flex-1 flex flex-col min-w-0">
       {/* Status bar */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-[var(--theme-glass-border)] bg-theme-status-success/3">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-[rgba(255,255,255,0.1)]">
         <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-theme-status-success animate-glow-pulse" />
+          <div className="w-1.5 h-1.5 rounded-full bg-theme-status-success" />
           <span className="text-[10px] font-mono text-theme-status-success tracking-wider">
             {t("comms.connected")}
           </span>
         </div>
         <button
           onClick={disconnect}
-          className="text-[9px] font-mono text-theme-status-error/60 hover:text-theme-status-error tracking-wider transition-colors"
+          className="text-[9px] font-mono text-theme-text-dimmer hover:text-theme-status-error tracking-wider transition-colors"
         >
           {t("comms.disconnect")}
         </button>

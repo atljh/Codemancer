@@ -27,7 +27,8 @@ type SoundEvent =
   | "hydraulic_hiss"
   | "radio_static"
   | "mission_registered"
-  | "scan_sweep";
+  | "scan_sweep"
+  | "smart_alert";
 
 let audioCtx: AudioContext | null = null;
 
@@ -488,6 +489,22 @@ function selfRepairDone() {
   crash.stop(ctx.currentTime + 1.5);
 }
 
+// ── Smart Alert — low-frequency thud ──────────────────────
+
+function smartAlertThud() {
+  const ctx = getCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(55, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.2);
+  gain.gain.setValueAtTime(0.15, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.4);
+}
+
 // ── BRIDGE sounds (industrial / command bridge) ───────────
 
 function bridgeRelayClick() {
@@ -550,7 +567,10 @@ function bridgeRadioStatic() {
   const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
   const data = buf.getChannelData(0);
   for (let i = 0; i < bufSize; i++) {
-    const env = i < bufSize * 0.05 ? i / (bufSize * 0.05) : Math.exp(-(i - bufSize * 0.05) / (ctx.sampleRate * 0.15));
+    const env =
+      i < bufSize * 0.05
+        ? i / (bufSize * 0.05)
+        : Math.exp(-(i - bufSize * 0.05) / (ctx.sampleRate * 0.15));
     data[i] = (Math.random() * 2 - 1) * env * 0.3;
   }
   const src = ctx.createBufferSource();
@@ -648,7 +668,10 @@ function bridgeAmbientStart() {
   const lp = ctx.createBiquadFilter();
   lp.type = "lowpass";
   lp.frequency.value = 250;
-  bridgeAmbientSource.connect(lp).connect(bridgeAmbientGain).connect(ctx.destination);
+  bridgeAmbientSource
+    .connect(lp)
+    .connect(bridgeAmbientGain)
+    .connect(ctx.destination);
   bridgeAmbientSource.start();
 }
 
@@ -951,6 +974,7 @@ const DEFAULT_PACK: SoundMap = {
   radio_static: bridgeRadioStatic,
   mission_registered: bridgeMissionRegistered,
   scan_sweep: bridgeScanSweep,
+  smart_alert: smartAlertThud,
 };
 
 const JARVIS_PACK: SoundMap = {
@@ -970,6 +994,7 @@ const JARVIS_PACK: SoundMap = {
   radio_static: bridgeRadioStatic,
   mission_registered: bridgeMissionRegistered,
   scan_sweep: bridgeScanSweep,
+  smart_alert: smartAlertThud,
 };
 
 const PIPBOY_PACK: SoundMap = {
@@ -989,6 +1014,7 @@ const PIPBOY_PACK: SoundMap = {
   radio_static: bridgeRadioStatic,
   mission_registered: bridgeMissionRegistered,
   scan_sweep: bridgeScanSweep,
+  smart_alert: smartAlertThud,
 };
 
 const RETRO_PACK: SoundMap = {
@@ -1008,6 +1034,7 @@ const RETRO_PACK: SoundMap = {
   radio_static: bridgeRadioStatic,
   mission_registered: bridgeMissionRegistered,
   scan_sweep: bridgeScanSweep,
+  smart_alert: smartAlertThud,
 };
 
 const SOUND_PACKS: Record<SoundPackId, SoundMap> = {

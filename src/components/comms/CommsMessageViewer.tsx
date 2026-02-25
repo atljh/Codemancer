@@ -3,9 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
-  Search as SearchIcon,
-  Link,
-  Crosshair,
   Loader2,
   FileText,
   Film,
@@ -40,19 +37,13 @@ export function CommsMessageViewer() {
     {},
   );
   const [extractingId, setExtractingId] = useState<number | null>(null);
-  const [glowActive, setGlowActive] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom & glow on new messages
+  // Scroll to bottom on new messages
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-    if (messages.length > 0) {
-      setGlowActive(true);
-      const timer = setTimeout(() => setGlowActive(false), 800);
-      return () => clearTimeout(timer);
     }
   }, [messages]);
 
@@ -83,7 +74,7 @@ export function CommsMessageViewer() {
     }
   };
 
-  const handleExtractQuest = async (msg: TelegramMessage) => {
+  const handleProcess = async (msg: TelegramMessage) => {
     const analysis = analyses[msg.id];
     if (!analysis?.quest_suggestion) return;
     setExtractingId(msg.id);
@@ -123,8 +114,8 @@ export function CommsMessageViewer() {
   return (
     <div className="flex-1 flex flex-col min-w-0">
       {/* Header */}
-      <div className="px-3 py-2.5 border-b border-[var(--theme-glass-border)]">
-        <h3 className="text-[10px] font-mono font-bold text-theme-accent tracking-[0.2em] uppercase">
+      <div className="px-3 py-2.5 border-b border-[rgba(255,255,255,0.1)]">
+        <h3 className="text-[11px] font-mono text-theme-text-dim tracking-widest uppercase">
           {t("comms.intercepted")}
         </h3>
       </div>
@@ -132,12 +123,7 @@ export function CommsMessageViewer() {
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto scrollbar-thin p-3 space-y-2 transition-shadow duration-800"
-        style={{
-          boxShadow: glowActive
-            ? "inset 0 0 20px rgba(var(--theme-accent-rgb), 0.2)"
-            : "none",
-        }}
+        className="flex-1 overflow-y-auto scrollbar-thin p-3 space-y-2"
       >
         {messages.map((msg) => {
           const analysis = analyses[msg.id];
@@ -150,7 +136,7 @@ export function CommsMessageViewer() {
                 </span>{" "}
                 <span
                   className={
-                    msg.out ? "text-theme-accent-dim" : "text-theme-accent"
+                    msg.out ? "text-theme-text-dim" : "text-[var(--theme-accent)]"
                   }
                 >
                   [{msg.out ? "OUT" : msg.senderName || "SRC"}]
@@ -159,7 +145,7 @@ export function CommsMessageViewer() {
 
               {/* Message content */}
               <div
-                className={`mt-0.5 pl-2 border-l border-[var(--theme-glass-border)] ${msg.out ? "text-theme-text-dim" : "text-theme-text"}`}
+                className={`mt-0.5 pl-2 border-l border-[rgba(255,255,255,0.1)] ${msg.out ? "text-theme-text-dim" : "text-theme-text"}`}
               >
                 {/* Media */}
                 {msg.media && (
@@ -189,35 +175,28 @@ export function CommsMessageViewer() {
                   <button
                     onClick={() => handleAnalyze(msg)}
                     disabled={analyzingId === msg.id}
-                    className="flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-mono tracking-wider border border-theme-accent/15 text-theme-accent/70 hover:bg-theme-accent/8 hover:text-theme-accent transition-all disabled:opacity-50"
+                    className="text-[9px] font-mono tracking-wider text-theme-text-dim hover:text-[var(--theme-accent)] transition-colors disabled:opacity-50"
                   >
                     {analyzingId === msg.id ? (
-                      <>
+                      <span className="flex items-center gap-1">
                         <Loader2
                           className="w-2.5 h-2.5 animate-spin"
                           strokeWidth={1.5}
                         />
                         {t("comms.analyzing")}
-                      </>
+                      </span>
                     ) : (
-                      <>
-                        <SearchIcon
-                          className="w-2.5 h-2.5"
-                          strokeWidth={1.5}
-                        />
-                        {t("comms.analyze")}
-                      </>
+                      `[${t("comms.analyze")}]`
                     )}
                   </button>
 
                   {analysis?.quest_suggestion && (
                     <button
-                      onClick={() => handleExtractQuest(msg)}
+                      onClick={() => handleProcess(msg)}
                       disabled={extractingId === msg.id}
-                      className="flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-mono tracking-wider border border-theme-status-success/15 text-theme-status-success/70 hover:bg-theme-status-success/8 hover:text-theme-status-success transition-all disabled:opacity-50"
+                      className="text-[9px] font-mono tracking-wider text-theme-text-dim hover:text-[var(--theme-accent)] transition-colors disabled:opacity-50"
                     >
-                      <Crosshair className="w-2.5 h-2.5" strokeWidth={1.5} />
-                      {t("comms.extractQuest")}
+                      [{t("comms.extractQuest")}]
                     </button>
                   )}
                 </div>
@@ -230,18 +209,9 @@ export function CommsMessageViewer() {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="mt-1 mb-1 ml-2 flex items-center gap-1.5 px-2 py-1 rounded bg-theme-status-warning/5 border border-theme-status-warning/15"
+                    className="mt-1 mb-1 ml-2 text-[9px] font-mono text-theme-text-dim"
                   >
-                    <Link
-                      className="w-3 h-3 text-theme-status-warning shrink-0"
-                      strokeWidth={1.5}
-                    />
-                    <span className="text-[9px] font-mono text-theme-status-warning tracking-wider font-bold">
-                      {t("comms.linkedSector")}:
-                    </span>
-                    <span className="text-[9px] font-mono text-theme-text-dim truncate">
-                      {analysis.linked_files.join(", ")}
-                    </span>
+                    [LINKED] {analysis.linked_files.join(", ")}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -292,14 +262,18 @@ function MediaRenderer({
   onImageClick: (url: string) => void;
   t: (key: TranslationKey) => string;
 }) {
-  if (media.type === "photo" || media.type === "sticker" || media.type === "gif") {
+  if (
+    media.type === "photo" ||
+    media.type === "sticker" ||
+    media.type === "gif"
+  ) {
     if (media.url) {
       return (
         <div className="my-1.5">
           <img
             src={media.url}
             alt={media.type}
-            className={`rounded border border-[var(--theme-glass-border)] hover:border-theme-accent/40 transition-colors cursor-pointer ${
+            className={`rounded border border-[rgba(255,255,255,0.1)] hover:border-[var(--theme-accent)]/40 transition-colors cursor-pointer ${
               media.type === "sticker"
                 ? "max-h-[150px]"
                 : "max-h-[300px] max-w-full"
@@ -309,11 +283,10 @@ function MediaRenderer({
         </div>
       );
     }
-    // Photo not yet downloaded — show placeholder
     return (
-      <div className="my-1.5 flex items-center gap-1.5 px-2.5 py-2 rounded border border-[var(--theme-glass-border)] bg-white/2 w-fit">
+      <div className="my-1.5 flex items-center gap-1.5 px-2.5 py-2 rounded border border-[rgba(255,255,255,0.1)] w-fit">
         <Loader2
-          className="w-3.5 h-3.5 text-theme-accent/50 animate-spin"
+          className="w-3.5 h-3.5 text-theme-text-dimmer animate-spin"
           strokeWidth={1.5}
         />
         <span className="text-[10px] font-mono text-theme-text-dimmer tracking-wider">
@@ -325,8 +298,8 @@ function MediaRenderer({
 
   if (media.type === "video") {
     return (
-      <div className="my-1.5 flex items-center gap-1.5 px-2.5 py-2 rounded border border-[var(--theme-glass-border)] bg-white/2 w-fit">
-        <Film className="w-3.5 h-3.5 text-theme-accent/60" strokeWidth={1.5} />
+      <div className="my-1.5 flex items-center gap-1.5 px-2.5 py-2 rounded border border-[rgba(255,255,255,0.1)] w-fit">
+        <Film className="w-3.5 h-3.5 text-theme-text-dimmer" strokeWidth={1.5} />
         <span className="text-[10px] font-mono text-theme-text-dim tracking-wider">
           {t("comms.video")}
           {media.fileName ? ` — ${media.fileName}` : ""}
@@ -337,8 +310,8 @@ function MediaRenderer({
 
   if (media.type === "voice") {
     return (
-      <div className="my-1.5 flex items-center gap-1.5 px-2.5 py-2 rounded border border-[var(--theme-glass-border)] bg-white/2 w-fit">
-        <Mic className="w-3.5 h-3.5 text-theme-accent/60" strokeWidth={1.5} />
+      <div className="my-1.5 flex items-center gap-1.5 px-2.5 py-2 rounded border border-[rgba(255,255,255,0.1)] w-fit">
+        <Mic className="w-3.5 h-3.5 text-theme-text-dimmer" strokeWidth={1.5} />
         <span className="text-[10px] font-mono text-theme-text-dim tracking-wider">
           {t("comms.voice")}
         </span>
@@ -348,9 +321,9 @@ function MediaRenderer({
 
   if (media.type === "document") {
     return (
-      <div className="my-1.5 flex items-center gap-1.5 px-2.5 py-2 rounded border border-[var(--theme-glass-border)] bg-white/2 w-fit">
+      <div className="my-1.5 flex items-center gap-1.5 px-2.5 py-2 rounded border border-[rgba(255,255,255,0.1)] w-fit">
         <FileText
-          className="w-3.5 h-3.5 text-theme-accent/60"
+          className="w-3.5 h-3.5 text-theme-text-dimmer"
           strokeWidth={1.5}
         />
         <span className="text-[10px] font-mono text-theme-text-dim tracking-wider">
@@ -366,15 +339,15 @@ function MediaRenderer({
         href={media.webpageUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="my-1.5 block rounded border border-[var(--theme-glass-border)] bg-white/2 hover:bg-white/4 transition-colors overflow-hidden max-w-[400px]"
+        className="my-1.5 block rounded border border-[rgba(255,255,255,0.1)] hover:bg-white/2 transition-colors overflow-hidden max-w-[400px]"
       >
         <div className="px-2.5 py-2 space-y-0.5">
           <div className="flex items-center gap-1.5">
             <Globe
-              className="w-3 h-3 text-theme-accent/60 shrink-0"
+              className="w-3 h-3 text-theme-text-dimmer shrink-0"
               strokeWidth={1.5}
             />
-            <span className="text-[10px] font-mono text-theme-accent truncate">
+            <span className="text-[10px] font-mono text-[var(--theme-accent)] truncate">
               {new URL(media.webpageUrl).hostname}
             </span>
           </div>
@@ -420,7 +393,7 @@ const markdownComponents = {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-theme-accent underline underline-offset-2 hover:text-theme-accent/80 break-all"
+        className="text-[var(--theme-accent)] underline underline-offset-2 hover:opacity-80 break-all"
       >
         {children}
       </a>
@@ -428,21 +401,21 @@ const markdownComponents = {
   },
   code({ children }: any) {
     return (
-      <code className="px-1 py-0.5 rounded bg-theme-accent/10 text-theme-accent text-[11px]">
+      <code className="px-1 py-0.5 rounded bg-white/5 text-theme-text-bright text-[11px]">
         {children}
       </code>
     );
   },
   pre({ children }: any) {
     return (
-      <pre className="my-1.5 bg-theme-bg-inset rounded border border-[var(--theme-glass-border)] p-2 overflow-x-auto text-[11px] text-theme-text/80 leading-relaxed">
+      <pre className="my-1.5 bg-theme-bg-inset rounded border border-[rgba(255,255,255,0.1)] p-2 overflow-x-auto text-[11px] text-theme-text/80 leading-relaxed">
         {children}
       </pre>
     );
   },
   blockquote({ children }: any) {
     return (
-      <blockquote className="border-l-2 border-theme-accent/30 pl-2 my-1 text-theme-text-dim italic text-[11px]">
+      <blockquote className="border-l-2 border-[rgba(255,255,255,0.15)] pl-2 my-1 text-theme-text-dim italic text-[11px]">
         {children}
       </blockquote>
     );
@@ -483,6 +456,6 @@ const markdownComponents = {
     );
   },
   hr() {
-    return <hr className="border-theme-accent/15 my-1.5" />;
+    return <hr className="border-[rgba(255,255,255,0.1)] my-1.5" />;
   },
 };

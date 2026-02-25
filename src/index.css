@@ -24,7 +24,6 @@
   --color-theme-purple-dim: var(--theme-purple-dim);
 
   --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
-  --font-display: "Orbitron", "Rajdhani", sans-serif;
 }
 
 /* Base styles */
@@ -49,128 +48,16 @@ body,
 }
 
 /* ═══════════════════════════════════════════════
-   COMMAND BRIDGE — PERSPECTIVE GRID BACKGROUND
-   ═══════════════════════════════════════════════ */
-.tactical-grid {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background: radial-gradient(
-    ellipse at 50% 100%,
-    rgba(var(--theme-accent-rgb), 0.03) 0%,
-    transparent 60%
-  );
-  overflow: hidden;
-}
-
-/* Perspective grid plane */
-.tactical-grid::before {
-  content: "";
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
-  background-image:
-    linear-gradient(to right, rgba(var(--theme-accent-rgb), 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(var(--theme-accent-rgb), 0.04) 1px, transparent 1px);
-  background-size: 50px 50px;
-  transform: perspective(600px) rotateX(55deg);
-  transform-origin: center 70%;
-  animation: grid-drift 80s linear infinite;
-  mask-image: radial-gradient(ellipse at 50% 70%, black 30%, transparent 70%);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 70%, black 30%, transparent 70%);
-}
-
-/* Flat dot grid overlay for non-perspective areas */
-.tactical-grid::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, rgba(var(--theme-accent-rgb), 0.025) 1px, transparent 1px);
-  background-size: 20px 20px;
-  opacity: 0.6;
-}
-
-@keyframes grid-drift {
-  from { transform: perspective(600px) rotateX(55deg) translateY(0); }
-  to { transform: perspective(600px) rotateX(55deg) translateY(50px); }
-}
-
-/* ═══════════════════════════════════════════════
-   GLASSMORPHISM PANELS — BRIDGE EDITION
+   PANELS — flat, no blur
    ═══════════════════════════════════════════════ */
 .glass-panel {
-  background: rgba(16, 18, 27, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(var(--theme-accent-rgb), 0.12);
+  background: var(--theme-bg-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .glass-panel-bright {
-  background: rgba(16, 18, 27, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(var(--theme-accent-rgb), 0.2);
-}
-
-/* L-bracket corner decoration for bridge panels */
-.bridge-brackets {
-  position: relative;
-}
-
-.bridge-brackets::before,
-.bridge-brackets::after {
-  content: "";
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.bridge-brackets::before {
-  top: -1px;
-  left: -1px;
-  border-top: 2px solid rgba(var(--theme-accent-rgb), 0.4);
-  border-left: 2px solid rgba(var(--theme-accent-rgb), 0.4);
-}
-
-.bridge-brackets::after {
-  bottom: -1px;
-  right: -1px;
-  border-bottom: 2px solid rgba(var(--theme-accent-rgb), 0.4);
-  border-right: 2px solid rgba(var(--theme-accent-rgb), 0.4);
-}
-
-/* Inner L-brackets (via child element) */
-.bridge-brackets-inner {
-  position: relative;
-}
-
-.bridge-brackets-inner::before,
-.bridge-brackets-inner::after {
-  content: "";
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.bridge-brackets-inner::before {
-  top: -1px;
-  right: -1px;
-  border-top: 2px solid rgba(var(--theme-accent-rgb), 0.25);
-  border-right: 2px solid rgba(var(--theme-accent-rgb), 0.25);
-}
-
-.bridge-brackets-inner::after {
-  bottom: -1px;
-  left: -1px;
-  border-bottom: 2px solid rgba(var(--theme-accent-rgb), 0.25);
-  border-left: 2px solid rgba(var(--theme-accent-rgb), 0.25);
+  background: var(--theme-bg-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 /* ═══════════════════════════════════════════════
@@ -185,144 +72,17 @@ body,
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(var(--theme-accent-rgb), 0.15);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 9999px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(var(--theme-accent-rgb), 0.3);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* ═══════════════════════════════════════════════
-   SEGMENTED BAR OVERLAY
+   ANIMATIONS — kept minimal
    ═══════════════════════════════════════════════ */
-.segmented-overlay {
-  background-image: repeating-linear-gradient(
-    to right,
-    transparent 0px,
-    transparent 6px,
-    var(--theme-bg-deep) 6px,
-    var(--theme-bg-deep) 8px
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   ANIMATIONS
-   ═══════════════════════════════════════════════ */
-
-/* Glow pulse for active indicators */
-@keyframes glow-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 6px rgba(var(--theme-accent-rgb), 0.2);
-  }
-  50% {
-    box-shadow: 0 0 18px rgba(var(--theme-accent-rgb), 0.5);
-  }
-}
-
-.animate-glow-pulse {
-  animation: glow-pulse 2s ease-in-out infinite;
-}
-
-/* Tactical glow for focused elements */
-@keyframes tactical-glow {
-  0%,
-  100% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-.animate-tactical-glow {
-  animation: tactical-glow 2.5s ease-in-out infinite;
-}
-
-/* Digital glitch effect */
-@keyframes glitch {
-  0%,
-  88%,
-  100% {
-    transform: translate(0);
-    opacity: 1;
-  }
-  90% {
-    transform: translate(-2px, 1px);
-    opacity: 0.8;
-    filter: hue-rotate(90deg);
-  }
-  92% {
-    transform: translate(2px, -1px);
-    opacity: 0.9;
-    filter: hue-rotate(-90deg);
-  }
-  94% {
-    transform: translate(-1px, 0);
-    opacity: 0.85;
-  }
-}
-
-.animate-glitch {
-  animation: glitch 4s ease-in-out infinite;
-}
-
-/* Shimmer scan line */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(var(--theme-accent-rgb), 0.04) 50%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 4s linear infinite;
-}
-
-/* Scan line CRT effect — enhanced bridge scanline */
-@keyframes scanline {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 0 100%;
-  }
-}
-
-.animate-scanline {
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(var(--theme-accent-rgb), 0.02) 2px,
-    rgba(var(--theme-accent-rgb), 0.02) 4px
-  );
-  background-size: 100% 200%;
-  animation: scanline 8s linear infinite;
-}
-
-/* Hologram flicker — subtle opacity oscillation */
-@keyframes hologram-flicker {
-  0%   { opacity: 0.97; }
-  25%  { opacity: 1; }
-  50%  { opacity: 0.98; }
-  75%  { opacity: 1; }
-  100% { opacity: 0.97; }
-}
-
-.hologram-flicker {
-  animation: hologram-flicker 4s ease-in-out infinite;
-}
 
 /* Code block flash on appear */
 @keyframes code-flash {
@@ -353,157 +113,7 @@ body,
   animation: cursor-blink 1s step-end infinite;
 }
 
-/* Tech glow for focus */
-@keyframes tech-glow {
-  0%,
-  100% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.animate-tech-glow {
-  animation: tech-glow 2s ease-in-out infinite;
-}
-
-/* Bar pulse for active stats */
-@keyframes bar-pulse {
-  0%,
-  100% {
-    filter: brightness(1);
-  }
-  50% {
-    filter: brightness(1.3);
-  }
-}
-
-.animate-bar-pulse {
-  animation: bar-pulse 2s ease-in-out infinite;
-}
-
-/* Data stream effect */
-@keyframes data-stream {
-  0% {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.6;
-  }
-  90% {
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-}
-
-/* Corner brackets for tactical panels */
-.tactical-corners {
-  position: relative;
-}
-
-.tactical-corners::before,
-.tactical-corners::after {
-  content: "";
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-color: var(--theme-corner-color);
-  pointer-events: none;
-}
-
-.tactical-corners::before {
-  top: -1px;
-  left: -1px;
-  border-top: 1px solid;
-  border-left: 1px solid;
-}
-
-.tactical-corners::after {
-  bottom: -1px;
-  right: -1px;
-  border-bottom: 1px solid;
-  border-right: 1px solid;
-}
-
-/* Font utilities */
-.font-display {
-  font-family: "Orbitron", sans-serif;
-}
-
-.font-tactical {
-  font-family: "JetBrains Mono", monospace;
-}
-
-/* Radar sweep animation for health scanner */
-@keyframes radar-sweep {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* ═══════════════════════════════════════════════
-   LOW HP GLITCH OVERLAY
-   ═══════════════════════════════════════════════ */
-@keyframes critical-glitch {
-  0%,
-  92%,
-  100% {
-    transform: translate(0);
-    filter: none;
-  }
-  93% {
-    transform: translate(-3px, 1px) skewX(-0.5deg);
-    filter: hue-rotate(90deg) saturate(2);
-  }
-  95% {
-    transform: translate(3px, -1px) skewX(0.5deg);
-    filter: hue-rotate(-90deg) brightness(1.3);
-  }
-  97% {
-    transform: translate(-1px, 0);
-    filter: hue-rotate(45deg);
-  }
-}
-
-.low-hp-glitch {
-  animation: critical-glitch 3s ease-in-out infinite;
-}
-
-/* Red vignette overlay for critical HP */
-.low-hp-vignette {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 50;
-  background: radial-gradient(
-    ellipse at center,
-    transparent 50%,
-    rgba(200, 0, 0, 0.08) 100%
-  );
-  animation: vignette-pulse 2s ease-in-out infinite;
-}
-
-@keyframes vignette-pulse {
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-/* ═══════════════════════════════════════════════
-   LISTENING PULSE (voice input active)
-   ═══════════════════════════════════════════════ */
+/* Listening pulse (voice input active) */
 @keyframes listening-ring {
   0% {
     box-shadow: 0 0 0 0 rgba(255, 60, 60, 0.4);
@@ -520,156 +130,37 @@ body,
   animation: listening-ring 1.5s ease-out infinite;
 }
 
-/* ═══════════════════════════════════════════════
-   BOUNTY ZONE PULSE (COMMS)
-   ═══════════════════════════════════════════════ */
-@keyframes bounty-pulse {
-  0%,
-  100% {
-    opacity: 0.9;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.animate-bounty-pulse {
-  animation: bounty-pulse 1.5s ease-in-out infinite;
-}
-
-/* ═══════════════════════════════════════════════
-   COMMAND BRIDGE EFFECTS
-   ═══════════════════════════════════════════════ */
-
-/* Chromatic aberration on hover for interactive elements */
-.bridge-chromatic:hover {
-  text-shadow:
-    -1px 0 rgba(255, 0, 60, 0.3),
-    1px 0 rgba(0, 212, 255, 0.3);
-  transition: text-shadow 0.2s ease;
-}
-
-/* Chromatic aberration for panels */
-.bridge-panel-chromatic:hover {
-  box-shadow:
-    -1px 0 2px rgba(255, 0, 60, 0.08),
-    1px 0 2px rgba(0, 212, 255, 0.08),
-    inset 0 0 30px rgba(var(--theme-accent-rgb), 0.02);
-  transition: box-shadow 0.3s ease;
-}
-
-/* Sector label corners — pseudo-elements for technical panel numbering */
-.sector-label {
-  position: relative;
-}
-
-.sector-label::before {
-  content: attr(data-sector);
-  position: absolute;
-  top: 2px;
-  right: 4px;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 7px;
-  letter-spacing: 0.15em;
-  color: var(--theme-corner-color);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Critical anomaly red flicker */
-@keyframes anomaly-flicker {
-  0%, 95%, 100% {
-    border-color: var(--theme-glass-border);
-    box-shadow: none;
-  }
-  96% {
-    border-color: rgba(200, 0, 0, 0.5);
-    box-shadow: inset 0 0 20px rgba(200, 0, 0, 0.05);
-  }
-  98% {
-    border-color: var(--theme-glass-border);
-    box-shadow: none;
-  }
-  99% {
-    border-color: rgba(200, 0, 0, 0.3);
-    box-shadow: inset 0 0 15px rgba(200, 0, 0, 0.03);
-  }
-}
-
-.anomaly-flicker {
-  animation: anomaly-flicker 4s ease-in-out infinite;
-}
-
-/* Sector stabilized flash (green confirmation) */
-@keyframes sector-stabilized {
+/* Smart Alert — single shudder on critical error */
+@keyframes smart-alert-shudder {
   0% {
-    border-color: rgba(34, 197, 94, 0.6);
-    box-shadow: inset 0 0 30px rgba(34, 197, 94, 0.1);
+    transform: translate(0);
   }
+  10% {
+    transform: translate(-2px, 1px);
+  }
+  20% {
+    transform: translate(2px, -1px);
+  }
+  30% {
+    transform: translate(-1px, 0);
+  }
+  40%,
   100% {
-    border-color: var(--theme-glass-border);
-    box-shadow: none;
+    transform: translate(0);
   }
 }
 
-.animate-sector-stabilized {
-  animation: sector-stabilized 1.5s ease-out forwards;
-}
-
-/* Mission Tree neon pulse — soft glow on connectors */
-@keyframes neon-pulse {
-  0%, 100% {
-    box-shadow: 0 0 2px rgba(var(--theme-accent-rgb), 0.3);
-    background-color: rgba(var(--theme-accent-rgb), 0.2);
-  }
-  50% {
-    box-shadow: 0 0 8px rgba(var(--theme-accent-rgb), 0.6);
-    background-color: rgba(var(--theme-accent-rgb), 0.4);
-  }
-}
-
-.neon-connector {
-  animation: neon-pulse 2.5s ease-in-out infinite;
-}
-
-/* Neon line — SVG / border glow for mission tree links */
-@keyframes neon-line-pulse {
-  0%, 100% {
-    opacity: 0.3;
-    filter: drop-shadow(0 0 2px rgba(var(--theme-accent-rgb), 0.3));
-  }
-  50% {
-    opacity: 0.7;
-    filter: drop-shadow(0 0 6px rgba(var(--theme-accent-rgb), 0.6));
-  }
-}
-
-.neon-line {
-  animation: neon-line-pulse 2.5s ease-in-out infinite;
-}
-
-/* Status bar segmented display — industrial gauge style */
-@keyframes integrity-pulse {
-  0%, 100% {
-    opacity: 0.8;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.integrity-critical {
-  animation: integrity-pulse 1s ease-in-out infinite;
-}
-
-/* Holographic parallax container */
-.holographic-layer {
-  transition: transform 0.15s ease-out;
-  will-change: transform;
+.smart-alert-active {
+  animation: smart-alert-shudder 0.5s ease-out forwards;
 }
 
 /* Selection color */
 ::selection {
   background: rgba(var(--theme-accent-rgb), 0.25);
   color: var(--theme-text-bright);
+}
+
+/* Font utilities */
+.font-tactical {
+  font-family: "JetBrains Mono", monospace;
 }

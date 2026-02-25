@@ -23,40 +23,41 @@ Codemancer uses CSS custom properties for theming. Adding a new theme means defi
 3. The theme ID added to the `ThemeId` type in `src/types/game.ts`
 
 **Variables to define:**
+
 ```css
 [data-theme="your-theme"] {
-  --theme-bg-deep: ...;        /* Deepest background */
-  --theme-bg-base: ...;        /* Main background */
-  --theme-bg-elevated: ...;    /* Cards, panels */
-  --theme-bg-inset: ...;       /* Inset areas */
-  --theme-bg-empty: ...;       /* Empty state backgrounds */
+  --theme-bg-deep: ...; /* Deepest background */
+  --theme-bg-base: ...; /* Main background */
+  --theme-bg-elevated: ...; /* Cards, panels */
+  --theme-bg-inset: ...; /* Inset areas */
+  --theme-bg-empty: ...; /* Empty state backgrounds */
 
-  --theme-accent: ...;         /* Primary accent color */
-  --theme-accent-dim: ...;     /* Dimmed accent */
-  --theme-accent-rgb: ...;     /* RGB values for alpha usage */
-  --theme-accent-hue: ...;     /* Hue for programmatic shifts */
+  --theme-accent: ...; /* Primary accent color */
+  --theme-accent-dim: ...; /* Dimmed accent */
+  --theme-accent-rgb: ...; /* RGB values for alpha usage */
+  --theme-accent-hue: ...; /* Hue for programmatic shifts */
 
-  --theme-text: ...;           /* Primary text */
-  --theme-text-dim: ...;       /* Secondary text */
-  --theme-text-dimmer: ...;    /* Tertiary text */
-  --theme-text-bright: ...;    /* Highlighted text */
+  --theme-text: ...; /* Primary text */
+  --theme-text-dim: ...; /* Secondary text */
+  --theme-text-dimmer: ...; /* Tertiary text */
+  --theme-text-bright: ...; /* Highlighted text */
 
   --theme-status-success: ...; /* Green status */
   --theme-status-warning: ...; /* Amber status */
-  --theme-status-error: ...;   /* Red status */
+  --theme-status-error: ...; /* Red status */
 
-  --theme-glass-bg: ...;       /* Glass panel background */
+  --theme-glass-bg: ...; /* Glass panel background */
   --theme-glass-bg-bright: ...;
-  --theme-glass-border: ...;   /* Glass panel borders */
+  --theme-glass-border: ...; /* Glass panel borders */
   --theme-glass-border-bright: ...;
 
-  --theme-grid-color: ...;     /* Tactical grid dots */
+  --theme-grid-color: ...; /* Tactical grid dots */
   --theme-grid-line: ...;
-  --theme-corner-color: ...;   /* Corner brackets */
+  --theme-corner-color: ...; /* Corner brackets */
 
-  --theme-purple: ...;         /* MP bar / secondary accent */
+  --theme-purple: ...; /* MP bar / secondary accent */
   --theme-purple-dim: ...;
-  --theme-exp-hue-start: ...;  /* EXP bar gradient start hue */
+  --theme-exp-hue-start: ...; /* EXP bar gradient start hue */
 }
 ```
 
@@ -78,6 +79,7 @@ Sound packs use the Web Audio API to procedurally generate all sounds — no aud
 4. A selector entry in `src/components/modals/SettingsModal.tsx`
 
 **Sound events to implement:**
+
 ```
 level_up         — Player leveled up
 action_done      — Successful action completed
@@ -102,17 +104,20 @@ Each handler is a plain function that creates `OscillatorNode`, `GainNode`, etc.
 Codemancer is modular. New features typically involve:
 
 **Backend (Python FastAPI):**
+
 1. Model in `backend/models/`
 2. Router in `backend/routes/` with `APIRouter(prefix="/api/...")`
 3. Register in `backend/main.py`
 
 **Frontend (React + TypeScript):**
+
 1. Component in `src/components/`
 2. State slice in `src/stores/gameStore.ts` (Zustand)
 3. API methods in `src/hooks/useApi.ts`
 4. Translation keys in `src/i18n/translations.ts` (EN + RU)
 
 **Ideas for modules:**
+
 - Skill trees with spec paths (Architect, Debugger, etc.)
 - Achievement system with badges
 - Team mode / multiplayer EXP tracking
@@ -137,6 +142,7 @@ pnpm exec tsc --noEmit  # Type check
 ```
 
 Backend standalone:
+
 ```bash
 cd backend && uv run python -m uvicorn main:app --host 127.0.0.1 --port 8420
 ```

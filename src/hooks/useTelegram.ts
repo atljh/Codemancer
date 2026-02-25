@@ -61,7 +61,10 @@ function entitiesToMarkdown(
       replacement = `\n\`\`\`${lang}\n${substr}\n\`\`\`\n`;
     } else if (cn === "MessageEntityTextUrl" && entity.url) {
       replacement = `[${substr}](${entity.url})`;
-    } else if (cn === "MessageEntityStrike" || cn === "MessageEntityStrikethrough") {
+    } else if (
+      cn === "MessageEntityStrike" ||
+      cn === "MessageEntityStrikethrough"
+    ) {
       replacement = `~~${substr}~~`;
     } else if (cn === "MessageEntityBlockquote") {
       replacement = "\n> " + substr.replace(/\n/g, "\n> ") + "\n";
@@ -95,16 +98,33 @@ function getMediaInfo(m: any): TelegramMedia | undefined {
       (a: any) => a.className === "DocumentAttributeFilename",
     );
 
-    if (mime === "image/gif" || attrs.some((a: any) => a.className === "DocumentAttributeAnimated")) {
+    if (
+      mime === "image/gif" ||
+      attrs.some((a: any) => a.className === "DocumentAttributeAnimated")
+    ) {
       return { type: "gif", mimeType: mime };
     }
     if (mime.startsWith("video/")) {
-      return { type: "video", mimeType: mime, fileName: fileNameAttr?.fileName };
+      return {
+        type: "video",
+        mimeType: mime,
+        fileName: fileNameAttr?.fileName,
+      };
     }
-    if (mime.startsWith("audio/") || attrs.some((a: any) => a.className === "DocumentAttributeAudio")) {
-      return { type: "voice", mimeType: mime, fileName: fileNameAttr?.fileName };
+    if (
+      mime.startsWith("audio/") ||
+      attrs.some((a: any) => a.className === "DocumentAttributeAudio")
+    ) {
+      return {
+        type: "voice",
+        mimeType: mime,
+        fileName: fileNameAttr?.fileName,
+      };
     }
-    if (mime === "image/webp" || attrs.some((a: any) => a.className === "DocumentAttributeSticker")) {
+    if (
+      mime === "image/webp" ||
+      attrs.some((a: any) => a.className === "DocumentAttributeSticker")
+    ) {
       return { type: "sticker", mimeType: mime };
     }
 
@@ -389,8 +409,7 @@ export function useTelegram() {
 
           if (urlMap.size > 0) {
             // Check that the user hasn't navigated away
-            const currentDialog =
-              useGameStore.getState().commsActiveDialogId;
+            const currentDialog = useGameStore.getState().commsActiveDialogId;
             if (currentDialog === dialogId) {
               const current = useGameStore.getState().commsMessages;
               const updated = current.map((msg) => {
