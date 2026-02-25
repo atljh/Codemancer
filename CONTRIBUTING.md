@@ -55,9 +55,8 @@ Codemancer uses CSS custom properties for theming. Adding a new theme means defi
   --theme-grid-line: ...;
   --theme-corner-color: ...; /* Corner brackets */
 
-  --theme-purple: ...; /* MP bar / secondary accent */
+  --theme-purple: ...; /* Secondary accent */
   --theme-purple-dim: ...;
-  --theme-exp-hue-start: ...; /* EXP bar gradient start hue */
 }
 ```
 
@@ -81,7 +80,6 @@ Sound packs use the Web Audio API to procedurally generate all sounds — no aud
 **Sound events to implement:**
 
 ```
-level_up         — Player leveled up
 action_done      — Successful action completed
 scan_start       — Project scan beginning
 scan_tick        — File being processed
@@ -118,9 +116,8 @@ Codemancer is modular. New features typically involve:
 
 **Ideas for modules:**
 
-- Skill trees with spec paths (Architect, Debugger, etc.)
+- Skill trees with specialized agent capabilities
 - Achievement system with badges
-- Team mode / multiplayer EXP tracking
 - GitHub/GitLab integration panel
 - CI/CD pipeline monitor
 - Notification system for external events
@@ -152,7 +149,7 @@ cd backend && uv run python -m uvicorn main:app --host 127.0.0.1 --port 8420
 ## Code Conventions
 
 - **TypeScript strict mode** — no `any`, no implicit returns
-- **Relative imports** in backend (`from models.player import Player`, not `backend.models...`)
+- **Relative imports** in backend (`from models.player import AgentStatus`, not `backend.models...`)
 - **Zustand only** for state management — no React context for app state
 - **Translations** — every user-facing string through `useTranslation()`, added to both EN and RU
 - **Tailwind CSS** — use existing utility classes (`glass-panel`, `glass-panel-bright`) and `--theme-*` custom properties

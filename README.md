@@ -27,7 +27,7 @@
 
 Codemancer is not an IDE. It's a **tactical code reality management interface** for the era where development means commanding AI agents, not typing lines.
 
-> While your AI agent operates files and terminal, you see the big picture: dependency maps, tech debt radars, EXP bars, and a voice link to your operative.
+> While your AI agent operates files and terminal, you see the big picture: dependency maps, tech debt radars, integrity metrics, and a voice link to your operative.
 
 <p align="center">
   <img src="docs/gifs/hero-overview.gif" alt="Codemancer full interface overview" width="800" />
@@ -106,25 +106,18 @@ Interactive dependency graph with "fog of war". When the AI writes files, orange
 
 ---
 
-### RPG Progression — Every Action Earns EXP
+### Project Monitoring — Real Metrics, Not Gamification
 
-Messages, commits, bug fixes, file saves — everything feeds your experience bar. Level up, watch HP/MP fluctuate, unlock focus mode for x2 multiplier.
+Live dashboard replaces RPG bars. System integrity tracks code health, knowledge base grows as the agent touches files.
 
-<p align="center">
-  <img src="docs/gifs/exp-growth.gif" alt="EXP bar filling up and level-up notification" width="700" />
-</p>
+| Metric         | Description                                         |
+| -------------- | --------------------------------------------------- |
+| **INTG**       | System integrity (0-100%) from code health analysis |
+| **STATUS**     | Agent state: IDLE or PROCESSING                     |
+| **KNOWLEDGE**  | Files the agent has worked with / total project files|
+| **DATA**       | Total bytes processed by the agent                  |
 
-| Action         | EXP           |
-| -------------- | ------------- |
-| Send message   | +10           |
-| Save file      | +5            |
-| Apply code     | +50           |
-| Fix bug        | +100          |
-| Git commit     | variable      |
-| Tool execution | +15-25        |
-| Focus mode     | x2 multiplier |
-
-**Level formula:** `level = floor(sqrt(total_exp / 100))`
+Integrity is computed from complexity, coverage, cleanliness, and file size scores. Background health watch alerts when critical anomalies appear.
 
 ---
 
@@ -183,7 +176,7 @@ Radar diagram of code anomalies. Complexity, coverage, cleanliness, file size �
 
 ### Agentic Tools — The Agent Executes, Not Just Advises
 
-Full access to `list_files`, `read_file`, `write_file`, `search_text`, `run_command`. Failed commands deal HP damage; the agent proposes repair plans automatically.
+Full access to `list_files`, `read_file`, `write_file`, `search_text`, `run_command`. Failed commands trigger anomaly alerts; the agent proposes repair plans automatically.
 
 ---
 
@@ -216,10 +209,9 @@ Streaming responses, persistent conversations, project context injection.
 - **Visual Git Client** — stage, unstage, commit, AI-generated messages
 - **Command Palette** (Cmd+K) — 20+ commands
 - **Quick Open** (Cmd+P) — fuzzy file search
-- **Quest System** — auto-scan TODOs/FIXMEs into quests
+- **Quest System** — auto-scan TODOs/FIXMEs into operational objectives
 - **Proactive Assistant** — background pulse analyzes `git diff` every 5 minutes
-- **Deep Dive Mode** — RPG focus timer with EXP multiplier
-- **Critical HP Effects** — below 20% HP, the UI glitches with red vignette
+- **Focus Timer** — productivity timer for deep work sessions
 - **2 Languages** — English and Russian
 
 ---
@@ -229,7 +221,7 @@ Streaming responses, persistent conversations, project context injection.
 ```
 src/                        # React 19 + TypeScript + Vite 7
   components/               # 40+ components across 15 feature areas
-    bars/                   # EXP bar, stat bars
+    bars/                   # Stat bars
     chat/                   # OmniChat, message bubbles
     editor/                 # Monaco editor, file tabs
     explorer/               # File tree browser
@@ -254,7 +246,7 @@ backend/                    # Python 3.12+ FastAPI
   services/                 # Business logic
     providers/              # AI providers (Anthropic, OpenAI, Gemini, Custom)
   conversations/            # JSON files — persisted chat history
-  state.json                # Player state
+  state.json                # Agent state
 
 src-tauri/                  # Rust — Tauri 2.0 shell
   src/lib.rs                # App setup, Python process lifecycle, OAuth
@@ -293,7 +285,7 @@ Output in `src-tauri/target/release/bundle/`.
 ## Roadmap
 
 - **Visual Vision** — agent "sees" your running app's UI
-- **Skill Trees** — level up as Architect or Debugger, unlock new tools
+- **Skill Trees** — unlock specialized agent capabilities
 - **Multi-agent Orchestration** — coordinate multiple AI agents
 - **GitHub/CI Integration** — PR reviews, pipeline monitoring from the deck
 - **Plugin System** — community-built modules and themes
