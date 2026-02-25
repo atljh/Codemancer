@@ -20,7 +20,6 @@ from services.mission_synthesizer import synthesize_operations
 router = APIRouter(prefix="/api/missions", tags=["missions"])
 
 # Injected from main.py
-player = None
 save_state_fn = None
 chronicle_service = None
 
@@ -107,7 +106,7 @@ async def update_operation(op_id: str, data: OperationUpdate):
 
 @router.post("/operations/{op_id}/complete")
 async def complete_operation(op_id: str):
-    """Complete an operation and award EXP."""
+    """Complete an operation."""
     op = _operations.get(op_id)
     if not op:
         raise HTTPException(status_code=404, detail="Operation not found")
@@ -118,25 +117,14 @@ async def complete_operation(op_id: str):
     op.updated_at = datetime.now(timezone.utc).isoformat()
     _operations[op.id] = op
 
-    # Award EXP
-    if player:
-        player.total_exp += op.exp_reward
-        if save_state_fn:
-            save_state_fn()
-        if chronicle_service:
-            chronicle_service.log_event(
-                "mission_complete",
-                f"Operation completed: {op.title}",
-                op.related_sectors,
-                op.exp_reward,
-            )
+    if chronicle_service:
+        chronicle_service.log_event(
+            "mission_complete",
+            f"Operation completed: {op.title}",
+            op.related_sectors,
+        )
 
-    from routes.game import get_player_response
-    return {
-        "operation": op,
-        "player": get_player_response(player) if player else None,
-        "exp_gained": op.exp_reward,
-    }
+    return {"operation": op}
 
 
 @router.delete("/operations/{op_id}")
@@ -185,7 +173,6 @@ async def scan_signals(req: ScanRequest):
             "mission_scan",
             f"Scanned {len(all_signals)} signals → {len(new_ops)} new operations",
             [s.file_path for s in all_signals if s.file_path][:10],
-            0,
         )
 
     return ScanResult(

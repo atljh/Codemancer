@@ -6,7 +6,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from models.chat import ChatRequest, ChatResponse, ImageData
-from models.player import Player
+from models.player import AgentStatus
 from services.providers import get_provider
 from services.tools import ToolExecutor
 from services.tool_schemas import get_anthropic_tools, get_openai_tools
@@ -18,7 +18,7 @@ from services.dependency_service import DependencyService
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
-player: Player | None = None
+agent: AgentStatus | None = None
 quest_service = None
 file_service: FileService | None = None
 save_state_fn = None
@@ -63,7 +63,7 @@ Your communication style is analytical and precise:
 You help the Operator write code, debug, and learn programming.
 Use markdown for code blocks. Keep responses focused and actionable.
 
-{player_info}
+{agent_info}
 {project_info}
 {tools_info}"""
 
@@ -80,9 +80,9 @@ def _get_model(settings: dict) -> str:
 
 
 def _build_system_prompt(project_context: str = "", has_tools: bool = False) -> str:
-    player_info = ""
-    if player:
-        player_info = f"Player: {player.name}, Level {player.level}, EXP {player.total_exp}"
+    agent_info = ""
+    if agent:
+        agent_info = f"Agent: {agent.name}, Integrity: {agent.integrity_score}%"
 
     project_info = ""
     if project_context:
@@ -106,7 +106,7 @@ When a run_command fails (tests, build, lint), analyze the output and propose a 
 If you wrote code that caused a test failure, fix it immediately."""
 
     return SYSTEM_PROMPT_TEMPLATE.format(
-        player_info=player_info,
+        agent_info=agent_info,
         project_info=project_info,
         tools_info=tools_info,
     )
@@ -217,7 +217,6 @@ async def chat_stream(req: ChatRequest):
         nonlocal messages
         total_tokens = 0
         total_bytes_processed = 0
-        total_exp_from_tools = 0
         max_iterations = 10
 
         try:
@@ -273,38 +272,33 @@ async def chat_stream(req: ChatRequest):
                     # Execute
                     result = tool_executor.execute(tc["name"], tc["id"], tc["input"])
 
-                    # Update player stats
-                    if player:
-                        player.mp = max(0, player.mp - result.mp_cost)
-                        player.total_exp += result.exp_gained
-                        player.total_bytes_processed += result.bytes_processed
-                        # HP damage from failed commands
-                        if result.hp_damage > 0:
-                            player.hp = max(0, player.hp - result.hp_damage)
+                    # Update agent stats
+                    if agent:
+                        agent.total_bytes_processed += result.bytes_processed
+                        if result.file_path and result.file_path not in agent.known_files:
+                            agent.known_files.append(result.file_path)
                         if save_state_fn:
                             save_state_fn()
 
                     total_bytes_processed += result.bytes_processed
-                    total_exp_from_tools += result.exp_gained
 
                     if chronicle_service:
                         chronicle_service.log_event(
                             action_type=f"tool_{result.tool_name}",
                             description=result.summary[:120] if result.summary else f"Tool: {result.tool_name}",
                             files_affected=[result.file_path] if result.file_path else [],
-                            exp_gained=result.exp_gained,
                         )
 
                     # Send tool_result event to frontend
-                    yield f"data: {json.dumps({'type': 'tool_result', 'tool_id': result.tool_id, 'tool_name': result.tool_name, 'status': result.status, 'summary': result.summary, 'exp_gained': result.exp_gained, 'mp_cost': result.mp_cost, 'bytes_processed': result.bytes_processed})}\n\n"
+                    yield f"data: {json.dumps({'type': 'tool_result', 'tool_id': result.tool_id, 'tool_name': result.tool_name, 'status': result.status, 'summary': result.summary, 'bytes_processed': result.bytes_processed})}\n\n"
 
-                    # Send command_result for run_command with output and HP damage
+                    # Send command_result for run_command with output
                     if result.tool_name == "run_command":
-                        yield f"data: {json.dumps({'type': 'command_result', 'tool_id': result.tool_id, 'command': tc['input'].get('command', ''), 'exit_code': result.exit_code, 'output': result.content[:3000], 'hp_damage': result.hp_damage, 'status': result.status})}\n\n"
+                        yield f"data: {json.dumps({'type': 'command_result', 'tool_id': result.tool_id, 'command': tc['input'].get('command', ''), 'exit_code': result.exit_code, 'output': result.content[:3000], 'status': result.status})}\n\n"
 
                     # Send tool_diff for write operations
                     if result.tool_name == "write_file" and result.old_content is not None and result.new_content is not None:
-                        yield f"data: {json.dumps({'type': 'tool_diff', 'tool_id': result.tool_id, 'file_path': result.file_path or '', 'file_name': Path(result.file_path).name if result.file_path else '', 'old_content': result.old_content, 'new_content': result.new_content, 'exp_gained': result.exp_gained})}\n\n"
+                        yield f"data: {json.dumps({'type': 'tool_diff', 'tool_id': result.tool_id, 'file_path': result.file_path or '', 'file_name': Path(result.file_path).name if result.file_path else '', 'old_content': result.old_content, 'new_content': result.new_content})}\n\n"
 
                         # Pre-Commit Scan: compute blast radius
                         if workspace_root and result.file_path:
@@ -339,7 +333,7 @@ async def chat_stream(req: ChatRequest):
             yield f"data: {json.dumps({'type': 'error', 'error': error_msg})}\n\n"
 
         # Send done event
-        yield f"data: {json.dumps({'done': True, 'tokens_used': total_tokens, 'total_bytes_processed': total_bytes_processed, 'total_exp_from_tools': total_exp_from_tools})}\n\n"
+        yield f"data: {json.dumps({'done': True, 'tokens_used': total_tokens, 'total_bytes_processed': total_bytes_processed})}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 

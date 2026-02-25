@@ -32,7 +32,6 @@ class Operation(BaseModel):
     status: OperationStatus = OperationStatus.ANALYSIS
     signals: list[Signal] = []
     related_sectors: list[str] = []
-    exp_reward: int = 100
     created_at: str
     updated_at: str
     children: list[str] = []

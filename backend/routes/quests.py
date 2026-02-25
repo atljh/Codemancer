@@ -6,7 +6,6 @@ from pydantic import BaseModel
 router = APIRouter(prefix="/api/quests", tags=["quests"])
 
 quest_service = None
-player = None
 
 class ScanRequest(BaseModel):
     directory: str
@@ -28,9 +27,7 @@ async def complete_quest(quest_id: str):
     quest = quest_service.complete(quest_id)
     if not quest:
         raise HTTPException(status_code=404, detail="Quest not found or already completed")
-    player.total_exp += quest.exp_reward
-    from routes.game import get_player_response
-    return {"quest": quest, "player": get_player_response(player)}
+    return {"quest": quest}
 
 @router.post("/scan", response_model=list[Quest])
 async def scan_todos(req: ScanRequest):

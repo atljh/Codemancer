@@ -130,14 +130,11 @@ class ToolResult:
     status: str  # "success" or "error"
     content: str  # for LLM context
     summary: str  # for UI display
-    exp_gained: int = 0
-    mp_cost: int = 0
     bytes_processed: int = 0
     old_content: str | None = None
     new_content: str | None = None
     file_path: str | None = None
     exit_code: int | None = None
-    hp_damage: int = 0
 
 
 def _tree_to_text(nodes: list, indent: int = 0) -> str:
@@ -198,7 +195,6 @@ class ToolExecutor:
         tree = self.file_service.get_file_tree(path, max_depth)
         text = _tree_to_text(tree)
         bytes_processed = len(text.encode("utf-8"))
-        mp_cost = min(10, 2 + bytes_processed // 2048)
         count = text.count("\n") + 1 if text else 0
         return ToolResult(
             tool_id=tool_id,
@@ -206,7 +202,6 @@ class ToolExecutor:
             status="success",
             content=text or "(empty directory)",
             summary=f"Listed {count} entries in {Path(path).name}/",
-            mp_cost=mp_cost,
             bytes_processed=bytes_processed,
         )
 
@@ -215,14 +210,12 @@ class ToolExecutor:
         content, language = self.file_service.read_file(path)
         lines = content.count("\n") + 1
         bytes_processed = len(content.encode("utf-8"))
-        mp_cost = min(10, 2 + bytes_processed // 2048)
         return ToolResult(
             tool_id=tool_id,
             tool_name="read_file",
             status="success",
             content=content,
             summary=f"Read {lines} lines ({language})",
-            mp_cost=mp_cost,
             bytes_processed=bytes_processed,
             file_path=path,
         )
@@ -240,7 +233,6 @@ class ToolExecutor:
 
         self.file_service.write_file(path, new_content)
         bytes_processed = len(new_content.encode("utf-8"))
-        mp_cost = min(10, 2 + bytes_processed // 2048)
         lines = new_content.count("\n") + 1
         return ToolResult(
             tool_id=tool_id,
@@ -248,8 +240,6 @@ class ToolExecutor:
             status="success",
             content=f"Successfully wrote {lines} lines to {Path(path).name}",
             summary=f"Wrote {lines} lines to {Path(path).name}",
-            exp_gained=25,
-            mp_cost=mp_cost,
             bytes_processed=bytes_processed,
             old_content=old_content,
             new_content=new_content,
@@ -301,16 +291,12 @@ class ToolExecutor:
                 break
 
         content = "\n".join(matches) if matches else "No matches found."
-        mp_cost = min(10, 2 + bytes_processed // 2048)
-        exp_gained = 10 if matches else 0
         return ToolResult(
             tool_id=tool_id,
             tool_name="search_text",
             status="success",
             content=content,
             summary=f"Found {len(matches)} matches for '{pattern}'",
-            exp_gained=exp_gained,
-            mp_cost=mp_cost,
             bytes_processed=bytes_processed,
         )
 
@@ -361,21 +347,13 @@ class ToolExecutor:
             exit_code = result.returncode
             is_success = exit_code == 0
 
-            # HP damage on failure (tests failing = damage to the project)
-            hp_damage = 0
-            if not is_success:
-                hp_damage = min(20, 5 + abs(exit_code))
-
             return ToolResult(
                 tool_id=tool_id,
                 tool_name="run_command",
                 status="success" if is_success else "error",
                 content=output or "(no output)",
                 summary=f"Exit {exit_code}: {command[:50]}",
-                exp_gained=15 if is_success else 0,
-                mp_cost=3,
                 exit_code=exit_code,
-                hp_damage=hp_damage,
             )
         except subprocess.TimeoutExpired:
             return ToolResult(
@@ -383,7 +361,7 @@ class ToolExecutor:
                 status="error",
                 content="Command timed out after 60 seconds",
                 summary=f"Timeout: {command[:50]}",
-                mp_cost=3, exit_code=-1, hp_damage=10,
+                exit_code=-1,
             )
         except Exception as e:
             return ToolResult(
@@ -391,5 +369,5 @@ class ToolExecutor:
                 status="error",
                 content=f"Execution error: {str(e)}",
                 summary=f"Error: {str(e)[:60]}",
-                mp_cost=3, exit_code=-1, hp_damage=5,
+                exit_code=-1,
             )

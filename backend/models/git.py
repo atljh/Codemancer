@@ -37,4 +37,3 @@ class GitCommitRequest(BaseModel):
 class GitCommitResponse(BaseModel):
     hash: str
     message: str
-    exp_gained: int = 0

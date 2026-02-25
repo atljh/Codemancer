@@ -3,7 +3,7 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from models.player import Player
+from models.player import AgentStatus
 from models.git import (
     GitStatusResponse,
     GitBranchesResponse,
@@ -12,7 +12,6 @@ from models.git import (
     GitCommitResponse,
 )
 from services.git_service import GitService
-from services.exp_service import ActionType, calculate_exp_with_focus
 from services.chronicle_service import ChronicleService
 from services.providers import get_provider
 from routes.settings import load_settings
@@ -20,7 +19,7 @@ from routes.settings import load_settings
 router = APIRouter(prefix="/api/git", tags=["git"])
 
 # Injected from main.py lifespan
-player: Player = Player()
+agent: AgentStatus = AgentStatus()
 save_state_fn = lambda: None
 chronicle_service: ChronicleService | None = None
 
@@ -64,16 +63,12 @@ async def git_unstage(req: GitPathsRequest):
 async def git_commit(req: GitCommitRequest):
     svc = _get_service()
     result = svc.commit(req.message)
-    exp = calculate_exp_with_focus(ActionType.git_commit, player)
-    player.total_exp += exp
-    result.exp_gained = exp
     save_state_fn()
 
     if chronicle_service:
         chronicle_service.log_event(
             action_type="git_commit",
             description=f"Commit: {req.message[:80]}",
-            exp_gained=exp,
         )
 
     return result

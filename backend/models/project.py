@@ -12,7 +12,6 @@ class ProjectScanResponse(BaseModel):
     total_dirs: int
     key_files: list[str]
     file_types: dict[str, int]
-    exp_gained: int = 0
 
 
 class ProjectContextResponse(ProjectScanResponse):

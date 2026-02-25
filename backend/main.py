@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from models.player import Player
+from models.player import AgentStatus
 from services.quest_service import QuestService
 from services.chronicle_service import ChronicleService
 from routes import game, quests, files, settings, chat, project, commands, conversations, git
@@ -20,22 +20,37 @@ from services.file_service import FileService
 
 STATE_FILE = Path(__file__).parent / "state.json"
 
-player = Player()
+agent = AgentStatus()
 quest_service = QuestService()
 chronicle_service = ChronicleService()
 
 def load_state():
-    global player
+    global agent
     if STATE_FILE.exists():
         try:
             data = json.loads(STATE_FILE.read_text())
-            player = Player(**data.get("player", {}))
+            # Migration: "player" -> "agent"
+            if "agent" in data:
+                agent = AgentStatus(**data["agent"])
+            elif "player" in data:
+                old = data["player"]
+                agent = AgentStatus(
+                    name=old.get("name", "Codemancer"),
+                    total_bytes_processed=old.get("total_bytes_processed", 0),
+                    focus_active=old.get("focus_active", False),
+                    focus_started_at=old.get("focus_started_at"),
+                    focus_duration_minutes=old.get("focus_duration_minutes", 0),
+                    known_files=[],
+                    integrity_score=100.0,
+                )
+            else:
+                agent = AgentStatus()
         except Exception:
-            player = Player()
+            agent = AgentStatus()
 
 def save_state():
     STATE_FILE.write_text(json.dumps({
-        "player": player.model_dump(),
+        "agent": agent.model_dump(),
     }, indent=2))
 
 @asynccontextmanager
@@ -43,27 +58,24 @@ async def lifespan(app: FastAPI):
     load_state()
     chronicle_service.start_session()
     file_service = FileService()
-    game.player = player
+    game.agent = agent
     game.quest_service = quest_service
     game.save_state_fn = save_state
     game.chronicle_service = chronicle_service
-    quests.player = player
     quests.quest_service = quest_service
     files.file_service = file_service
-    chat.player = player
+    chat.agent = agent
     chat.quest_service = quest_service
     chat.file_service = file_service
     chat.save_state_fn = save_state
     chat.chronicle_service = chronicle_service
     project.file_service = file_service
-    project.player = player
     project.save_state_fn = save_state
-    git.player = player
+    git.agent = agent
     git.save_state_fn = save_state
     git.chronicle_service = chronicle_service
     chronicle_route.chronicle_service = chronicle_service
     telegram_route.quest_service = quest_service
-    missions_route.player = player
     missions_route.save_state_fn = save_state
     missions_route.chronicle_service = chronicle_service
     yield

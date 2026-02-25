@@ -1,14 +1,11 @@
 from fastapi import APIRouter, HTTPException
 
 from models.project import ProjectScanRequest, ProjectScanResponse, ProjectContextResponse
-from models.player import Player
 from services.file_service import FileService
-from services.exp_service import ActionType, calculate_exp_with_focus
 
 router = APIRouter(prefix="/api/project", tags=["project"])
 
 file_service: FileService | None = None
-player: Player | None = None
 
 save_state_fn = None  # injected from main.py
 
@@ -23,14 +20,7 @@ async def scan_project(req: ProjectScanRequest):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    exp_gained = 0
-    if req.award_exp and player:
-        exp_gained = calculate_exp_with_focus(ActionType.project_scan, player)
-        player.total_exp += exp_gained
-        if save_state_fn:
-            save_state_fn()
-
-    return ProjectScanResponse(**result, exp_gained=exp_gained)
+    return ProjectScanResponse(**result)
 
 
 @router.post("/context", response_model=ProjectContextResponse)
@@ -55,11 +45,4 @@ async def get_project_context(req: ProjectScanRequest):
         f"Top file types: {types_str}"
     )
 
-    exp_gained = 0
-    if req.award_exp and player:
-        exp_gained = calculate_exp_with_focus(ActionType.project_scan, player)
-        player.total_exp += exp_gained
-        if save_state_fn:
-            save_state_fn()
-
-    return ProjectContextResponse(**result, exp_gained=exp_gained, summary=summary)
+    return ProjectContextResponse(**result, summary=summary)
