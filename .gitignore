@@ -30,6 +30,7 @@ backend/**/__pycache__/
 backend/state.json
 backend/settings.json
 backend/chronicle.db
+backend/signal_cache.db
 backend/recent_projects.json
 backend/conversations/
 
