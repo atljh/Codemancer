@@ -55,6 +55,7 @@ export function useAgentActivity() {
     commsConnected: false,
     commsMsgCount: 0,
     lastSaveTime: 0 as number | null,
+    refineryNewCount: 0,
   });
 
   useEffect(() => {
@@ -114,7 +115,45 @@ export function useAgentActivity() {
       }
       prev.commsMsgCount = msgCount;
 
-      // 4) FILE_SAVED
+      // 4) SIGNAL_REFINERY
+      if (state.refineryNewCount > prev.refineryNewCount) {
+        const delta = state.refineryNewCount - prev.refineryNewCount;
+
+        // Check for critical signals (internal priority 1 = user priority 5)
+        const criticalSignals = state.refinerySignals.filter(
+          (s) => s.priority <= 1 && (s.status === "new" || s.status === "triaged"),
+        );
+        if (criticalSignals.length > 0) {
+          const sector =
+            criticalSignals[0].file_path
+              ? basename(criticalSignals[0].file_path)
+              : criticalSignals[0].title?.slice(0, 30) || "unknown";
+          emit(
+            t(state.locale, "activity.criticalSignal", { sector }),
+          );
+        } else {
+          // Check if any new signals are from Slack or Jira for specific log messages
+          const slackSignals = state.refinerySignals.filter(
+            (s) => s.source === "SLACK" && s.status === "new",
+          );
+          const jiraSignals = state.refinerySignals.filter(
+            (s) => s.source === "JIRA" && s.status === "new",
+          );
+
+          if (slackSignals.length > 0) {
+            emit(t(state.locale, "activity.slackSignal", { count: slackSignals.length }));
+          } else if (jiraSignals.length > 0) {
+            emit(t(state.locale, "activity.jiraSignal", { count: jiraSignals.length }));
+          } else {
+            emit(
+              t(state.locale, "activity.refinerySignal", { count: delta }),
+            );
+          }
+        }
+      }
+      prev.refineryNewCount = state.refineryNewCount;
+
+      // 5) FILE_SAVED
       if (
         state.lastSaveTime &&
         state.lastSaveTime !== prev.lastSaveTime
@@ -185,6 +224,7 @@ export function useAgentActivity() {
       commsConnected: s.commsConnected,
       commsMsgCount: s.commsMessages.length,
       lastSaveTime: s.lastSaveTime,
+      refineryNewCount: s.refineryNewCount,
     };
 
     return () => {

@@ -23,7 +23,16 @@ export function MissionControl() {
   const { playSound } = useAudio();
   const { t } = useTranslation();
 
+  const setRefineryStatus = useGameStore((s) => s.setRefineryStatus);
+  const setRefineryNewCount = useGameStore((s) => s.setRefineryNewCount);
+  const refineryStatus = useGameStore((s) => s.refineryStatus);
+
+  const hideLowPriority = useGameStore((s) => s.settings.signal_hide_low_priority);
+  const aiTriageEnabled = useGameStore((s) => s.settings.signal_ai_triage_enabled);
+
   const [scanning, setScanning] = useState(false);
+  const [polling, setPolling] = useState(false);
+  const [triaging, setTriaging] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const scanTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -44,6 +53,57 @@ export function MissionControl() {
       .then(setOperations)
       .catch(() => {});
   }, [api, setOperations]);
+
+  // Fetch refinery status periodically
+  useEffect(() => {
+    const fetchStatus = () => {
+      api.getRefineryStatus().then((s) => {
+        setRefineryStatus(s);
+        setRefineryNewCount(s.new_signals);
+      }).catch(() => {});
+    };
+    fetchStatus();
+    const timer = setInterval(fetchStatus, 60_000);
+    return () => clearInterval(timer);
+  }, [api, setRefineryStatus, setRefineryNewCount]);
+
+  const handlePollNow = useCallback(async () => {
+    if (polling) return;
+    setPolling(true);
+    try {
+      const result = await api.triggerRefineryPoll();
+      if (result.new_signals > 0) {
+        const ops = await api.getOperations();
+        setOperations(ops);
+        playSound("mission_registered");
+      }
+      // Refresh refinery status
+      const s = await api.getRefineryStatus();
+      setRefineryStatus(s);
+      setRefineryNewCount(s.new_signals);
+    } catch {
+      // silent
+    } finally {
+      setPolling(false);
+    }
+  }, [polling, api, setOperations, playSound, setRefineryStatus, setRefineryNewCount]);
+
+  const handleTriage = useCallback(async () => {
+    if (triaging) return;
+    setTriaging(true);
+    try {
+      await api.triageSignals();
+      const ops = await api.getOperations();
+      setOperations(ops);
+      const s = await api.getRefineryStatus();
+      setRefineryStatus(s);
+      setRefineryNewCount(s.new_signals);
+    } catch {
+      // silent
+    } finally {
+      setTriaging(false);
+    }
+  }, [triaging, api, setOperations, setRefineryStatus, setRefineryNewCount]);
 
   // Auto-scan every 5 minutes
   useEffect(() => {
@@ -125,9 +185,18 @@ export function MissionControl() {
     }
   }, [newTitle, api, setOperations, playSound, selectOperation]);
 
+  // Filter by priority if enabled (hide internal priority > 3, i.e. LOW/NOISE)
+  const filteredOps = hideLowPriority
+    ? operations.filter((op) => {
+        // Keep operation if at least one signal has priority <= 3
+        if (op.signals.length === 0) return true;
+        return op.signals.some((s) => s.priority <= 3);
+      })
+    : operations;
+
   // Split operations by status
-  const activeOps = operations.filter((o) => o.status !== "COMPLETED");
-  const completedOps = operations.filter((o) => o.status === "COMPLETED");
+  const activeOps = filteredOps.filter((o) => o.status !== "COMPLETED");
+  const completedOps = filteredOps.filter((o) => o.status === "COMPLETED");
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -138,10 +207,56 @@ export function MissionControl() {
         </h2>
 
         <div className="ml-auto flex items-center gap-2">
+          {/* Refinery status indicator */}
+          {refineryStatus && (
+            <span className="flex items-center gap-1 text-[9px] font-mono text-theme-text-dimmer">
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  refineryStatus.polling_active
+                    ? refineryStatus.new_signals > 0
+                      ? "bg-yellow-400 animate-pulse"
+                      : "bg-green-400"
+                    : "bg-theme-text-dimmer"
+                }`}
+              />
+              {refineryStatus.new_signals > 0
+                ? `${refineryStatus.new_signals} ${t("refinery.new")}`
+                : t("refinery.title")}
+            </span>
+          )}
+
           {/* Stats */}
           <span className="text-[9px] font-mono text-theme-text-dimmer">
             {t("bridge.totalOps").replace("{count}", String(operations.length))}
           </span>
+
+          {/* Poll Now button */}
+          <button
+            onClick={handlePollNow}
+            disabled={polling}
+            className={`text-[9px] font-mono font-bold px-2 py-1 rounded transition-colors ${
+              polling
+                ? "text-purple-400 animate-pulse"
+                : "text-theme-text-dim hover:text-purple-400"
+            }`}
+          >
+            [{polling ? t("refinery.polling") : t("refinery.pollNow")}]
+          </button>
+
+          {/* Triage button */}
+          {aiTriageEnabled && (
+            <button
+              onClick={handleTriage}
+              disabled={triaging}
+              className={`text-[9px] font-mono font-bold px-2 py-1 rounded transition-colors ${
+                triaging
+                  ? "text-amber-400 animate-pulse"
+                  : "text-theme-text-dim hover:text-amber-400"
+              }`}
+            >
+              [{triaging ? t("refinery.triaging") : t("refinery.triage")}]
+            </button>
+          )}
 
           {/* Scan button */}
           <button

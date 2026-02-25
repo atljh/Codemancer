@@ -158,6 +158,26 @@ export interface AppSettings {
   telegram_api_id: string;
   telegram_api_hash: string;
   sound_pack: SoundPackId;
+  // Signal Refinery — GitHub
+  github_token: string;
+  github_owner: string;
+  github_repo: string;
+  signal_github_enabled: boolean;
+  signal_github_poll_interval: number;
+  // Signal Refinery — Jira
+  jira_base_url: string;
+  jira_email: string;
+  jira_api_token: string;
+  signal_jira_enabled: boolean;
+  signal_jira_poll_interval: number;
+  // Signal Refinery — Slack
+  slack_bot_token: string;
+  slack_channels: string;
+  signal_slack_enabled: boolean;
+  signal_slack_poll_interval: number;
+  // AI Triage
+  signal_ai_triage_enabled: boolean;
+  signal_hide_low_priority: boolean;
 }
 
 export interface ProjectScanResult {
@@ -351,7 +371,13 @@ export interface TelegramAnalysis {
 }
 
 // MissionControl types
-export type SignalSource = "TELEGRAM" | "CODE_TODO" | "LSP_ERRORS";
+export type SignalSource =
+  | "TELEGRAM"
+  | "CODE_TODO"
+  | "LSP_ERRORS"
+  | "GITHUB"
+  | "JIRA"
+  | "SLACK";
 
 export type OperationStatus =
   | "ANALYSIS"
@@ -366,6 +392,9 @@ export interface MissionSignal {
   file_path: string | null;
   line_number: number | null;
   timestamp: string;
+  priority: number;
+  url: string | null;
+  reason: string | null;
   metadata: Record<string, unknown>;
 }
 
@@ -393,6 +422,42 @@ export interface MissionStatus {
   by_status: Record<OperationStatus, number>;
   total_signals: number;
   last_scan: string | null;
+}
+
+// Signal Refinery types
+export interface UnifiedSignal {
+  id: string;
+  source: string;
+  external_id: string;
+  title: string;
+  content: string;
+  url: string | null;
+  file_path: string | null;
+  line_number: number | null;
+  priority: number;
+  status: string;
+  reason: string | null;
+  provider_metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  fetched_at: string;
+  operation_id: string | null;
+}
+
+export interface RefineryProviderStatus {
+  name: string;
+  configured: boolean;
+  enabled: boolean;
+  last_poll: string | null;
+  error_count: number;
+  last_error: string | null;
+}
+
+export interface RefineryStatus {
+  providers: Record<string, RefineryProviderStatus>;
+  total_signals: number;
+  new_signals: number;
+  polling_active: boolean;
 }
 
 export type CommsAuthState =

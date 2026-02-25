@@ -30,6 +30,8 @@ import type {
   MissionSignal,
   MissionScanResult,
   MissionStatus,
+  UnifiedSignal,
+  RefineryStatus,
 } from "../types/game";
 
 const API_BASE = "http://127.0.0.1:8420";
@@ -476,6 +478,66 @@ const api = {
     ),
 
   getMissionStatus: () => fetchJson<MissionStatus>("/api/missions/status"),
+
+  // Signal Refinery
+  getRefinerySignals: (params?: {
+    source?: string;
+    status?: string;
+    priority_max?: number;
+    limit?: number;
+    offset?: number;
+  }) => {
+    const q = new URLSearchParams();
+    if (params?.source) q.set("source", params.source);
+    if (params?.status) q.set("status", params.status);
+    if (params?.priority_max) q.set("priority_max", String(params.priority_max));
+    if (params?.limit) q.set("limit", String(params.limit));
+    if (params?.offset) q.set("offset", String(params.offset));
+    const qs = q.toString();
+    return fetchJson<UnifiedSignal[]>(
+      `/api/signals/refinery/signals${qs ? `?${qs}` : ""}`,
+    );
+  },
+
+  getRefineryStatus: () =>
+    fetchJson<RefineryStatus>("/api/signals/refinery/status"),
+
+  dismissSignal: (signalId: string) =>
+    fetchJson<{ ok: boolean }>("/api/signals/refinery/dismiss", {
+      method: "POST",
+      body: JSON.stringify({ signal_id: signalId }),
+    }),
+
+  linkSignal: (signalId: string, filePath: string, lineNumber?: number) =>
+    fetchJson<{ ok: boolean }>("/api/signals/refinery/link", {
+      method: "POST",
+      body: JSON.stringify({
+        signal_id: signalId,
+        file_path: filePath,
+        line_number: lineNumber,
+      }),
+    }),
+
+  triggerRefineryPoll: () =>
+    fetchJson<{ ok: boolean; new_signals: number }>(
+      "/api/signals/refinery/poll-now",
+      { method: "POST" },
+    ),
+
+  ingestSignals: (source: string, messages: Record<string, unknown>[]) =>
+    fetchJson<UnifiedSignal[]>("/api/signals/refinery/ingest", {
+      method: "POST",
+      body: JSON.stringify({ source, messages }),
+    }),
+
+  triageSignals: (signalIds?: string[]) =>
+    fetchJson<{ ok: boolean; triaged: number }>(
+      "/api/signals/refinery/triage",
+      {
+        method: "POST",
+        body: JSON.stringify({ signal_ids: signalIds ?? null }),
+      },
+    ),
 };
 
 export { api };

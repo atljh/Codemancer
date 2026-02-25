@@ -17,6 +17,8 @@ import type {
   TelegramDialog,
   TelegramMessage,
   Operation,
+  RefineryStatus,
+  UnifiedSignal,
 } from "../types/game";
 
 interface GameState {
@@ -116,6 +118,11 @@ interface GameState {
 
   // Smart Alert
   smartAlertActive: boolean;
+
+  // Signal Refinery
+  refineryStatus: RefineryStatus | null;
+  refinerySignals: UnifiedSignal[];
+  refineryNewCount: number;
 
   // Actions
   setAgent: (agent: AgentStatus) => void;
@@ -228,6 +235,11 @@ interface GameState {
   // Smart Alert actions
   triggerSmartAlert: () => void;
 
+  // Signal Refinery actions
+  setRefineryStatus: (status: RefineryStatus | null) => void;
+  setRefinerySignals: (signals: UnifiedSignal[]) => void;
+  setRefineryNewCount: (count: number) => void;
+
   // MissionControl actions
   setOperations: (ops: Operation[]) => void;
   addOperation: (op: Operation) => void;
@@ -268,6 +280,22 @@ const defaultSettings: AppSettings = {
   telegram_api_id: "",
   telegram_api_hash: "",
   sound_pack: "default",
+  github_token: "",
+  github_owner: "",
+  github_repo: "",
+  signal_github_enabled: false,
+  signal_github_poll_interval: 300,
+  jira_base_url: "",
+  jira_email: "",
+  jira_api_token: "",
+  signal_jira_enabled: false,
+  signal_jira_poll_interval: 300,
+  slack_bot_token: "",
+  slack_channels: "",
+  signal_slack_enabled: false,
+  signal_slack_poll_interval: 300,
+  signal_ai_triage_enabled: false,
+  signal_hide_low_priority: false,
 };
 
 export const useGameStore = create<GameState>((set) => ({
@@ -333,6 +361,9 @@ export const useGameStore = create<GameState>((set) => ({
   showMissionControl: false,
   missionBriefingActive: false,
   smartAlertActive: false,
+  refineryStatus: null,
+  refinerySignals: [],
+  refineryNewCount: 0,
 
   setAgent: (agent) => set({ agent }),
   setQuests: (quests) => set({ quests }),
@@ -547,6 +578,11 @@ export const useGameStore = create<GameState>((set) => ({
     set({ smartAlertActive: true });
     setTimeout(() => set({ smartAlertActive: false }), 600);
   },
+
+  // Signal Refinery
+  setRefineryStatus: (status) => set({ refineryStatus: status }),
+  setRefinerySignals: (signals) => set({ refinerySignals: signals }),
+  setRefineryNewCount: (count) => set({ refineryNewCount: count }),
 
   // MissionControl
   setOperations: (ops) => set({ operations: ops }),

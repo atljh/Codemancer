@@ -409,6 +409,359 @@ function GeneralTab({
         </div>
       </div>
 
+      {/* Signal Refinery */}
+      <div className="mt-5 pt-4 border-t border-[var(--theme-glass-border)]">
+        <div className="flex items-center gap-2 mb-3">
+          <Radio
+            className="w-3.5 h-3.5 text-purple-400/60"
+            strokeWidth={1.5}
+          />
+          <h3 className="text-xs font-mono font-bold text-theme-text-dim uppercase tracking-[0.15em]">
+            {t("settings.refinerySection")}
+          </h3>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">
+              {t("settings.githubToken")}
+            </label>
+            <input
+              type="password"
+              value={draft.github_token}
+              onChange={(e) =>
+                setDraft({ ...draft, github_token: e.target.value })
+              }
+              placeholder="ghp_..."
+              className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
+            />
+            <p className="text-[11px] text-theme-text-dimmer mt-1 font-mono">
+              {t("settings.githubTokenHint")}
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">
+                {t("settings.githubOwner")}
+              </label>
+              <input
+                type="text"
+                value={draft.github_owner}
+                onChange={(e) =>
+                  setDraft({ ...draft, github_owner: e.target.value })
+                }
+                placeholder="auto-detect"
+                className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
+              />
+              <p className="text-[11px] text-theme-text-dimmer mt-1 font-mono">
+                {t("settings.githubOwnerHint")}
+              </p>
+            </div>
+            <div>
+              <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">
+                {t("settings.githubRepo")}
+              </label>
+              <input
+                type="text"
+                value={draft.github_repo}
+                onChange={(e) =>
+                  setDraft({ ...draft, github_repo: e.target.value })
+                }
+                placeholder="auto-detect"
+                className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
+              />
+              <p className="text-[11px] text-theme-text-dimmer mt-1 font-mono">
+                {t("settings.githubRepoHint")}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={draft.signal_github_enabled}
+                onChange={(e) =>
+                  setDraft({ ...draft, signal_github_enabled: e.target.checked })
+                }
+                className="accent-purple-400"
+              />
+              <span className="text-[11px] font-mono text-theme-text-dim tracking-wider">
+                {t("settings.githubEnabled")}
+              </span>
+            </label>
+          </div>
+          <div>
+            <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">
+              {t("settings.githubPollInterval")}
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={60}
+                max={900}
+                step={30}
+                value={draft.signal_github_poll_interval}
+                onChange={(e) =>
+                  setDraft({
+                    ...draft,
+                    signal_github_poll_interval: parseInt(e.target.value),
+                  })
+                }
+                className="flex-1 accent-purple-400"
+              />
+              <span className="text-xs font-mono text-theme-text-dim w-12 text-right">
+                {draft.signal_github_poll_interval}s
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Jira */}
+      <div className="mt-5 pt-4 border-t border-[var(--theme-glass-border)]">
+        <div className="flex items-center gap-2 mb-3">
+          <Radio
+            className="w-3.5 h-3.5 text-sky-400/60"
+            strokeWidth={1.5}
+          />
+          <h3 className="text-xs font-mono font-bold text-theme-text-dim uppercase tracking-[0.15em]">
+            {t("settings.jiraSection")}
+          </h3>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">
+              {t("settings.jiraBaseUrl")}
+            </label>
+            <input
+              type="text"
+              value={draft.jira_base_url}
+              onChange={(e) =>
+                setDraft({ ...draft, jira_base_url: e.target.value })
+              }
+              placeholder="https://myteam.atlassian.net"
+              className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
+            />
+            <p className="text-[11px] text-theme-text-dimmer mt-1 font-mono">
+              {t("settings.jiraBaseUrlHint")}
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">
+                {t("settings.jiraEmail")}
+              </label>
+              <input
+                type="text"
+                value={draft.jira_email}
+                onChange={(e) =>
+                  setDraft({ ...draft, jira_email: e.target.value })
+                }
+                placeholder="user@company.com"
+                className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
+              />
+              <p className="text-[11px] text-theme-text-dimmer mt-1 font-mono">
+                {t("settings.jiraEmailHint")}
+              </p>
+            </div>
+            <div>
+              <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">
+                {t("settings.jiraApiToken")}
+              </label>
+              <input
+                type="password"
+                value={draft.jira_api_token}
+                onChange={(e) =>
+                  setDraft({ ...draft, jira_api_token: e.target.value })
+                }
+                placeholder="ATATT..."
+                className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
+              />
+              <p className="text-[11px] text-theme-text-dimmer mt-1 font-mono">
+                {t("settings.jiraApiTokenHint")}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={draft.signal_jira_enabled}
+                onChange={(e) =>
+                  setDraft({ ...draft, signal_jira_enabled: e.target.checked })
+                }
+                className="accent-sky-400"
+              />
+              <span className="text-[11px] font-mono text-theme-text-dim tracking-wider">
+                {t("settings.jiraEnabled")}
+              </span>
+            </label>
+          </div>
+          <div>
+            <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">
+              {t("settings.jiraPollInterval")}
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={60}
+                max={900}
+                step={30}
+                value={draft.signal_jira_poll_interval}
+                onChange={(e) =>
+                  setDraft({
+                    ...draft,
+                    signal_jira_poll_interval: parseInt(e.target.value),
+                  })
+                }
+                className="flex-1 accent-sky-400"
+              />
+              <span className="text-xs font-mono text-theme-text-dim w-12 text-right">
+                {draft.signal_jira_poll_interval}s
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Slack */}
+      <div className="mt-5 pt-4 border-t border-[var(--theme-glass-border)]">
+        <div className="flex items-center gap-2 mb-3">
+          <Radio
+            className="w-3.5 h-3.5 text-violet-400/60"
+            strokeWidth={1.5}
+          />
+          <h3 className="text-xs font-mono font-bold text-theme-text-dim uppercase tracking-[0.15em]">
+            {t("settings.slackSection")}
+          </h3>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">
+              {t("settings.slackBotToken")}
+            </label>
+            <input
+              type="password"
+              value={draft.slack_bot_token}
+              onChange={(e) =>
+                setDraft({ ...draft, slack_bot_token: e.target.value })
+              }
+              placeholder="xoxb-..."
+              className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
+            />
+            <p className="text-[11px] text-theme-text-dimmer mt-1 font-mono">
+              {t("settings.slackBotTokenHint")}
+            </p>
+          </div>
+          <div>
+            <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">
+              {t("settings.slackChannels")}
+            </label>
+            <input
+              type="text"
+              value={draft.slack_channels}
+              onChange={(e) =>
+                setDraft({ ...draft, slack_channels: e.target.value })
+              }
+              placeholder="dev,alerts,general"
+              className="w-full bg-theme-bg-base border border-[var(--theme-glass-border)] rounded px-3 py-2.5 text-sm text-theme-text placeholder-theme-text-dimmer outline-none focus:border-theme-accent/30 font-mono transition-colors"
+            />
+            <p className="text-[11px] text-theme-text-dimmer mt-1 font-mono">
+              {t("settings.slackChannelsHint")}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={draft.signal_slack_enabled}
+                onChange={(e) =>
+                  setDraft({ ...draft, signal_slack_enabled: e.target.checked })
+                }
+                className="accent-violet-400"
+              />
+              <span className="text-[11px] font-mono text-theme-text-dim tracking-wider">
+                {t("settings.slackEnabled")}
+              </span>
+            </label>
+          </div>
+          <div>
+            <label className="text-[11px] font-mono text-theme-text-dim mb-1 block tracking-wider">
+              {t("settings.slackPollInterval")}
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={60}
+                max={900}
+                step={30}
+                value={draft.signal_slack_poll_interval}
+                onChange={(e) =>
+                  setDraft({
+                    ...draft,
+                    signal_slack_poll_interval: parseInt(e.target.value),
+                  })
+                }
+                className="flex-1 accent-violet-400"
+              />
+              <span className="text-xs font-mono text-theme-text-dim w-12 text-right">
+                {draft.signal_slack_poll_interval}s
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* AI Triage & Filtering */}
+      <div className="mt-5 pt-4 border-t border-[var(--theme-glass-border)]">
+        <div className="flex items-center gap-2 mb-3">
+          <Brain
+            className="w-3.5 h-3.5 text-amber-400/60"
+            strokeWidth={1.5}
+          />
+          <h3 className="text-xs font-mono font-bold text-theme-text-dim uppercase tracking-[0.15em]">
+            AI Triage
+          </h3>
+        </div>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={draft.signal_ai_triage_enabled}
+                onChange={(e) =>
+                  setDraft({ ...draft, signal_ai_triage_enabled: e.target.checked })
+                }
+                className="accent-amber-400"
+              />
+              <span className="text-[11px] font-mono text-theme-text-dim tracking-wider">
+                {t("settings.aiTriageEnabled")}
+              </span>
+            </label>
+          </div>
+          <p className="text-[11px] text-theme-text-dimmer font-mono">
+            {t("settings.aiTriageHint")}
+          </p>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={draft.signal_hide_low_priority}
+                onChange={(e) =>
+                  setDraft({ ...draft, signal_hide_low_priority: e.target.checked })
+                }
+                className="accent-amber-400"
+              />
+              <span className="text-[11px] font-mono text-theme-text-dim tracking-wider">
+                {t("settings.hideLowPriority")}
+              </span>
+            </label>
+          </div>
+          <p className="text-[11px] text-theme-text-dimmer font-mono">
+            {t("settings.hideLowPriorityHint")}
+          </p>
+        </div>
+      </div>
+
       <div className="mt-5 pt-4 border-t border-theme-status-error/10">
         <h3 className="text-xs font-mono font-bold text-theme-status-error/70 uppercase tracking-[0.15em] mb-3">
           {t("settings.dangerZone")}

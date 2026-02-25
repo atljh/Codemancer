@@ -47,6 +47,18 @@ export function TacticalMap() {
   const blastSet = useMemo(() => new Set(blastRadiusFiles), [blastRadiusFiles]);
   const bountySet = useMemo(() => new Set(bountyZoneFiles), [bountyZoneFiles]);
 
+  // Refinery high-priority signal files
+  const refinerySignals = useGameStore((s) => s.refinerySignals);
+  const [showRefineryLayer, setShowRefineryLayer] = useState(false);
+  const refineryFileSet = useMemo(() => {
+    if (!showRefineryLayer) return new Set<string>();
+    return new Set(
+      refinerySignals
+        .filter((s) => s.priority <= 2 && s.file_path)
+        .map((s) => s.file_path!),
+    );
+  }, [showRefineryLayer, refinerySignals]);
+
   // Observe container size
   useEffect(() => {
     const el = containerRef.current;
@@ -261,6 +273,16 @@ export function TacticalMap() {
           </span>
         )}
         <button
+          onClick={() => setShowRefineryLayer(!showRefineryLayer)}
+          className={`text-[9px] font-mono px-2 py-1 rounded transition-colors ${
+            showRefineryLayer
+              ? "bg-fuchsia-500/15 text-fuchsia-400"
+              : "bg-white/5 text-theme-text-dim"
+          }`}
+        >
+          {t("refinery.title")}
+        </button>
+        <button
           onClick={resetView}
           className="text-[9px] font-mono px-2 py-1 rounded bg-white/5 text-theme-text-dim hover:text-theme-text hover:bg-white/8"
         >
@@ -377,6 +399,8 @@ export function TacticalMap() {
           const isBountyTarget = bountySet.has(ln.id);
           const isMissionSector =
             missionSectors.has(ln.id) || missionSectors.has(ln.node.path);
+          const isRefinery =
+            refineryFileSet.has(ln.id) || refineryFileSet.has(ln.node.path);
           const showLabel =
             isActive ||
             isDependent ||
@@ -385,7 +409,8 @@ export function TacticalMap() {
             isBlastTarget ||
             isBountySource ||
             isBountyTarget ||
-            isMissionSector;
+            isMissionSector ||
+            isRefinery;
 
           let fill = "var(--theme-accent)";
           // If fog of war is on but no files are open, show all nodes normally
@@ -409,6 +434,9 @@ export function TacticalMap() {
             nodeOpacity = 0.9;
           } else if (isMissionSector) {
             fill = "hsl(190, 90%, 55%)";
+            nodeOpacity = 1;
+          } else if (isRefinery) {
+            fill = "hsl(300, 80%, 60%)";
             nodeOpacity = 1;
           } else if (isDependent) {
             fill = "hsl(0, 70%, 55%)";

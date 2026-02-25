@@ -1,6 +1,19 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import type { Operation, OperationStatus } from "../../types/game";
 import { useTranslation } from "../../hooks/useTranslation";
+
+const SOURCE_BADGE: Record<
+  string,
+  { label: string; className: string }
+> = {
+  GITHUB: { label: "GH", className: "text-green-400 bg-green-400/10" },
+  JIRA: { label: "JI", className: "text-sky-300 bg-sky-400/10" },
+  SLACK: { label: "SL", className: "text-violet-400 bg-violet-400/10" },
+  TELEGRAM: { label: "TG", className: "text-cyan-400 bg-cyan-400/10" },
+  CODE_TODO: { label: "CD", className: "text-yellow-400 bg-yellow-400/10" },
+  LSP_ERRORS: { label: "LS", className: "text-red-400 bg-red-400/10" },
+};
 
 const STATUS_LABEL: Record<OperationStatus, string> = {
   ANALYSIS: "PENDING",
@@ -103,16 +116,28 @@ export function MissionNode({
 
           {/* Signals */}
           {operation.signals.length > 0 && (
-            <div className="text-theme-text-dim mb-1">
+            <div className="flex flex-wrap gap-1.5 mb-1">
               {Array.from(new Set(operation.signals.map((s) => s.source))).map(
                 (source) => {
-                  const count = operation.signals.filter(
+                  const sourceSignals = operation.signals.filter(
                     (s) => s.source === source,
-                  ).length;
+                  );
+                  const count = sourceSignals.length;
+                  const badge = SOURCE_BADGE[source] || {
+                    label: source.slice(0, 2),
+                    className: "text-theme-text-dim bg-white/5",
+                  };
+                  const reasons = sourceSignals
+                    .filter((s) => s.reason)
+                    .map((s) => s.reason!)
+                    .slice(0, 3);
                   return (
-                    <span key={source} className="mr-3">
-                      Signal: {source} x{count}
-                    </span>
+                    <SignalBadge
+                      key={source}
+                      badge={badge}
+                      count={count}
+                      reasons={reasons}
+                    />
                   );
                 },
               )}
@@ -152,5 +177,38 @@ export function MissionNode({
         </motion.div>
       )}
     </div>
+  );
+}
+
+/* ── Signal badge with AI reason tooltip ── */
+function SignalBadge({
+  badge,
+  count,
+  reasons,
+}: {
+  badge: { label: string; className: string };
+  count: number;
+  reasons: string[];
+}) {
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  return (
+    <span
+      className={`relative inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold cursor-default ${badge.className}`}
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
+      {badge.label} x{count}
+      {showTooltip && reasons.length > 0 && (
+        <span className="absolute bottom-full left-0 mb-1.5 z-50 w-56 px-2 py-1.5 rounded bg-theme-bg-deep/95 border border-[var(--theme-glass-border)] shadow-lg text-[9px] font-mono font-normal text-theme-text-dim leading-snug whitespace-normal pointer-events-none">
+          {reasons.map((r, i) => (
+            <span key={i} className="block">
+              {i > 0 && <span className="block h-px bg-white/5 my-1" />}
+              {r}
+            </span>
+          ))}
+        </span>
+      )}
+    </span>
   );
 }
