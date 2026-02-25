@@ -3,6 +3,7 @@ import { AppLayout } from "./components/layout/AppLayout";
 import { useGameStore } from "./stores/gameStore";
 import { useApi } from "./hooks/useApi";
 import { useThemeEffect } from "./hooks/useThemeEffect";
+import { useAgentActivity } from "./hooks/useAgentActivity";
 import translations from "./i18n/translations";
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
   const api = useApi();
 
   useThemeEffect(theme);
+  useAgentActivity();
   const initRef = useRef(false);
 
   // Initialize

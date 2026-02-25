@@ -349,6 +349,32 @@ const translations = {
     "proactive.suggestion":
       "Operator, shall we initiate stabilization protocol?",
 
+    // Agent activity
+    "activity.fileOpen":
+      "[PROACTIVE_LOG]: Accessing '{file}'. Scanning for structural anomalies...",
+    "activity.fileAnalyze":
+      "[PROACTIVE_LOG]: Analyzing sector '{file}'. Checking dependency graph...",
+    "activity.filePatterns":
+      "[PROACTIVE_LOG]: Accessing '{file}'. Checking for deprecated patterns...",
+    "activity.fileSaved":
+      "[PROACTIVE_LOG]: Sector '{file}' updated. Running post-write integrity check.",
+    "activity.integrityStable":
+      "[PROACTIVE_LOG]: Internal integrity at {score}%. System stable.",
+    "activity.integrityWarning":
+      "[PROACTIVE_LOG]: Integrity at {score}%. Minor anomalies detected. Monitoring.",
+    "activity.integrityCritical":
+      "[PROACTIVE_LOG]: Integrity at {score}%. Critical threshold. Recommend stabilization.",
+    "activity.commsConnected":
+      "[PROACTIVE_LOG]: Secure signal channel established. Monitoring for incoming data.",
+    "activity.commsSignal":
+      "[PROACTIVE_LOG]: {count} new signal(s) intercepted from Telegram. Awaiting manual decoding.",
+    "activity.optimizationLarge":
+      "[PROACTIVE_LOG]: Sector '{file}' contains {lines} lines. Complexity threshold exceeded.",
+    "activity.optimizationClean":
+      "[PROACTIVE_LOG]: Sector '{file}' — structure nominal. No action required.",
+    "activity.optimizationScan":
+      "[PROACTIVE_LOG]: Running optimization pass on '{file}'. Analyzing control flow...",
+
     // Waveform
     "waveform.thinking": "Processing",
     "waveform.idle": "Standby",
@@ -815,6 +841,32 @@ const translations = {
     "proactive.changedFiles":
       "Обнаружено {count} изменённых файл(ов) в рабочем пространстве.",
     "proactive.suggestion": "Оператор, инициировать протокол стабилизации?",
+
+    // Agent activity
+    "activity.fileOpen":
+      "[PROACTIVE_LOG]: Доступ к '{file}'. Сканирование структурных аномалий...",
+    "activity.fileAnalyze":
+      "[PROACTIVE_LOG]: Анализ сектора '{file}'. Проверка графа зависимостей...",
+    "activity.filePatterns":
+      "[PROACTIVE_LOG]: Доступ к '{file}'. Поиск устаревших паттернов...",
+    "activity.fileSaved":
+      "[PROACTIVE_LOG]: Сектор '{file}' обновлён. Проверка целостности после записи.",
+    "activity.integrityStable":
+      "[PROACTIVE_LOG]: Целостность системы {score}%. Состояние стабильно.",
+    "activity.integrityWarning":
+      "[PROACTIVE_LOG]: Целостность {score}%. Обнаружены незначительные аномалии. Мониторинг.",
+    "activity.integrityCritical":
+      "[PROACTIVE_LOG]: Целостность {score}%. Критический порог. Рекомендуется стабилизация.",
+    "activity.commsConnected":
+      "[PROACTIVE_LOG]: Защищённый канал связи установлен. Мониторинг входящих данных.",
+    "activity.commsSignal":
+      "[PROACTIVE_LOG]: Перехвачено {count} новых сигнал(ов) из Telegram. Ожидание ручного декодирования.",
+    "activity.optimizationLarge":
+      "[PROACTIVE_LOG]: Сектор '{file}' содержит {lines} строк. Порог сложности превышен.",
+    "activity.optimizationClean":
+      "[PROACTIVE_LOG]: Сектор '{file}' — структура номинальна. Действия не требуются.",
+    "activity.optimizationScan":
+      "[PROACTIVE_LOG]: Оптимизационный проход по '{file}'. Анализ потока управления...",
 
     // Waveform
     "waveform.thinking": "Обработка",
