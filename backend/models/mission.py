@@ -6,6 +6,9 @@ class SignalSource(str, Enum):
     TELEGRAM = "TELEGRAM"
     CODE_TODO = "CODE_TODO"
     LSP_ERRORS = "LSP_ERRORS"
+    GITHUB = "GITHUB"
+    JIRA = "JIRA"
+    SLACK = "SLACK"
 
 
 class OperationStatus(str, Enum):
@@ -22,6 +25,9 @@ class Signal(BaseModel):
     file_path: str | None = None
     line_number: int | None = None
     timestamp: str
+    priority: int = 3
+    url: str | None = None
+    reason: str | None = None
     metadata: dict = {}
 
 

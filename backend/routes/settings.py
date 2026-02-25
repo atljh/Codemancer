@@ -31,6 +31,26 @@ DEFAULT_SETTINGS = {
     "telegram_api_id": "",
     "telegram_api_hash": "",
     "sound_pack": "default",
+    # Signal Refinery — GitHub
+    "github_token": "",
+    "github_owner": "",
+    "github_repo": "",
+    "signal_github_enabled": False,
+    "signal_github_poll_interval": 300,
+    # Signal Refinery — Jira
+    "jira_base_url": "",
+    "jira_email": "",
+    "jira_api_token": "",
+    "signal_jira_enabled": False,
+    "signal_jira_poll_interval": 300,
+    # Signal Refinery — Slack
+    "slack_bot_token": "",
+    "slack_channels": "",
+    "signal_slack_enabled": False,
+    "signal_slack_poll_interval": 300,
+    # AI Triage
+    "signal_ai_triage_enabled": False,
+    "signal_hide_low_priority": False,
 }
 
 
@@ -56,6 +76,26 @@ class AppSettings(BaseModel):
     telegram_api_id: str = ""
     telegram_api_hash: str = ""
     sound_pack: str = "default"
+    # Signal Refinery — GitHub
+    github_token: str = ""
+    github_owner: str = ""
+    github_repo: str = ""
+    signal_github_enabled: bool = False
+    signal_github_poll_interval: int = 300
+    # Signal Refinery — Jira
+    jira_base_url: str = ""
+    jira_email: str = ""
+    jira_api_token: str = ""
+    signal_jira_enabled: bool = False
+    signal_jira_poll_interval: int = 300
+    # Signal Refinery — Slack
+    slack_bot_token: str = ""
+    slack_channels: str = ""
+    signal_slack_enabled: bool = False
+    signal_slack_poll_interval: int = 300
+    # AI Triage
+    signal_ai_triage_enabled: bool = False
+    signal_hide_low_priority: bool = False
 
 
 def load_settings() -> dict:

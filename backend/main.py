@@ -16,7 +16,10 @@ from routes import proactive as proactive_route
 from routes import telegram as telegram_route
 from routes import repair as repair_route
 from routes import missions as missions_route
+from routes import refinery as refinery_route
 from services.file_service import FileService
+from services.context_aggregator import ContextAggregator
+from services.signal_poller import SignalPoller
 
 STATE_FILE = Path(__file__).parent / "state.json"
 
@@ -78,7 +81,22 @@ async def lifespan(app: FastAPI):
     telegram_route.quest_service = quest_service
     missions_route.save_state_fn = save_state
     missions_route.chronicle_service = chronicle_service
+
+    # Signal Refinery
+    aggregator = ContextAggregator()
+    signal_poller = SignalPoller(
+        aggregator=aggregator,
+        operations_store=missions_route._operations,
+    )
+    refinery_route.aggregator = aggregator
+    refinery_route.poller = signal_poller
+    refinery_route.chronicle_service = chronicle_service
+    refinery_route.operations_store = missions_route._operations
+    signal_poller.start()
+
     yield
+
+    signal_poller.stop()
     chronicle_service.end_session()
     save_state()
 
@@ -108,6 +126,7 @@ app.include_router(proactive_route.router)
 app.include_router(telegram_route.router)
 app.include_router(repair_route.router)
 app.include_router(missions_route.router)
+app.include_router(refinery_route.router)
 
 @app.get("/health")
 async def health():
