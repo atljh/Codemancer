@@ -18,7 +18,9 @@ from routes import repair as repair_route
 from routes import missions as missions_route
 from routes import refinery as refinery_route
 from routes import supervisor as supervisor_route
+from routes import shadow_audit as shadow_audit_route
 from services.file_service import FileService
+from services.shadow_auditor import ShadowAuditor
 from services.context_aggregator import ContextAggregator
 from services.signal_poller import SignalPoller
 from services.agentic_supervisor import AgenticSupervisor
@@ -96,6 +98,13 @@ async def lifespan(app: FastAPI):
     refinery_route.operations_store = missions_route._operations
     signal_poller.start()
 
+    # Shadow Auditor
+    from routes.settings import load_settings as _load_s
+    _s = _load_s()
+    shadow_aud = ShadowAuditor(workspace_root=_s.get("workspace_root", ""))
+    chat.shadow_auditor = shadow_aud
+    shadow_audit_route.shadow_auditor = shadow_aud
+
     # Agentic Supervisor
     agentic_supervisor = AgenticSupervisor()
     supervisor_route.supervisor = agentic_supervisor
@@ -137,6 +146,7 @@ app.include_router(repair_route.router)
 app.include_router(missions_route.router)
 app.include_router(refinery_route.router)
 app.include_router(supervisor_route.router)
+app.include_router(shadow_audit_route.router)
 
 @app.get("/health")
 async def health():

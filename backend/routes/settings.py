@@ -54,6 +54,9 @@ DEFAULT_SETTINGS = {
     # Agentic Supervisor
     "supervisor_enabled": False,
     "supervisor_sandbox_mode": True,
+    # Shadow Auditor
+    "shadow_audit_enabled": True,
+    "shadow_auto_tests_enabled": False,
 }
 
 
@@ -102,6 +105,9 @@ class AppSettings(BaseModel):
     # Agentic Supervisor
     supervisor_enabled: bool = False
     supervisor_sandbox_mode: bool = True
+    # Shadow Auditor
+    shadow_audit_enabled: bool = True
+    shadow_auto_tests_enabled: bool = False
 
 
 def load_settings() -> dict:

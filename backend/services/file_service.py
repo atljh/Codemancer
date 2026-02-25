@@ -29,7 +29,7 @@ EXTENSION_LANGUAGE_MAP: dict[str, str] = {
     ".txt": "plaintext",
 }
 
-SKIP_DIRS = {".git", "node_modules", "__pycache__", "target", ".venv", "venv", "dist", ".next", ".claude"}
+SKIP_DIRS = {".git", "node_modules", "__pycache__", "target", ".venv", "venv", "dist", ".next", ".claude", ".codemancer_shadow_tests"}
 
 
 class FileService:

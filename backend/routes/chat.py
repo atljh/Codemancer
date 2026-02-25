@@ -24,6 +24,7 @@ quest_service = None
 file_service: FileService | None = None
 save_state_fn = None
 chronicle_service: ChronicleService | None = None
+shadow_auditor = None  # Injected from main.py
 
 PROVIDER_MODELS = {
     "anthropic": [
@@ -324,6 +325,37 @@ async def chat_stream(req: ChatRequest):
                                 br = dep_svc.blast_radius(file_rel)
                                 if br["count"] > 0:
                                     yield f"data: {json.dumps({'type': 'blast_radius', 'file': br['file'], 'dependents': br['dependents'], 'count': br['count'], 'high': br['high']})}\n\n"
+                            except Exception:
+                                pass
+
+                        # Shadow Auditor: signature analysis
+                        if shadow_auditor and result.file_path and result.old_content is not None:
+                            try:
+                                sig_report = shadow_auditor.analyze_signatures(
+                                    result.file_path, result.old_content, result.new_content
+                                )
+                                if sig_report.changes:
+                                    # Enrich dependent_count from blast_radius if available
+                                    if workspace_root:
+                                        try:
+                                            sa_dep_svc = DependencyService(workspace_root)
+                                            sa_br = sa_dep_svc.blast_radius(
+                                                str(Path(result.file_path).relative_to(workspace_root))
+                                            )
+                                            sig_report.dependent_count = sa_br["count"]
+                                        except Exception:
+                                            pass
+                                    yield f"data: {json.dumps({'type': 'shadow_audit', **sig_report.model_dump()})}\n\n"
+
+                                # Fire-and-forget: background test generation
+                                sa_settings = _load_settings()
+                                if sa_settings.get("shadow_auto_tests_enabled", False):
+                                    shadow_auditor.cancel_file(result.file_path)
+                                    asyncio.create_task(
+                                        shadow_auditor.verify_file(
+                                            result.file_path, result.new_content, sa_settings, None
+                                        )
+                                    )
                             except Exception:
                                 pass
 
