@@ -442,144 +442,166 @@ export function OmniChat() {
 
         const decoder = new TextDecoder();
         let accumulated = "";
+        let lineBuffer = ""; // Buffer for incomplete SSE lines across chunks
+        let streamDone = false;
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+        const processLine = async (line: string) => {
+          if (!line.startsWith("data: ")) return;
+          const data = JSON.parse(line.slice(6));
 
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split("\n");
-
-          for (const line of lines) {
-            if (!line.startsWith("data: ")) continue;
+          if (data.done) {
+            // Final event with totals
+            if (data.total_bytes_processed) {
+              addBytesProcessed(data.total_bytes_processed);
+            }
+            // TTS: speak the beginning of the response
+            if (accumulated) sayText(accumulated.slice(0, 300));
+            // Refresh agent to get updated stats
             try {
-              const data = JSON.parse(line.slice(6));
-
-              if (data.done) {
-                // Final event with totals
-                if (data.total_bytes_processed) {
-                  addBytesProcessed(data.total_bytes_processed);
-                }
-                // TTS: speak the beginning of the response
-                if (accumulated) sayText(accumulated.slice(0, 300));
-                // Refresh agent to get updated stats
-                try {
-                  const updatedAgent = await api.getStatus();
-                  setAgent(updatedAgent);
-                } catch {
-                  // ignore
-                }
-                break;
-              }
-
-              // Error event from backend
-              if (data.type === "error") {
-                console.error("[OmniChat] Backend error event:", data.error);
-                updateMessageById(
-                  assistantMsgId,
-                  data.error || t("ai.streamError"),
-                );
-                break;
-              }
-
-              // Text chunk (both old format and new type:text format)
-              if (data.text) {
-                accumulated += data.text;
-                updateMessageById(assistantMsgId, accumulated);
-              }
-
-              // Tool call event
-              if (data.type === "tool_call") {
-                playSound("tool_start");
-                const displayName = getToolDisplayName(data.tool_name);
-                const pathInfo = data.input?.path ? ` ${data.input.path}` : "";
-                addActionLog({
-                  action: `[EXECUTING]: ${displayName}${pathInfo}`,
-                  status: "pending",
-                  toolName: data.tool_name,
-                  toolId: data.tool_id,
-                });
-              }
-
-              // Tool result event
-              if (data.type === "tool_result") {
-                playSound(
-                  data.status === "success" ? "mission_complete" : "tool_error",
-                );
-                const displayName = getToolDisplayName(data.tool_name);
-                addActionLog({
-                  action: `[DATA_ACQUIRED]: ${displayName} — ${data.summary}`,
-                  status: data.status === "success" ? "done" : "error",
-                  toolName: data.tool_name,
-                  toolId: data.tool_id,
-                  bytesProcessed: data.bytes_processed,
-                });
-              }
-
-              // Tool diff event (for write operations)
-              if (data.type === "tool_diff") {
-                addActionCard({
-                  fileName: data.file_name || "file",
-                  status: "patched",
-                  filePath: data.file_path || "",
-                  oldContent: data.old_content,
-                  newContent: data.new_content,
-                });
-              }
-
-              // Command result event (run_command)
-              if (data.type === "command_result") {
-                const exitCode = data.exit_code as number;
-                const cmdOutput = (data.output || "") as string;
-                const command = (data.command || "") as string;
-                const isFail = exitCode !== 0;
-                playSound(isFail ? "glitch" : "mission_complete");
-
-                const statusLine = isFail
-                  ? t("tool.cmdFailed", { hp: "0" })
-                  : t("tool.cmdSuccess");
-                const outputPreview =
-                  cmdOutput.length > 1500
-                    ? cmdOutput.slice(0, 750) +
-                      "\n...\n" +
-                      cmdOutput.slice(-500)
-                    : cmdOutput;
-
-                let content = `**${statusLine}**\n\n\`\`\`\n$ ${command}\n${outputPreview}\n\`\`\``;
-                if (isFail) {
-                  content += `\n\n_${t("tool.cmdRepairHint")}_`;
-                }
-
-                addMessage({
-                  role: "system",
-                  content,
-                  type: "command_result",
-                });
-              }
-
-              // Blast radius event (pre-commit scan)
-              if (data.type === "blast_radius") {
-                playSound("alert");
-                const count = data.count as number;
-                const isHigh = data.high as boolean;
-                const dependents = (data.dependents || []) as string[];
-                const file = (data.file || "") as string;
-                const warningText = isHigh
-                  ? t("blast.warning", { count: String(count) })
-                  : t("blast.low", { count: String(count) });
-                const meta = JSON.stringify({ dependents, high: isHigh, file });
-                addMessage({
-                  role: "system",
-                  content: `${warningText}\n---meta---\n${meta}`,
-                  type: "blast_radius",
-                });
-                // Store for map highlighting
-                useGameStore.getState().setBlastRadius(file, dependents);
-              }
+              const updatedAgent = await api.getStatus();
+              setAgent(updatedAgent);
             } catch {
-              // ignore parse errors
+              // ignore
+            }
+            streamDone = true;
+            return;
+          }
+
+          // Error event from backend
+          if (data.type === "error") {
+            console.error("[OmniChat] Backend error event:", data.error);
+            updateMessageById(
+              assistantMsgId,
+              data.error || t("ai.streamError"),
+            );
+            streamDone = true;
+            return;
+          }
+
+          // Text chunk (both old format and new type:text format)
+          if (data.text) {
+            accumulated += data.text;
+            updateMessageById(assistantMsgId, accumulated);
+          }
+
+          // Tool call event
+          if (data.type === "tool_call") {
+            playSound("tool_start");
+            const displayName = getToolDisplayName(data.tool_name);
+            const pathInfo = data.input?.path ? ` ${data.input.path}` : "";
+            addActionLog({
+              action: `[EXECUTING]: ${displayName}${pathInfo}`,
+              status: "pending",
+              toolName: data.tool_name,
+              toolId: data.tool_id,
+            });
+          }
+
+          // Tool result event
+          if (data.type === "tool_result") {
+            playSound(
+              data.status === "success" ? "mission_complete" : "tool_error",
+            );
+            const displayName = getToolDisplayName(data.tool_name);
+            addActionLog({
+              action: `[DATA_ACQUIRED]: ${displayName} — ${data.summary}`,
+              status: data.status === "success" ? "done" : "error",
+              toolName: data.tool_name,
+              toolId: data.tool_id,
+              bytesProcessed: data.bytes_processed,
+            });
+          }
+
+          // Tool diff event (for write operations)
+          if (data.type === "tool_diff") {
+            addActionCard({
+              fileName: data.file_name || "file",
+              status: "patched",
+              filePath: data.file_path || "",
+              oldContent: data.old_content,
+              newContent: data.new_content,
+            });
+          }
+
+          // Command result event (run_command)
+          if (data.type === "command_result") {
+            const exitCode = data.exit_code as number;
+            const cmdOutput = (data.output || "") as string;
+            const command = (data.command || "") as string;
+            const isFail = exitCode !== 0;
+            playSound(isFail ? "glitch" : "mission_complete");
+
+            const statusLine = isFail
+              ? t("tool.cmdFailed", { hp: "0" })
+              : t("tool.cmdSuccess");
+            const outputPreview =
+              cmdOutput.length > 1500
+                ? cmdOutput.slice(0, 750) +
+                  "\n...\n" +
+                  cmdOutput.slice(-500)
+                : cmdOutput;
+
+            let content = `**${statusLine}**\n\n\`\`\`\n$ ${command}\n${outputPreview}\n\`\`\``;
+            if (isFail) {
+              content += `\n\n_${t("tool.cmdRepairHint")}_`;
+            }
+
+            addMessage({
+              role: "system",
+              content,
+              type: "command_result",
+            });
+          }
+
+          // Blast radius event (pre-commit scan)
+          if (data.type === "blast_radius") {
+            playSound("alert");
+            const count = data.count as number;
+            const isHigh = data.high as boolean;
+            const dependents = (data.dependents || []) as string[];
+            const file = (data.file || "") as string;
+            const warningText = isHigh
+              ? t("blast.warning", { count: String(count) })
+              : t("blast.low", { count: String(count) });
+            const meta = JSON.stringify({ dependents, high: isHigh, file });
+            addMessage({
+              role: "system",
+              content: `${warningText}\n---meta---\n${meta}`,
+              type: "blast_radius",
+            });
+            // Store for map highlighting
+            useGameStore.getState().setBlastRadius(file, dependents);
+          }
+        };
+
+        while (!streamDone) {
+          const { done, value } = await reader.read();
+
+          // Decode chunk (flush remaining bytes when stream ends)
+          const chunk = done
+            ? decoder.decode(new Uint8Array(), { stream: false })
+            : decoder.decode(value, { stream: true });
+
+          if (chunk) {
+            // Prepend any leftover from previous chunk
+            const text = lineBuffer + chunk;
+            const lines = text.split("\n");
+
+            // Last element may be incomplete — keep it in buffer
+            lineBuffer = lines.pop() ?? "";
+
+            for (const line of lines) {
+              if (!line.startsWith("data: ")) continue;
+              try {
+                await processLine(line);
+                if (streamDone) break;
+              } catch {
+                // ignore parse errors for malformed SSE lines
+              }
             }
           }
+
+          if (done) break;
         }
       } catch (e) {
         console.error("[OmniChat] Stream error:", e);

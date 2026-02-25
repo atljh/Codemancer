@@ -1,3 +1,4 @@
+import asyncio
 import json
 from pathlib import Path
 
@@ -213,6 +214,16 @@ async def chat_stream(req: ChatRequest):
         fs = FileService(workspace_root=workspace_root)
         tool_executor = ToolExecutor(fs)
 
+    _sentinel = object()
+
+    async def _anext_sync(gen: Generator) -> dict | object:
+        """Get next item from a sync generator in a thread pool."""
+        return await asyncio.to_thread(next, gen, _sentinel)
+
+    async def _run_tool(executor: ToolExecutor, name: str, tid: str, inp: dict):
+        """Run tool execution in a thread pool (file I/O, subprocess)."""
+        return await asyncio.to_thread(executor.execute, name, tid, inp)
+
     async def event_generator():
         nonlocal messages
         total_tokens = 0
@@ -233,7 +244,12 @@ async def chat_stream(req: ChatRequest):
                 tool_calls: list[dict] = []
                 stop_reason = "end_turn"
 
-                for chunk in stream:
+                # Iterate the sync generator via thread pool so we don't
+                # block the event loop while waiting for LLM tokens
+                while True:
+                    chunk = await _anext_sync(stream)
+                    if chunk is _sentinel:
+                        break
                     if chunk.get("done"):
                         total_tokens += chunk.get("tokens_used", 0)
                         stop_reason = chunk.get("stop_reason", "end_turn")
@@ -269,8 +285,8 @@ async def chat_stream(req: ChatRequest):
                     # Send tool_call event to frontend
                     yield f"data: {json.dumps({'type': 'tool_call', 'tool_id': tc['id'], 'tool_name': tc['name'], 'input': tc['input']})}\n\n"
 
-                    # Execute
-                    result = tool_executor.execute(tc["name"], tc["id"], tc["input"])
+                    # Execute in thread pool to avoid blocking event loop
+                    result = await _run_tool(tool_executor, tc["name"], tc["id"], tc["input"])
 
                     # Update agent stats
                     if agent:
