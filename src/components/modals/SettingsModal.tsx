@@ -20,6 +20,7 @@ import {
   Pencil,
   Radio,
   Volume2,
+  ShieldCheck,
 } from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
@@ -853,6 +854,57 @@ function IntegrationsTab({
           </div>
           <p className="text-[11px] text-theme-text-dimmer font-mono">
             {t("settings.supervisorSandboxHint")}
+          </p>
+        </div>
+      </div>
+
+      {/* Shadow Auditor */}
+      <div className="mt-5 pt-4 border-t border-[var(--theme-glass-border)]">
+        <div className="flex items-center gap-2 mb-3">
+          <ShieldCheck
+            className="w-3.5 h-3.5 text-purple-400/60"
+            strokeWidth={1.5}
+          />
+          <h3 className="text-xs font-mono font-bold text-theme-text-dim uppercase tracking-[0.15em]">
+            {t("settings.shadowSection")}
+          </h3>
+        </div>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={draft.shadow_audit_enabled}
+                onChange={(e) =>
+                  setDraft({ ...draft, shadow_audit_enabled: e.target.checked })
+                }
+                className="accent-purple-400"
+              />
+              <span className="text-[11px] font-mono text-theme-text-dim tracking-wider">
+                {t("settings.shadowAudit")}
+              </span>
+            </label>
+          </div>
+          <p className="text-[11px] text-theme-text-dimmer font-mono">
+            {t("settings.shadowAuditHint")}
+          </p>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={draft.shadow_auto_tests_enabled}
+                onChange={(e) =>
+                  setDraft({ ...draft, shadow_auto_tests_enabled: e.target.checked })
+                }
+                className="accent-purple-400"
+              />
+              <span className="text-[11px] font-mono text-theme-text-dim tracking-wider">
+                {t("settings.shadowAutoTests")}
+              </span>
+            </label>
+          </div>
+          <p className="text-[11px] text-theme-text-dimmer font-mono">
+            {t("settings.shadowAutoTestsHint")}
           </p>
         </div>
       </div>

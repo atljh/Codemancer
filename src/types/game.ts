@@ -80,7 +80,8 @@ export interface ChatMessage {
     | "command_result"
     | "proactive_log"
     | "intel_entry"
-    | "agent_proposal";
+    | "agent_proposal"
+    | "shadow_audit";
   actionCard?: ActionCardData;
   actionLog?: ActionLogData;
   images?: ImageAttachment[];
@@ -182,6 +183,9 @@ export interface AppSettings {
   // Agentic Supervisor
   supervisor_enabled: boolean;
   supervisor_sandbox_mode: boolean;
+  // Shadow Auditor
+  shadow_audit_enabled: boolean;
+  shadow_auto_tests_enabled: boolean;
 }
 
 export interface ProjectScanResult {
@@ -505,6 +509,40 @@ export interface ActionPlan {
   updated_at: string;
   affected_files: string[];
   execution_log: string[];
+}
+
+// Shadow Auditor types
+export interface SignatureChange {
+  kind: string;
+  name: string;
+  change_type: "added" | "removed" | "modified";
+  old_signature: string | null;
+  new_signature: string | null;
+  line: number | null;
+}
+
+export interface SignatureReport {
+  file_path: string;
+  changes: SignatureChange[];
+  has_breaking: boolean;
+  dependent_count: number;
+}
+
+export interface VerificationResult {
+  file_path: string;
+  status: "pending" | "pass" | "fail" | "error" | "skipped";
+  test_count: number;
+  passed: number;
+  failed: number;
+  error_message: string;
+  completed_at: string | null;
+}
+
+export interface PendingVerificationEntry {
+  status: "pending" | "verified" | "failed" | "skipped";
+  signatureChanges: SignatureChange[];
+  testResults: VerificationResult | null;
+  timestamp: number;
 }
 
 export type CommsAuthState =

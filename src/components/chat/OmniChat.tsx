@@ -9,6 +9,7 @@ import { BlastRadiusBubble } from "./BlastRadiusBubble";
 import { ProactiveLogBubble } from "./ProactiveLogBubble";
 import { IntelBubble } from "./IntelBubble";
 import { AgentProposalCard } from "./AgentProposalCard";
+import { ShadowAuditBubble } from "./ShadowAuditBubble";
 import { MissionObjective } from "./MissionObjective";
 import { CommandInput } from "./CommandInput";
 import { ConversationDrawer } from "./ConversationDrawer";
@@ -84,6 +85,7 @@ export function OmniChat() {
               "proactive_log",
               "intel_entry",
               "agent_proposal",
+              "shadow_audit",
             ].includes(m.type!),
         );
       try {
@@ -553,6 +555,25 @@ export function OmniChat() {
             });
           }
 
+          // Shadow audit event (signature analysis)
+          if (data.type === "shadow_audit") {
+            const hasBreaking = data.has_breaking as boolean;
+            if (hasBreaking) playSound("alert");
+            const meta = JSON.stringify(data);
+            addMessage({
+              role: "system",
+              content: `${hasBreaking ? "[SIGNATURE_BREACH]" : "[SHADOW_AUDIT]"}\n---meta---\n${meta}`,
+              type: "shadow_audit",
+            });
+            // Mark file as pending verification
+            useGameStore.getState().setPendingVerification(data.file_path, {
+              status: "pending",
+              signatureChanges: data.changes || [],
+              testResults: null,
+              timestamp: Date.now(),
+            });
+          }
+
           // Blast radius event (pre-commit scan)
           if (data.type === "blast_radius") {
             playSound("alert");
@@ -695,6 +716,9 @@ export function OmniChat() {
             }
             if (msg.type === "agent_proposal") {
               return <AgentProposalCard key={msg.id} message={msg} />;
+            }
+            if (msg.type === "shadow_audit") {
+              return <ShadowAuditBubble key={msg.id} message={msg} />;
             }
             if (msg.type === "proactive_log") {
               return <ProactiveLogBubble key={msg.id} message={msg} />;

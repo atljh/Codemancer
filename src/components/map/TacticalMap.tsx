@@ -66,6 +66,13 @@ export function TacticalMap() {
     [supervisorActiveFiles],
   );
 
+  // Shadow Auditor pending verifications
+  const pendingVerification = useGameStore((s) => s.pendingVerification);
+  const pendingVerifSet = useMemo(
+    () => new Set(Object.keys(pendingVerification)),
+    [pendingVerification],
+  );
+
   // Observe container size
   useEffect(() => {
     const el = containerRef.current;
@@ -294,6 +301,11 @@ export function TacticalMap() {
             SUPERVISOR ({supervisorFileSet.size})
           </span>
         )}
+        {pendingVerifSet.size > 0 && (
+          <span className="text-[9px] font-mono px-2 py-1 rounded bg-orange-500/15 text-orange-400 animate-glow-pulse">
+            VERIFYING ({pendingVerifSet.size})
+          </span>
+        )}
         <button
           onClick={resetView}
           className="text-[9px] font-mono px-2 py-1 rounded bg-white/5 text-theme-text-dim hover:text-theme-text hover:bg-white/8"
@@ -417,6 +429,10 @@ export function TacticalMap() {
             supervisorFileSet.has(ln.id) ||
             supervisorFileSet.has(ln.node.path) ||
             supervisorFileSet.has(fullNodePath);
+          const isPendingVerif =
+            pendingVerifSet.has(ln.id) ||
+            pendingVerifSet.has(ln.node.path) ||
+            pendingVerifSet.has(fullNodePath);
           const showLabel =
             isActive ||
             isDependent ||
@@ -427,7 +443,8 @@ export function TacticalMap() {
             isBountyTarget ||
             isMissionSector ||
             isRefinery ||
-            isSupervisor;
+            isSupervisor ||
+            isPendingVerif;
 
           let fill = "var(--theme-accent)";
           // If fog of war is on but no files are open, show all nodes normally
@@ -449,6 +466,19 @@ export function TacticalMap() {
           } else if (isBlastTarget) {
             fill = "hsl(30, 70%, 50%)";
             nodeOpacity = 0.9;
+          } else if (isPendingVerif) {
+            const verifEntry =
+              pendingVerification[ln.id] ||
+              pendingVerification[ln.node.path] ||
+              pendingVerification[fullNodePath];
+            if (verifEntry?.status === "verified") {
+              fill = "hsl(140, 70%, 50%)";
+            } else if (verifEntry?.status === "failed") {
+              fill = "hsl(0, 80%, 55%)";
+            } else {
+              fill = "hsl(30, 90%, 55%)";
+            }
+            nodeOpacity = 1;
           } else if (isSupervisor) {
             fill = "hsl(45, 90%, 55%)";
             nodeOpacity = 1;
@@ -490,7 +520,13 @@ export function TacticalMap() {
                 className={
                   isBountySource || isBountyTarget
                     ? "animate-bounty-pulse"
-                    : undefined
+                    : isPendingVerif
+                      ? pendingVerification[ln.id]?.status === "verified" ||
+                        pendingVerification[ln.node.path]?.status === "verified" ||
+                        pendingVerification[fullNodePath]?.status === "verified"
+                        ? "animate-verified-flash"
+                        : "animate-shadow-pulse"
+                      : undefined
                 }
               />
               {showLabel && (

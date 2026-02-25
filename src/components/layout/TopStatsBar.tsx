@@ -17,6 +17,7 @@ import {
 import { open } from "@tauri-apps/plugin-dialog";
 import { FocusTimer } from "../focus/FocusTimer";
 import { WaveformVisualizer } from "../ui/WaveformVisualizer";
+import { IntegrityHeartbeat } from "../ui/IntegrityHeartbeat";
 import { useGameStore } from "../../stores/gameStore";
 import { useApi } from "../../hooks/useApi";
 import { useAudio } from "../../hooks/useAudio";
@@ -306,6 +307,7 @@ export function TopStatsBar() {
           <span className={`text-[10px] font-mono tabular-nums ${integrityColor}`}>
             {agent.integrity_score.toFixed(1)}%
           </span>
+          <IntegrityHeartbeat integrityScore={agent.integrity_score} className="ml-1" />
         </div>
 
         {/* Status */}

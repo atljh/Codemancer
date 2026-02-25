@@ -578,6 +578,32 @@ const translations = {
     "supervisor.signalContext": "Signal context",
     "activity.supervisorProposal":
       "[AGENTIC_SUPERVISOR]: New action plan generated for sector '{sector}'. Awaiting authorization.",
+    "activity.sectorVerified":
+      "[SECTOR_VERIFIED]: Shadow tests passed. Deployment integrity confirmed.",
+    "activity.logicCollision":
+      "[LOGIC_COLLISION]: Shadow test failure detected. Review recommended.",
+
+    // Shadow Auditor
+    "shadow.title": "[SHADOW_AUDIT]",
+    "shadow.signatureBreach": "[SIGNATURE_BREACH]",
+    "shadow.auditClean": "No signature changes detected",
+    "shadow.verifying": "VERIFYING",
+    "shadow.verified": "VERIFIED",
+    "shadow.logicCollision": "LOGIC COLLISION",
+    "shadow.noRunner": "No test runner detected",
+    "shadow.dependents": "Dependent files",
+    "shadow.openMap": "SHOW ON MAP",
+    "shadow.added": "ADDED",
+    "shadow.removed": "REMOVED",
+    "shadow.modified": "MODIFIED",
+    "settings.shadowAudit": "Shadow Audit (signature analysis)",
+    "settings.shadowAuditHint":
+      "Analyzes function/class signature changes on every file write. Lightweight, no API cost.",
+    "settings.shadowAutoTests": "Auto-generate shadow tests",
+    "settings.shadowAutoTestsHint":
+      "Uses AI to generate and run tests after file writes. Consumes API credits.",
+    "settings.shadowSection": "Shadow Auditor",
+
     "settings.tabIntegrations": "Integrations",
     "settings.supervisorSection": "Agentic Supervisor",
     "settings.supervisorEnabled": "Enable Supervisor",
@@ -1165,6 +1191,32 @@ const translations = {
     "supervisor.signalContext": "Контекст сигнала",
     "activity.supervisorProposal":
       "[AGENTIC_SUPERVISOR]: Сгенерирован план действий для сектора '{sector}'. Ожидание авторизации.",
+    "activity.sectorVerified":
+      "[SECTOR_VERIFIED]: Теневые тесты пройдены. Целостность развёртывания подтверждена.",
+    "activity.logicCollision":
+      "[LOGIC_COLLISION]: Обнаружен сбой теневых тестов. Рекомендуется ревью.",
+
+    // Shadow Auditor
+    "shadow.title": "[SHADOW_AUDIT]",
+    "shadow.signatureBreach": "[SIGNATURE_BREACH]",
+    "shadow.auditClean": "Изменений сигнатур не обнаружено",
+    "shadow.verifying": "ВЕРИФИКАЦИЯ",
+    "shadow.verified": "ВЕРИФИЦИРОВАНО",
+    "shadow.logicCollision": "КОЛЛИЗИЯ ЛОГИКИ",
+    "shadow.noRunner": "Тестовый раннер не обнаружен",
+    "shadow.dependents": "Зависимые файлы",
+    "shadow.openMap": "ПОКАЗАТЬ НА КАРТЕ",
+    "shadow.added": "ДОБАВЛЕНО",
+    "shadow.removed": "УДАЛЕНО",
+    "shadow.modified": "ИЗМЕНЕНО",
+    "settings.shadowAudit": "Shadow Audit (анализ сигнатур)",
+    "settings.shadowAuditHint":
+      "Анализирует изменения сигнатур функций/классов при каждой записи файла. Лёгкий, без расхода API.",
+    "settings.shadowAutoTests": "Автогенерация теневых тестов",
+    "settings.shadowAutoTestsHint":
+      "Использует AI для генерации и запуска тестов после записи файлов. Расходует кредиты API.",
+    "settings.shadowSection": "Shadow Auditor",
+
     "settings.tabIntegrations": "Интеграции",
     "settings.supervisorSection": "Агент-супервизор",
     "settings.supervisorEnabled": "Включить супервизор",

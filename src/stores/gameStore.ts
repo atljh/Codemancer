@@ -19,6 +19,7 @@ import type {
   Operation,
   RefineryStatus,
   UnifiedSignal,
+  PendingVerificationEntry,
 } from "../types/game";
 
 interface GameState {
@@ -127,6 +128,9 @@ interface GameState {
   // Agentic Supervisor
   supervisorProposalCount: number;
   supervisorActiveFiles: string[];
+
+  // Shadow Auditor
+  pendingVerification: Record<string, PendingVerificationEntry>;
 
   // Actions
   setAgent: (agent: AgentStatus) => void;
@@ -248,6 +252,11 @@ interface GameState {
   setSupervisorProposalCount: (count: number) => void;
   setSupervisorActiveFiles: (files: string[]) => void;
 
+  // Shadow Auditor actions
+  setPendingVerification: (filePath: string, entry: PendingVerificationEntry) => void;
+  clearVerification: (filePath: string) => void;
+  clearAllVerifications: () => void;
+
   // MissionControl actions
   setOperations: (ops: Operation[]) => void;
   addOperation: (op: Operation) => void;
@@ -306,6 +315,8 @@ const defaultSettings: AppSettings = {
   signal_hide_low_priority: false,
   supervisor_enabled: false,
   supervisor_sandbox_mode: true,
+  shadow_audit_enabled: true,
+  shadow_auto_tests_enabled: false,
 };
 
 export const useGameStore = create<GameState>((set) => ({
@@ -376,6 +387,7 @@ export const useGameStore = create<GameState>((set) => ({
   refineryNewCount: 0,
   supervisorProposalCount: 0,
   supervisorActiveFiles: [],
+  pendingVerification: {},
 
   setAgent: (agent) => set({ agent }),
   setQuests: (quests) => set({ quests }),
@@ -599,6 +611,18 @@ export const useGameStore = create<GameState>((set) => ({
   // Agentic Supervisor
   setSupervisorProposalCount: (count) => set({ supervisorProposalCount: count }),
   setSupervisorActiveFiles: (files) => set({ supervisorActiveFiles: files }),
+
+  // Shadow Auditor
+  setPendingVerification: (filePath, entry) =>
+    set((s) => ({
+      pendingVerification: { ...s.pendingVerification, [filePath]: entry },
+    })),
+  clearVerification: (filePath) =>
+    set((s) => {
+      const { [filePath]: _, ...rest } = s.pendingVerification;
+      return { pendingVerification: rest };
+    }),
+  clearAllVerifications: () => set({ pendingVerification: {} }),
 
   // MissionControl
   setOperations: (ops) => set({ operations: ops }),

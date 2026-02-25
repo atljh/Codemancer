@@ -33,6 +33,7 @@ import type {
   UnifiedSignal,
   RefineryStatus,
   ActionPlan,
+  VerificationResult,
 } from "../types/game";
 
 const API_BASE = "http://127.0.0.1:8420";
@@ -567,6 +568,15 @@ const api = {
 
   getSupervisorProposalCount: () =>
     fetchJson<{ count: number }>("/api/supervisor/proposals/count"),
+
+  // Shadow Auditor
+  getShadowAuditPending: () =>
+    fetchJson<Record<string, VerificationResult>>("/api/shadow-audit/pending"),
+  shadowAuditReverify: (filePath: string) =>
+    fetchJson<{ ok: boolean }>("/api/shadow-audit/reverify", {
+      method: "POST",
+      body: JSON.stringify({ file_path: filePath }),
+    }),
 };
 
 export { api };

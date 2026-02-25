@@ -162,7 +162,20 @@ export function useAgentActivity() {
       }
       prev.supervisorProposalCount = state.supervisorProposalCount;
 
-      // 6) FILE_SAVED
+      // 6) SHADOW_AUDIT: verification results
+      const verifEntries = Object.entries(state.pendingVerification);
+      for (const [, entry] of verifEntries) {
+        if (entry.status === "failed" && entry.timestamp > (prev.lastSaveTime || 0)) {
+          emit(t(state.locale, "activity.logicCollision"));
+          break;
+        }
+        if (entry.status === "verified" && entry.timestamp > (prev.lastSaveTime || 0)) {
+          emit(t(state.locale, "activity.sectorVerified"));
+          break;
+        }
+      }
+
+      // 7) FILE_SAVED
       if (
         state.lastSaveTime &&
         state.lastSaveTime !== prev.lastSaveTime

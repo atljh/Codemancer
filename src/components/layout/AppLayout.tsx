@@ -24,6 +24,7 @@ import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
 import { useHealthWatch } from "../../hooks/useHealthWatch";
 import { useProactivePulse } from "../../hooks/useProactivePulse";
 import { useSupervisorPolling } from "../../hooks/useSupervisorPolling";
+import { useShadowPolling } from "../../hooks/useShadowPolling";
 import { useGameStore } from "../../stores/gameStore";
 
 export function AppLayout() {
@@ -31,6 +32,7 @@ export function AppLayout() {
   useHealthWatch();
   useProactivePulse();
   useSupervisorPolling();
+  useShadowPolling();
   const appReady = useGameStore((s) => s.appReady);
   const workspaceRoot = useGameStore((s) => s.settings.workspace_root);
   const showGitPanel = useGameStore((s) => s.showGitPanel);
