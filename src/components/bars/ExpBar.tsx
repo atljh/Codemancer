@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useGameStore } from "../../stores/gameStore";
+import { useTranslation } from "../../hooks/useTranslation";
 import { themes } from "../../themes/themeConfig";
 import type { ThemeId } from "../../types/game";
 
@@ -8,6 +9,7 @@ const SEGMENTS = 24;
 export function ExpBar() {
   const player = useGameStore((s) => s.player);
   const currentTheme = useGameStore((s) => s.settings.theme);
+  const { t } = useTranslation();
   const accentHue = themes[currentTheme as ThemeId]?.accentHue ?? 190;
   const pct = player.exp_progress;
   const filledSegments = Math.round(pct * SEGMENTS);
@@ -16,7 +18,7 @@ export function ExpBar() {
     <div className="space-y-0.5">
       <div className="flex justify-between items-center">
         <span className="text-[10px] font-bold tracking-widest uppercase text-theme-accent">
-          EXP
+          {t("stats.exp")}
         </span>
         <span className="text-[10px] text-theme-text-dim font-mono tabular-nums">
           {player.total_exp} / {player.exp_for_next_level}

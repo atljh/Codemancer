@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Settings,
   FolderOpen,
-  Shield,
+  Hexagon,
   HardDrive,
   ChevronDown,
   GitBranch,
@@ -12,6 +12,7 @@ import {
   Volume2,
   VolumeX,
   Wrench,
+  Crosshair,
 } from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { StatBar } from "../bars/StatBar";
@@ -56,6 +57,8 @@ export function TopStatsBar() {
   const setTtsEnabled = useGameStore((s) => s.setTtsEnabled);
   const selfRepairActive = useGameStore((s) => s.selfRepairActive);
   const setSelfRepairActive = useGameStore((s) => s.setSelfRepairActive);
+  const showMissionControl = useGameStore((s) => s.showMissionControl);
+  const toggleMissionControl = useGameStore((s) => s.toggleMissionControl);
   const api = useApi();
   const { playSound, stopRepairMusic } = useAudio();
   const { t } = useTranslation();
@@ -223,16 +226,16 @@ export function TopStatsBar() {
 
   return (
     <div className="h-11 flex items-center gap-4 px-4 glass-panel border-b border-[var(--theme-glass-border)] shrink-0">
-      {/* Operative ID + Level */}
+      {/* Commander ID + Clearance */}
       <div className="flex items-center gap-2">
         <div className="w-6 h-6 rounded glass-panel-bright flex items-center justify-center animate-glow-pulse">
-          <Shield className="w-3 h-3 text-theme-accent" strokeWidth={1.5} />
+          <Hexagon className="w-3 h-3 text-theme-accent" strokeWidth={1.5} />
         </div>
         <span className="text-xs font-bold text-theme-text tracking-wide uppercase">
           {player.name}
         </span>
         <span className="text-[10px] text-theme-accent font-mono font-bold tracking-wider">
-          LV.{player.level}
+          {t("stats.level").toUpperCase()} {player.level}
         </span>
       </div>
 
@@ -291,14 +294,14 @@ export function TopStatsBar() {
       {/* Divider */}
       <div className="w-px h-5 bg-[var(--theme-glass-border)]" />
 
-      {/* Stat Bars */}
+      {/* Bridge Gauges */}
       <div className="flex items-center gap-4 flex-1 max-w-lg">
         <div className="flex-1">
           <StatBar
             label={t("stats.hp")}
             current={player.hp}
             max={player.max_hp}
-            color="red"
+            color="integrity"
           />
         </div>
         <div className="flex-1">
@@ -306,7 +309,7 @@ export function TopStatsBar() {
             label={t("stats.mp")}
             current={player.mp}
             max={player.max_mp}
-            color="purple"
+            color="thermal"
           />
         </div>
         <div className="flex-1">
@@ -364,7 +367,18 @@ export function TopStatsBar() {
         </button>
       </div>
 
-      {/* Self-Repair + Chronicle + Health + Explorer + Git + Settings */}
+      {/* Bridge + Self-Repair + Chronicle + Health + Explorer + Git + Settings */}
+      <button
+        onClick={toggleMissionControl}
+        className={`p-1.5 rounded transition-colors ${
+          showMissionControl
+            ? "bg-theme-accent/15 text-theme-accent"
+            : "hover:bg-theme-accent/8 text-theme-text-dim hover:text-theme-accent"
+        }`}
+        title={t("bridge.title")}
+      >
+        <Crosshair className="w-4 h-4" strokeWidth={1.5} />
+      </button>
       <button
         onClick={handleSelfRepair}
         disabled={selfRepairActive}

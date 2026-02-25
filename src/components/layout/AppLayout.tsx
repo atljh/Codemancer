@@ -1,3 +1,4 @@
+import { useCallback, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
 import { TopStatsBar } from "./TopStatsBar";
 import { OmniChat } from "../chat/OmniChat";
@@ -15,6 +16,8 @@ import { IntelFeedPanel } from "../chronicle/IntelFeedPanel";
 import { HealthPanel } from "../health/HealthPanel";
 import { TacticalMap } from "../map/TacticalMap";
 import { CommsPanel } from "../comms/CommsPanel";
+import { MissionControl } from "../mission/MissionControl";
+import { MissionBriefing } from "../mission/MissionBriefing";
 import { QuickOpenModal } from "../modals/QuickOpenModal";
 import { CommandPaletteModal } from "../modals/CommandPaletteModal";
 import { GoToLineDialog } from "../modals/GoToLineDialog";
@@ -38,6 +41,21 @@ export function AppLayout() {
   const playerHp = useGameStore((s) => s.player.hp);
   const playerMaxHp = useGameStore((s) => s.player.max_hp);
   const isLowHp = playerMaxHp > 0 && playerHp / playerMaxHp < 0.2;
+
+  // Holographic parallax — track mouse and apply subtle offset
+  const holographicRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number>(0);
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      if (!holographicRef.current) return;
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      const dx = ((e.clientX - cx) / cx) * 1.5;
+      const dy = ((e.clientY - cy) / cy) * 1.5;
+      holographicRef.current.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+  }, []);
 
   const showWelcome = appReady && !workspaceRoot;
 
@@ -68,6 +86,7 @@ export function AppLayout() {
     <EditorRefProvider>
       <div
         className={`h-screen w-screen flex flex-col bg-theme-bg-deep text-theme-text overflow-hidden ${isLowHp ? "low-hp-glitch" : ""}`}
+        onMouseMove={handleMouseMove}
       >
         {/* Tactical grid background */}
         <div className="tactical-grid" />
@@ -76,8 +95,11 @@ export function AppLayout() {
         {/* Low HP vignette */}
         {isLowHp && <div className="low-hp-vignette" />}
 
-        {/* Main content */}
-        <div className="relative z-10 flex flex-col h-full">
+        {/* Main content — holographic parallax layer */}
+        <div
+          ref={holographicRef}
+          className="relative z-10 flex flex-col h-full holographic-layer hologram-flicker"
+        >
           <TopStatsBar />
           <main className="flex-1 flex overflow-hidden">
             <AnimatePresence>
@@ -90,6 +112,8 @@ export function AppLayout() {
               <EditorTabs />
               {activeTab === "chat" ? (
                 <OmniChat />
+              ) : activeTab === "bridge" ? (
+                <MissionControl />
               ) : activeTab === "map" ? (
                 <TacticalMap />
               ) : activeTab === "comms" ? (
@@ -109,6 +133,7 @@ export function AppLayout() {
       <ChroniclePanel />
       <IntelFeedPanel />
       <HealthPanel />
+      <MissionBriefing />
       <QuickOpenModal />
       <CommandPaletteModal />
       <GoToLineDialog />

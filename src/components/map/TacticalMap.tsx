@@ -32,6 +32,14 @@ export function TacticalMap() {
   const bountyZoneFiles = useGameStore((s) => s.bountyZoneFiles);
   const bountyZoneSource = useGameStore((s) => s.bountyZoneSource);
   const clearBountyZone = useGameStore((s) => s.clearBountyZone);
+  // Mission operation sectors
+  const operations = useGameStore((s) => s.operations);
+  const selectedOperationId = useGameStore((s) => s.selectedOperationId);
+  const missionSectors = useMemo(() => {
+    if (!selectedOperationId) return new Set<string>();
+    const op = operations.find((o) => o.id === selectedOperationId);
+    return new Set(op?.related_sectors ?? []);
+  }, [selectedOperationId, operations]);
   const openFilePaths = useMemo(
     () => new Set(openFiles.map((f) => f.path)),
     [openFiles],
@@ -247,6 +255,11 @@ export function TacticalMap() {
             BOUNTY ZONE
           </button>
         )}
+        {missionSectors.size > 0 && (
+          <span className="text-[9px] font-mono px-2 py-1 rounded bg-theme-accent/15 text-theme-accent animate-glow-pulse">
+            OP SECTORS ({missionSectors.size})
+          </span>
+        )}
         <button
           onClick={resetView}
           className="text-[9px] font-mono px-2 py-1 rounded bg-white/5 text-theme-text-dim hover:text-theme-text hover:bg-white/8"
@@ -362,6 +375,7 @@ export function TacticalMap() {
           const isBlastTarget = blastSet.has(ln.id);
           const isBountySource = ln.id === bountyZoneSource;
           const isBountyTarget = bountySet.has(ln.id);
+          const isMissionSector = missionSectors.has(ln.id) || missionSectors.has(ln.node.path);
           const showLabel =
             isActive ||
             isDependent ||
@@ -369,7 +383,8 @@ export function TacticalMap() {
             isBlastSource ||
             isBlastTarget ||
             isBountySource ||
-            isBountyTarget;
+            isBountyTarget ||
+            isMissionSector;
 
           let fill = "var(--theme-accent)";
           // If fog of war is on but no files are open, show all nodes normally
@@ -391,6 +406,9 @@ export function TacticalMap() {
           } else if (isBlastTarget) {
             fill = "hsl(30, 70%, 50%)";
             nodeOpacity = 0.9;
+          } else if (isMissionSector) {
+            fill = "hsl(190, 90%, 55%)";
+            nodeOpacity = 1;
           } else if (isDependent) {
             fill = "hsl(0, 70%, 55%)";
             nodeOpacity = 1;

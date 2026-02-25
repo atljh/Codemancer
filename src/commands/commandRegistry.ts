@@ -9,7 +9,7 @@ export interface Command {
   execute: () => void | Promise<void>;
 }
 
-const TAB_ORDER = ["chat", "map"] as const;
+const TAB_ORDER = ["chat", "bridge", "map", "comms"] as const;
 
 export function cycleTab(direction: 1 | -1) {
   const { activeTab, openFiles, setActiveTab } = useGameStore.getState();
@@ -81,7 +81,8 @@ export function getCommands(): Command[] {
       category: "File",
       execute: () => {
         const { activeTab, closeFile } = useGameStore.getState();
-        if (activeTab !== "chat" && activeTab !== "map") closeFile(activeTab);
+        const systemTabs = ["chat", "bridge", "map", "comms"];
+        if (!systemTabs.includes(activeTab)) closeFile(activeTab);
       },
     },
     {
@@ -128,6 +129,13 @@ export function getCommands(): Command[] {
       shortcut: "⇧⌘H",
       category: "View",
       execute: () => useGameStore.getState().toggleHealthPanel(),
+    },
+    {
+      id: "view.toggleBridge",
+      labelKey: "cmd.toggleBridge",
+      shortcut: "⇧⌘B",
+      category: "View",
+      execute: () => useGameStore.getState().setActiveTab("bridge"),
     },
     {
       id: "view.toggleIntelFeed",
@@ -267,11 +275,11 @@ export function getCommands(): Command[] {
       },
     },
 
-    // --- Quests ---
+    // --- Operations ---
     {
       id: "quests.scanTodos",
       labelKey: "cmd.scanTodos",
-      category: "Quests",
+      category: "Operations",
       execute: async () => {
         const { fileTreeRoot } = useGameStore.getState();
         if (fileTreeRoot) {

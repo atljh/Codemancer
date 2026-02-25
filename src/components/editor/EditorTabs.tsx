@@ -1,4 +1,4 @@
-import { MessageSquare, FileText, X, Map, Radio } from "lucide-react";
+import { Terminal, FileText, X, Map, Radio, Crosshair } from "lucide-react";
 import { useGameStore } from "../../stores/gameStore";
 import { useTranslation } from "../../hooks/useTranslation";
 
@@ -9,43 +9,35 @@ export function EditorTabs() {
   const setActiveTab = useGameStore((s) => s.setActiveTab);
   const closeFile = useGameStore((s) => s.closeFile);
 
+  const tabClass = (tab: string) =>
+    `flex items-center gap-1.5 px-3 h-full text-[11px] font-mono shrink-0 border-r border-[var(--theme-glass-border)] transition-colors ${
+      activeTab === tab
+        ? "bg-theme-accent/10 text-theme-accent"
+        : "text-theme-text-dim hover:text-theme-text hover:bg-white/3"
+    }`;
+
   return (
     <div className="flex items-center h-8 shrink-0 border-b border-[var(--theme-glass-border)] glass-panel overflow-x-auto scrollbar-thin">
-      {/* Chat tab — always first */}
-      <button
-        onClick={() => setActiveTab("chat")}
-        className={`flex items-center gap-1.5 px-3 h-full text-[11px] font-mono shrink-0 border-r border-[var(--theme-glass-border)] transition-colors ${
-          activeTab === "chat"
-            ? "bg-theme-accent/10 text-theme-accent"
-            : "text-theme-text-dim hover:text-theme-text hover:bg-white/3"
-        }`}
-      >
-        <MessageSquare className="w-3 h-3" strokeWidth={1.5} />
+      {/* Console tab — always first */}
+      <button onClick={() => setActiveTab("chat")} className={tabClass("chat")}>
+        <Terminal className="w-3 h-3" strokeWidth={1.5} />
         {t("editor.tabs.chat")}
       </button>
 
-      {/* Map tab */}
-      <button
-        onClick={() => setActiveTab("map")}
-        className={`flex items-center gap-1.5 px-3 h-full text-[11px] font-mono shrink-0 border-r border-[var(--theme-glass-border)] transition-colors ${
-          activeTab === "map"
-            ? "bg-theme-accent/10 text-theme-accent"
-            : "text-theme-text-dim hover:text-theme-text hover:bg-white/3"
-        }`}
-      >
+      {/* Bridge tab */}
+      <button onClick={() => setActiveTab("bridge")} className={tabClass("bridge")}>
+        <Crosshair className="w-3 h-3" strokeWidth={1.5} />
+        {t("bridge.tab")}
+      </button>
+
+      {/* Strategic Radar tab */}
+      <button onClick={() => setActiveTab("map")} className={tabClass("map")}>
         <Map className="w-3 h-3" strokeWidth={1.5} />
         {t("map.tab")}
       </button>
 
-      {/* COMMS tab */}
-      <button
-        onClick={() => setActiveTab("comms")}
-        className={`flex items-center gap-1.5 px-3 h-full text-[11px] font-mono shrink-0 border-r border-[var(--theme-glass-border)] transition-colors ${
-          activeTab === "comms"
-            ? "bg-theme-accent/10 text-theme-accent"
-            : "text-theme-text-dim hover:text-theme-text hover:bg-white/3"
-        }`}
-      >
+      {/* COMMS Intercept tab */}
+      <button onClick={() => setActiveTab("comms")} className={tabClass("comms")}>
         <Radio className="w-3 h-3" strokeWidth={1.5} />
         {t("comms.tab")}
       </button>

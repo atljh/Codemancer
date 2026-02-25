@@ -4,7 +4,7 @@ interface StatBarProps {
   label: string;
   current: number;
   max: number;
-  color: "cyan" | "purple" | "green" | "red";
+  color: "cyan" | "purple" | "green" | "red" | "integrity" | "thermal";
   className?: string;
 }
 
@@ -34,6 +34,20 @@ const colorMap = {
     text: "text-theme-status-error",
     dimText: "text-theme-status-error/50",
     shadowColor: "var(--theme-status-error)",
+  },
+  // System Integrity — blueish-cyan for bridge aesthetic
+  integrity: {
+    filled: "bg-theme-accent",
+    text: "text-theme-accent",
+    dimText: "text-theme-accent/50",
+    shadowColor: "var(--theme-accent)",
+  },
+  // Core Load — amber/orange for thermal gauge
+  thermal: {
+    filled: "bg-theme-status-warning",
+    text: "text-theme-status-warning",
+    dimText: "text-theme-status-warning/50",
+    shadowColor: "var(--theme-status-warning)",
   },
 };
 

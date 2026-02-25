@@ -49,38 +49,128 @@ body,
 }
 
 /* ═══════════════════════════════════════════════
-   TACTICAL GRID BACKGROUND
+   COMMAND BRIDGE — PERSPECTIVE GRID BACKGROUND
    ═══════════════════════════════════════════════ */
 .tactical-grid {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    rgba(var(--theme-accent-rgb), 0.03) 0%,
+    transparent 60%
+  );
+  overflow: hidden;
+}
+
+/* Perspective grid plane */
+.tactical-grid::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
   background-image:
-    radial-gradient(circle, var(--theme-grid-color) 1px, transparent 1px),
-    linear-gradient(var(--theme-grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--theme-grid-line) 1px, transparent 1px);
-  background-size:
-    20px 20px,
-    80px 80px,
-    80px 80px;
+    linear-gradient(to right, rgba(var(--theme-accent-rgb), 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(var(--theme-accent-rgb), 0.04) 1px, transparent 1px);
+  background-size: 50px 50px;
+  transform: perspective(600px) rotateX(55deg);
+  transform-origin: center 70%;
+  animation: grid-drift 80s linear infinite;
+  mask-image: radial-gradient(ellipse at 50% 70%, black 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 70%, black 30%, transparent 70%);
+}
+
+/* Flat dot grid overlay for non-perspective areas */
+.tactical-grid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(var(--theme-accent-rgb), 0.025) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.6;
+}
+
+@keyframes grid-drift {
+  from { transform: perspective(600px) rotateX(55deg) translateY(0); }
+  to { transform: perspective(600px) rotateX(55deg) translateY(50px); }
 }
 
 /* ═══════════════════════════════════════════════
-   GLASSMORPHISM PANELS
+   GLASSMORPHISM PANELS — BRIDGE EDITION
    ═══════════════════════════════════════════════ */
 .glass-panel {
-  background: var(--theme-glass-bg);
+  background: rgba(16, 18, 27, 0.7);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--theme-glass-border);
+  border: 1px solid rgba(var(--theme-accent-rgb), 0.12);
 }
 
 .glass-panel-bright {
-  background: var(--theme-glass-bg-bright);
+  background: rgba(16, 18, 27, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--theme-glass-border-bright);
+  border: 1px solid rgba(var(--theme-accent-rgb), 0.2);
+}
+
+/* L-bracket corner decoration for bridge panels */
+.bridge-brackets {
+  position: relative;
+}
+
+.bridge-brackets::before,
+.bridge-brackets::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.bridge-brackets::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid rgba(var(--theme-accent-rgb), 0.4);
+  border-left: 2px solid rgba(var(--theme-accent-rgb), 0.4);
+}
+
+.bridge-brackets::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid rgba(var(--theme-accent-rgb), 0.4);
+  border-right: 2px solid rgba(var(--theme-accent-rgb), 0.4);
+}
+
+/* Inner L-brackets (via child element) */
+.bridge-brackets-inner {
+  position: relative;
+}
+
+.bridge-brackets-inner::before,
+.bridge-brackets-inner::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.bridge-brackets-inner::before {
+  top: -1px;
+  right: -1px;
+  border-top: 2px solid rgba(var(--theme-accent-rgb), 0.25);
+  border-right: 2px solid rgba(var(--theme-accent-rgb), 0.25);
+}
+
+.bridge-brackets-inner::after {
+  bottom: -1px;
+  left: -1px;
+  border-bottom: 2px solid rgba(var(--theme-accent-rgb), 0.25);
+  border-left: 2px solid rgba(var(--theme-accent-rgb), 0.25);
 }
 
 /* ═══════════════════════════════════════════════
@@ -199,7 +289,7 @@ body,
   animation: shimmer 4s linear infinite;
 }
 
-/* Scan line CRT effect */
+/* Scan line CRT effect — enhanced bridge scanline */
 @keyframes scanline {
   0% {
     background-position: 0 0;
@@ -214,11 +304,24 @@ body,
     0deg,
     transparent,
     transparent 2px,
-    rgba(var(--theme-accent-rgb), 0.015) 2px,
-    rgba(var(--theme-accent-rgb), 0.015) 4px
+    rgba(var(--theme-accent-rgb), 0.02) 2px,
+    rgba(var(--theme-accent-rgb), 0.02) 4px
   );
   background-size: 100% 200%;
-  animation: scanline 10s linear infinite;
+  animation: scanline 8s linear infinite;
+}
+
+/* Hologram flicker — subtle opacity oscillation */
+@keyframes hologram-flicker {
+  0%   { opacity: 0.97; }
+  25%  { opacity: 1; }
+  50%  { opacity: 0.98; }
+  75%  { opacity: 1; }
+  100% { opacity: 0.97; }
+}
+
+.hologram-flicker {
+  animation: hologram-flicker 4s ease-in-out infinite;
 }
 
 /* Code block flash on appear */
@@ -432,6 +535,137 @@ body,
 
 .animate-bounty-pulse {
   animation: bounty-pulse 1.5s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════
+   COMMAND BRIDGE EFFECTS
+   ═══════════════════════════════════════════════ */
+
+/* Chromatic aberration on hover for interactive elements */
+.bridge-chromatic:hover {
+  text-shadow:
+    -1px 0 rgba(255, 0, 60, 0.3),
+    1px 0 rgba(0, 212, 255, 0.3);
+  transition: text-shadow 0.2s ease;
+}
+
+/* Chromatic aberration for panels */
+.bridge-panel-chromatic:hover {
+  box-shadow:
+    -1px 0 2px rgba(255, 0, 60, 0.08),
+    1px 0 2px rgba(0, 212, 255, 0.08),
+    inset 0 0 30px rgba(var(--theme-accent-rgb), 0.02);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Sector label corners — pseudo-elements for technical panel numbering */
+.sector-label {
+  position: relative;
+}
+
+.sector-label::before {
+  content: attr(data-sector);
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 7px;
+  letter-spacing: 0.15em;
+  color: var(--theme-corner-color);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Critical anomaly red flicker */
+@keyframes anomaly-flicker {
+  0%, 95%, 100% {
+    border-color: var(--theme-glass-border);
+    box-shadow: none;
+  }
+  96% {
+    border-color: rgba(200, 0, 0, 0.5);
+    box-shadow: inset 0 0 20px rgba(200, 0, 0, 0.05);
+  }
+  98% {
+    border-color: var(--theme-glass-border);
+    box-shadow: none;
+  }
+  99% {
+    border-color: rgba(200, 0, 0, 0.3);
+    box-shadow: inset 0 0 15px rgba(200, 0, 0, 0.03);
+  }
+}
+
+.anomaly-flicker {
+  animation: anomaly-flicker 4s ease-in-out infinite;
+}
+
+/* Sector stabilized flash (green confirmation) */
+@keyframes sector-stabilized {
+  0% {
+    border-color: rgba(34, 197, 94, 0.6);
+    box-shadow: inset 0 0 30px rgba(34, 197, 94, 0.1);
+  }
+  100% {
+    border-color: var(--theme-glass-border);
+    box-shadow: none;
+  }
+}
+
+.animate-sector-stabilized {
+  animation: sector-stabilized 1.5s ease-out forwards;
+}
+
+/* Mission Tree neon pulse — soft glow on connectors */
+@keyframes neon-pulse {
+  0%, 100% {
+    box-shadow: 0 0 2px rgba(var(--theme-accent-rgb), 0.3);
+    background-color: rgba(var(--theme-accent-rgb), 0.2);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(var(--theme-accent-rgb), 0.6);
+    background-color: rgba(var(--theme-accent-rgb), 0.4);
+  }
+}
+
+.neon-connector {
+  animation: neon-pulse 2.5s ease-in-out infinite;
+}
+
+/* Neon line — SVG / border glow for mission tree links */
+@keyframes neon-line-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    filter: drop-shadow(0 0 2px rgba(var(--theme-accent-rgb), 0.3));
+  }
+  50% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 6px rgba(var(--theme-accent-rgb), 0.6));
+  }
+}
+
+.neon-line {
+  animation: neon-line-pulse 2.5s ease-in-out infinite;
+}
+
+/* Status bar segmented display — industrial gauge style */
+@keyframes integrity-pulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.integrity-critical {
+  animation: integrity-pulse 1s ease-in-out infinite;
+}
+
+/* Holographic parallax container */
+.holographic-layer {
+  transition: transform 0.15s ease-out;
+  will-change: transform;
 }
 
 /* Selection color */

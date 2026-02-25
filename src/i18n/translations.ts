@@ -1,25 +1,25 @@
 const translations = {
   en: {
     // Panels
-    "panel.battleLog": "Operations Log",
-    "panel.quests": "Objectives",
-    "panel.explorer": "Explorer",
+    "panel.battleLog": "Command Console",
+    "panel.quests": "Operational Objectives",
+    "panel.explorer": "Asset Library",
     "panel.settings": "Settings",
 
     // Stats
-    "stats.level": "Level",
-    "stats.totalExp": "Total EXP",
-    "stats.hp": "HP",
-    "stats.mp": "MP",
-    "stats.exp": "EXP",
-    "stats.arcaneCoder": "Tactical Operative",
+    "stats.level": "Clearance",
+    "stats.totalExp": "Total Mastery",
+    "stats.hp": "SYS INTEGRITY",
+    "stats.mp": "CORE LOAD",
+    "stats.exp": "MASTERY",
+    "stats.arcaneCoder": "Bridge Commander",
 
     // Chat
     "chat.placeholder": "Execute command...",
     "chat.emptyState": "System initialized. Awaiting input...",
     "chat.spellReceived": "Command acknowledged.",
     "chat.connectionLost": "Connection to command server lost...",
-    "chat.noMp": "Insufficient energy for this operation!",
+    "chat.noMp": "Core load capacity exceeded!",
     "chat.missionLogs": "Mission Logs",
     "chat.newMission": "New Mission",
     "chat.deleteConfirm": "Delete this conversation?",
@@ -30,8 +30,8 @@ const translations = {
 
     // Level up
     "levelUp.title": "CLEARANCE UPGRADED",
-    "levelUp.continue": "Continue",
-    "levelUp.description": "System capabilities upgraded",
+    "levelUp.continue": "Acknowledge",
+    "levelUp.description": "Bridge authorization level increased",
 
     // Files / Editor
     "editor.selectFile": "Select a file to begin coding...",
@@ -41,8 +41,8 @@ const translations = {
 
     // Diff Viewer
     "diff.viewDiff": "View Diff",
-    "diff.apply": "Apply Changes +50 EXP",
-    "diff.applied": "Changes applied to",
+    "diff.apply": "Deploy Patch +50 MASTERY",
+    "diff.applied": "Patch deployed to",
     "diff.applyError": "Failed to apply changes",
     "diff.loading": "Loading editor...",
     "diff.codeBlock": "Code Block",
@@ -70,9 +70,9 @@ const translations = {
     "settings.aiConnected": "AI connected and ready",
     "settings.aiNotConfigured": "API key not configured",
     "settings.dangerZone": "Danger Zone",
-    "settings.resetProgress": "Reset Operative Progress",
+    "settings.resetProgress": "Reset Bridge Authorization",
     "settings.resetHint":
-      "Resets level, EXP, HP, and MP to starting values. This cannot be undone.",
+      "Resets clearance, mastery, system integrity, and core load to initial values. This cannot be undone.",
 
     // Settings - Auth
     "settings.authMethod": "Authentication Method",
@@ -91,9 +91,9 @@ const translations = {
     "welcome.configureAiTitle": "Configure AI Assistant",
     "welcome.configureAiDesc":
       "Set up your Anthropic API key and choose a model",
-    "welcome.questsTitle": "Scan Objectives",
+    "welcome.questsTitle": "Scan Operational Objectives",
     "welcome.questsDesc":
-      "Find TODOs in your code and turn them into objectives",
+      "Find TODOs in your code and convert them into operational objectives",
 
     // Welcome (legacy)
     "welcome.back":
@@ -101,25 +101,25 @@ const translations = {
     "welcome.error":
       "Command server unresponsive. Initialize backend to begin operations.",
 
-    // Quests / Objectives
-    "quests.active": "Active Objectives",
+    // Operational Objectives
+    "quests.active": "Active Operations",
     "quests.completed": "Completed",
-    "quests.addSample": "Add Sample Objective",
-    "quests.noActive": "No active objectives",
+    "quests.addSample": "Add Operational Objective",
+    "quests.noActive": "No active operational objectives",
 
-    // File Explorer
-    "explorer.title": "Explorer",
+    // Asset Library (File Explorer)
+    "explorer.title": "Asset Library",
     "explorer.refresh": "Refresh",
     "explorer.noRoot": "Set a workspace root in settings",
-    "explorer.empty": "No project loaded",
+    "explorer.empty": "No assets loaded",
     "explorer.collapse": "Collapse",
     "explorer.openFile": "Open",
 
     // Editor tabs
-    "editor.tabs.chat": "Chat",
+    "editor.tabs.chat": "CONSOLE",
     "editor.closeTab": "Close",
     "editor.save": "Save",
-    "editor.savedSuccess": "File saved +5 EXP",
+    "editor.savedSuccess": "Asset saved +5 MASTERY",
 
     // AI commit
     "git.generateMessage": "Generate commit message",
@@ -154,8 +154,8 @@ const translations = {
     "tool.executing": "Executing",
     "tool.runCommand": "Executing command",
     "tool.cmdSuccess": "Command completed successfully",
-    "tool.cmdFailed": "Command failed — HP damage: -{hp}",
-    "tool.cmdRepairHint": "Analyzing failure... initiating repair protocol",
+    "tool.cmdFailed": "Command failed — integrity loss: -{hp}",
+    "tool.cmdRepairHint": "[CRITICAL_ANOMALY_DETECTED] Analyzing failure... initiating repair protocol",
     "tool.dataAcquired": "Data acquired",
     "tool.success": "Success",
     "tool.fault": "Fault",
@@ -232,8 +232,8 @@ const translations = {
     "health.lines": "lines",
     "health.noIssues": "All clear",
     "health.error": "Scan failed",
-    "health.stabilize": "Initiate stabilization",
-    "health.alertDismissed": "Alert acknowledged",
+    "health.stabilize": "[INITIATE_STABILIZATION]",
+    "health.alertDismissed": "[ALERT_ACKNOWLEDGED]",
     "health.alertCritical":
       "[CRITICAL_ANOMALY]: Instability detected in sector `{sector}`. Bug probability elevated.",
     "health.alertFileSize": "Detected {count} file(s) exceeding 500 lines",
@@ -255,16 +255,16 @@ const translations = {
     "blast.dependents": "Affected systems",
     "blast.openMap": "Show on tactical map",
 
-    // Map
-    "map.title": "Tactical Map",
-    "map.loading": "Building graph...",
-    "map.noData": "No dependency data",
-    "map.dependencies": "Dependencies",
-    "map.dependents": "Dependents",
-    "map.files": "files",
+    // Strategic Radar
+    "map.title": "Strategic Radar",
+    "map.loading": "Building projection...",
+    "map.noData": "No structural data",
+    "map.dependencies": "Inbound",
+    "map.dependents": "Outbound",
+    "map.files": "assets",
     "map.lines": "lines",
-    "map.error": "Graph build failed",
-    "map.tab": "MAP",
+    "map.error": "Projection build failed",
+    "map.tab": "RADAR",
     "map.resetView": "Reset View",
     "map.fogOfWar": "Fog of War",
 
@@ -288,7 +288,7 @@ const translations = {
     "cmd.save": "Save File",
     "cmd.closeTab": "Close Tab",
     "cmd.newFile": "New File",
-    "cmd.toggleExplorer": "Toggle Explorer",
+    "cmd.toggleExplorer": "Toggle Asset Library",
     "cmd.toggleGit": "Toggle Git Panel",
     "cmd.toggleChronicle": "Toggle Chronicle",
     "cmd.toggleHealth": "Toggle Health Panel",
@@ -377,8 +377,8 @@ const translations = {
     "intel.processed":
       "[INTEL_PROCESSED]: Briefing analyzed. Intent formulated. Subtasks generated.",
     "intel.voiceCommand": "[VOICE_COMMAND]",
-    "intel.expBonus": "x1.5 EXP (briefing bonus)",
-    "intel.mpReward": "+5 MP (voice briefing)",
+    "intel.expBonus": "x1.5 MASTERY (briefing bonus)",
+    "intel.mpReward": "+5 CORE LOAD (voice briefing)",
     "cmd.toggleIntelFeed": "Intel Feed",
 
     // Sound packs
@@ -389,8 +389,8 @@ const translations = {
     "settings.soundRetro": "Retro Terminal",
 
     // Self-Repair
-    "repair.title": "SELF-REPAIR",
-    "repair.running": "Repairing...",
+    "repair.title": "AUTO-REPAIR PROTOCOL",
+    "repair.running": "[SECTOR_REPAIR_INITIATED]",
     "repair.toolStart": "Running {tool}...",
     "repair.toolDone": "{tool} — fixed",
     "repair.toolFailed": "{tool} — failed",
@@ -430,9 +430,9 @@ const translations = {
     "bridge.totalSignals": "{count} signals intercepted",
     "cmd.toggleBridge": "Command Bridge",
 
-    // COMMS (Telegram)
-    "comms.tab": "COMMS",
-    "comms.title": "COMMUNICATIONS DECK",
+    // COMMS Intercept (Telegram)
+    "comms.tab": "INTERCEPT",
+    "comms.title": "SIGNAL INTERCEPT",
     "comms.activeSignals": "Active Signals",
     "comms.noSignals": "No active signals detected",
     "comms.intercepted": "Intercepted Data Packets",
@@ -469,25 +469,25 @@ const translations = {
   },
   ru: {
     // Panels
-    "panel.battleLog": "Журнал операций",
-    "panel.quests": "Задачи",
-    "panel.explorer": "Проводник",
+    "panel.battleLog": "Командная консоль",
+    "panel.quests": "Оперативные цели",
+    "panel.explorer": "Библиотека активов",
     "panel.settings": "Настройки",
 
     // Stats
-    "stats.level": "Уровень",
-    "stats.totalExp": "Всего EXP",
-    "stats.hp": "HP",
-    "stats.mp": "MP",
-    "stats.exp": "EXP",
-    "stats.arcaneCoder": "Тактический оператор",
+    "stats.level": "Допуск",
+    "stats.totalExp": "Мастерство",
+    "stats.hp": "ЦЕЛОСТНОСТЬ",
+    "stats.mp": "НАГРУЗКА",
+    "stats.exp": "ПРОГРЕСС",
+    "stats.arcaneCoder": "Командир мостика",
 
     // Chat
     "chat.placeholder": "Выполнить команду...",
     "chat.emptyState": "Система инициализирована. Ожидание ввода...",
     "chat.spellReceived": "Команда принята.",
     "chat.connectionLost": "Связь с командным сервером потеряна...",
-    "chat.noMp": "Недостаточно энергии для операции!",
+    "chat.noMp": "Нагрузка на ядро превышена!",
     "chat.missionLogs": "Журнал миссий",
     "chat.newMission": "Новая миссия",
     "chat.deleteConfirm": "Удалить этот диалог?",
@@ -498,8 +498,8 @@ const translations = {
 
     // Level up
     "levelUp.title": "ДОПУСК ПОВЫШЕН",
-    "levelUp.continue": "Продолжить",
-    "levelUp.description": "Возможности системы улучшены",
+    "levelUp.continue": "Принято",
+    "levelUp.description": "Уровень авторизации мостика повышен",
 
     // Files / Editor
     "editor.selectFile": "Выберите файл, чтобы начать...",
@@ -509,8 +509,8 @@ const translations = {
 
     // Diff Viewer
     "diff.viewDiff": "Показать Diff",
-    "diff.apply": "Применить +50 EXP",
-    "diff.applied": "Изменения применены к",
+    "diff.apply": "Развернуть патч +50 ПРОГРЕСС",
+    "diff.applied": "Патч развёрнут для",
     "diff.applyError": "Не удалось применить изменения",
     "diff.loading": "Загрузка редактора...",
     "diff.codeBlock": "Блок кода",
@@ -538,9 +538,9 @@ const translations = {
     "settings.aiConnected": "ИИ подключён и готов",
     "settings.aiNotConfigured": "API ключ не настроен",
     "settings.dangerZone": "Опасная зона",
-    "settings.resetProgress": "Сбросить прогресс оператора",
+    "settings.resetProgress": "Сбросить авторизацию мостика",
     "settings.resetHint":
-      "Сбрасывает уровень, EXP, HP и MP до начальных значений. Отменить нельзя.",
+      "Сбрасывает допуск, прогресс, целостность и нагрузку до начальных значений. Отменить нельзя.",
 
     // Settings - Auth
     "settings.authMethod": "Метод аутентификации",
@@ -558,8 +558,8 @@ const translations = {
     "welcome.exploreDesc": "Сканировать структуру проекта и найти файлы",
     "welcome.configureAiTitle": "Настроить ИИ-ассистента",
     "welcome.configureAiDesc": "Указать API ключ Anthropic и выбрать модель",
-    "welcome.questsTitle": "Сканировать задачи",
-    "welcome.questsDesc": "Найти TODO в коде и превратить их в задачи",
+    "welcome.questsTitle": "Сканировать оперативные цели",
+    "welcome.questsDesc": "Найти TODO в коде и превратить в оперативные цели",
 
     // Welcome (legacy)
     "welcome.back":
@@ -567,25 +567,25 @@ const translations = {
     "welcome.error":
       "Командный сервер не отвечает. Запустите бэкенд для начала операций.",
 
-    // Quests / Objectives
-    "quests.active": "Активные задачи",
+    // Operational Objectives
+    "quests.active": "Активные операции",
     "quests.completed": "Завершённые",
-    "quests.addSample": "Добавить задачу",
-    "quests.noActive": "Нет активных задач",
+    "quests.addSample": "Добавить оперативную цель",
+    "quests.noActive": "Нет активных оперативных целей",
 
-    // File Explorer
-    "explorer.title": "Проводник",
+    // Asset Library (File Explorer)
+    "explorer.title": "Библиотека активов",
     "explorer.refresh": "Обновить",
     "explorer.noRoot": "Укажите корень проекта в настройках",
-    "explorer.empty": "Проект не загружен",
+    "explorer.empty": "Активы не загружены",
     "explorer.collapse": "Свернуть",
     "explorer.openFile": "Открыть",
 
     // Editor tabs
-    "editor.tabs.chat": "Чат",
+    "editor.tabs.chat": "КОНСОЛЬ",
     "editor.closeTab": "Закрыть",
     "editor.save": "Сохранить",
-    "editor.savedSuccess": "Файл сохранён +5 EXP",
+    "editor.savedSuccess": "Актив сохранён +5 ПРОГРЕСС",
 
     // AI commit
     "git.generateMessage": "Сгенерировать сообщение коммита",
@@ -620,8 +620,8 @@ const translations = {
     "tool.executing": "Выполнение",
     "tool.runCommand": "Выполнение команды",
     "tool.cmdSuccess": "Команда выполнена успешно",
-    "tool.cmdFailed": "Команда провалена — урон HP: -{hp}",
-    "tool.cmdRepairHint": "Анализ ошибки... запуск протокола ремонта",
+    "tool.cmdFailed": "Команда провалена — потеря целостности: -{hp}",
+    "tool.cmdRepairHint": "[CRITICAL_ANOMALY_DETECTED] Анализ ошибки... запуск протокола ремонта",
     "tool.dataAcquired": "Данные получены",
     "tool.success": "Успех",
     "tool.fault": "Ошибка",
@@ -698,8 +698,8 @@ const translations = {
     "health.lines": "строк",
     "health.noIssues": "Всё чисто",
     "health.error": "Ошибка сканирования",
-    "health.stabilize": "Начать стабилизацию",
-    "health.alertDismissed": "Тревога принята",
+    "health.stabilize": "[НАЧАТЬ_СТАБИЛИЗАЦИЮ]",
+    "health.alertDismissed": "[ТРЕВОГА_ПРИНЯТА]",
     "health.alertCritical":
       "[CRITICAL_ANOMALY]: Обнаружена нестабильность в секторе `{sector}`. Вероятность багов повышена.",
     "health.alertFileSize": "Обнаружено {count} файл(ов) свыше 500 строк",
@@ -722,16 +722,16 @@ const translations = {
     "blast.dependents": "Затронутые системы",
     "blast.openMap": "Показать на тактической карте",
 
-    // Map
-    "map.title": "Тактическая карта",
-    "map.loading": "Построение графа...",
-    "map.noData": "Нет данных о зависимостях",
-    "map.dependencies": "Зависимости",
-    "map.dependents": "Зависимые",
-    "map.files": "файлов",
+    // Strategic Radar
+    "map.title": "Стратегический радар",
+    "map.loading": "Построение проекции...",
+    "map.noData": "Нет структурных данных",
+    "map.dependencies": "Входящие",
+    "map.dependents": "Исходящие",
+    "map.files": "активов",
     "map.lines": "строк",
-    "map.error": "Ошибка построения графа",
-    "map.tab": "КАРТА",
+    "map.error": "Ошибка построения проекции",
+    "map.tab": "РАДАР",
     "map.resetView": "Сброс вида",
     "map.fogOfWar": "Туман войны",
 
@@ -755,7 +755,7 @@ const translations = {
     "cmd.save": "Сохранить файл",
     "cmd.closeTab": "Закрыть вкладку",
     "cmd.newFile": "Новый файл",
-    "cmd.toggleExplorer": "Проводник",
+    "cmd.toggleExplorer": "Библиотека активов",
     "cmd.toggleGit": "Git панель",
     "cmd.toggleChronicle": "Хроника",
     "cmd.toggleHealth": "Оценка угроз",
@@ -844,8 +844,8 @@ const translations = {
     "intel.processed":
       "[INTEL_PROCESSED]: Брифинг проанализирован. Намерение сформулировано. Подзадачи сгенерированы.",
     "intel.voiceCommand": "[VOICE_COMMAND]",
-    "intel.expBonus": "x1.5 EXP (бонус брифинга)",
-    "intel.mpReward": "+5 MP (голосовой брифинг)",
+    "intel.expBonus": "x1.5 ПРОГРЕСС (бонус брифинга)",
+    "intel.mpReward": "+5 НАГРУЗКА (голосовой брифинг)",
     "cmd.toggleIntelFeed": "Разведданные",
 
     // Sound packs
@@ -856,8 +856,8 @@ const translations = {
     "settings.soundRetro": "Ретро-терминал",
 
     // Self-Repair
-    "repair.title": "АВТОРЕМОНТ",
-    "repair.running": "Ремонт...",
+    "repair.title": "ПРОТОКОЛ АВТОРЕМОНТА",
+    "repair.running": "[РЕМОНТ_СЕКТОРА_ИНИЦИИРОВАН]",
     "repair.toolStart": "Запуск {tool}...",
     "repair.toolDone": "{tool} — исправлено",
     "repair.toolFailed": "{tool} — ошибка",
@@ -898,9 +898,9 @@ const translations = {
     "bridge.totalSignals": "{count} сигналов перехвачено",
     "cmd.toggleBridge": "Командный мостик",
 
-    // COMMS (Telegram)
-    "comms.tab": "СВЯЗЬ",
-    "comms.title": "ПУЛЬТ СВЯЗИ",
+    // COMMS Intercept (Telegram)
+    "comms.tab": "ПЕРЕХВАТ",
+    "comms.title": "ПЕРЕХВАТ СИГНАЛОВ",
     "comms.activeSignals": "Активные сигналы",
     "comms.noSignals": "Активных сигналов не обнаружено",
     "comms.intercepted": "Перехваченные пакеты данных",
